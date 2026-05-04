@@ -1,0 +1,81 @@
+services:
+    ai:
+        build:
+            context: ./ai/
+            dockerfile: Dockerfile
+        container_name: cultural-brain-ai
+        volumes:
+            - ./ai:/app
+        environment:
+            QDRANT_HOST: vector-db
+            GEMINI_API_KEY: ${GEMINI_API_KEY}
+        ports:
+            - "8001:8000"
+        depends_on:
+            - vector-db
+        networks:
+            - tourism-network
+
+    backend:
+        build:
+            context: ./backend/
+            dockerfile: Dockerfile
+        container_name: cultural-brain-be
+        volumes:
+            - ./backend:/app
+        environment:
+            DATABASE_URL: ${DATABASE_URL}
+            AI_CORE_URL: http://ai:8000
+            GOONG_API_KEY: ${GOONG_API_KEY}
+            WEATHER_API_KEY: ${WEATHER_API_KEY}
+        ports:
+            - "8000:8000"
+        depends_on:
+            - postgres-db
+            - ai
+        networks:
+            - tourism-network
+    
+    web-app:
+        build:
+            context: ./web/
+            dockerfile: Dockerfile
+        container_name: cultural-brain-web
+        ports:
+            - "3000:3000"
+        environment:
+            NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        networks:
+            - tourism-network
+
+    vector-db:
+        image: qdrant/qdrant:latest
+        container_name: cultural-brain-qdrant
+        ports:
+            - "6333:6333"
+        volumes:
+            - qdrant_data:/qdrant/storage
+        networks:
+            - tourism-network
+            
+    postgres-db:
+        image: postgres:15-alpine
+        container_name: cultural-brain-postgres
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        ports:
+            - "4000:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - tourism-network
+
+networks:
+    tourism-network:
+        driver: bridge
+        
+volumes:
+    qdrant_data:
+    postgres_data:

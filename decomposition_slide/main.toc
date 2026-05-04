@@ -1,3 +1,0 @@
-\babel@toc {vietnamese}{}\relax 
-\beamer@sectionintoc {1}{VietVibe - MultiAgent Smart Tourism System}{3}{0}{1}
-\beamer@subsectionintoc {1}{1}{Abstract}{3}{0}{1}
