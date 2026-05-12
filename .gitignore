@@ -1,5 +1,6 @@
 .agents/
 .superpowers/
+docs/
 slides/
 .env
 .slides/
