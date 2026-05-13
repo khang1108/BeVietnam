@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">BeVietnam</string>
+    <string name="app_tagline">Khám phá vẻ đẹp Việt Nam</string>
+    <string name="tab_login">Đăng nhập</string>
+    <string name="tab_register">Đăng ký</string>
+    <string name="email">Email</string>
+    <string name="hint_email">Nhập email của bạn</string>
+    <string name="password">Mật khẩu</string>
+    <string name="hint_password">Nhập mật khẩu</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="login">Đăng nhập</string>
+    <string name="create_account">Tạo tài khoản mới</string>
+    <string name="full_name">Họ và tên</string>
+    <string name="hint_full_name">Nhập họ và tên của bạn</string>
+    <string name="gender">Giới tính</string>
+    <string name="date_of_birth">Ngày sinh</string>
+    <string name="hint_email_register">Nhập email đăng ký</string>
+    <string name="hint_password_register">Nhập mật khẩu (ít nhất 6 ký tự)</string>
+    <string name="register">Đăng ký</string>
+    <string name="already_have_account">Đã có tài khoản? Đăng nhập</string>
+    <string name="gender_male">Nam</string>
+    <string name="gender_female">Nữ</string>
+    <string name="or_divider">Hoặc</string>
+
+    <!-- Profile Screen -->
+    <string name="avatar">Ảnh đại diện</string>
+    <string name="edit_profile">Chỉnh sửa hồ sơ</string>
+    <string name="share">Chia sẻ</string>
+    <string name="display_name">Tên hiển thị</string>
+    <string name="bio">Giới thiệu</string>
+    <string name="cancel">Hủy</string>
+    <string name="save">Lưu</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="app_version">Phiên bản 1.0.0</string>
+</resources>
