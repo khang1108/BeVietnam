@@ -12,3 +12,14 @@ submit/
 .venv-google-sheets/
 __pycache__/
 *.py[cod]
+
+# Web dependency and build outputs
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# Logs and local OS/editor noise
+*.log
+.DS_Store
