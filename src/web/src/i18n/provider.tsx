@@ -15,15 +15,21 @@ const I18nContext = createContext<I18nContextType>({
   t: (key: string) => key,
 });
 
+function getInitialLocale(): Locale {
+  if (typeof window === 'undefined') {
+    return defaultLocale;
+  }
+
+  const saved = localStorage.getItem('bevietnam-locale') as Locale | null;
+  return saved === 'vi' || saved === 'en' ? saved : defaultLocale;
+}
+
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(defaultLocale);
+  const [locale, setLocaleState] = useState<Locale>(getInitialLocale);
 
   useEffect(() => {
-    const saved = localStorage.getItem('bevietnam-locale') as Locale | null;
-    if (saved && (saved === 'vi' || saved === 'en')) {
-      setLocaleState(saved);
-    }
-  }, []);
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);

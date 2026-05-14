@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: bevietnam-ai
     volumes:
-      - ./src/ai/app:/app/app
+      - ./src/ai:/app/ai
     environment:
       QDRANT_HOST: vector-db
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
@@ -25,7 +25,7 @@ services:
       - ./src/backend/app:/app/app
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://bevietnam:bevietnam@postgres-db:5432/bevietnam}
-      AI_CORE_URL: http://ai:8000
+      AI_CORE_BASE_URL: http://ai:8000
       GOONG_API_KEY: ${GOONG_API_KEY:-}
       WEATHER_API_KEY: ${WEATHER_API_KEY:-}
     ports:
@@ -33,6 +33,23 @@ services:
     depends_on:
       - postgres-db
       - ai
+    networks:
+      - bevietnam-network
+
+  web:
+    image: node:22-alpine
+    container_name: bevietnam-web
+    working_dir: /app
+    volumes:
+      - ./src/web:/app
+      - web_node_modules:/app/node_modules
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+    command: sh -c "npm install && npm run dev -- --hostname 0.0.0.0"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
     networks:
       - bevietnam-network
 
@@ -67,3 +84,4 @@ networks:
 volumes:
   qdrant_data:
   postgres_data:
+  web_node_modules:

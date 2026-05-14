@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/i18n';
 import { useTheme } from '@/hooks/useTheme';
-import { localeNames, Locale } from '@/i18n/translations';
+import { localeNames } from '@/i18n/translations';
 import { IconCalendar, IconExplore, IconFeed, IconSparkle } from '@/components/icons/UiIcons';
 import styles from './Navbar.module.css';
 

@@ -16,23 +16,25 @@ const ThemeContext = createContext<ThemeContextType>({
   setTheme: () => {},
 });
 
+function getInitialTheme(): Theme {
+  if (typeof window === 'undefined') {
+    return 'light';
+  }
+
+  const saved = localStorage.getItem('bevietnam-theme') as Theme | null;
+  if (saved === 'light' || saved === 'dark') {
+    return saved;
+  }
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
-  const [mounted, setMounted] = useState(false);
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem('bevietnam-theme') as Theme | null;
-    if (saved && (saved === 'light' || saved === 'dark')) {
-      setThemeState(saved);
-      document.documentElement.setAttribute('data-theme', saved);
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const defaultTheme = prefersDark ? 'dark' : 'light';
-      setThemeState(defaultTheme);
-      document.documentElement.setAttribute('data-theme', defaultTheme);
-    }
-  }, []);
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   const setTheme = useCallback((newTheme: Theme) => {
     setThemeState(newTheme);
@@ -43,11 +45,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const toggleTheme = useCallback(() => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   }, [theme, setTheme]);
-
-  // Prevent flash of wrong theme
-  if (!mounted) {
-    return <>{children}</>;
-  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
