@@ -1,8 +1,8 @@
 package com.bevietnam.ui.screens.feed
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -16,9 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bevietnam.core.model.FeedItem
-import com.bevietnam.ui.components.ErrorView
-import com.bevietnam.ui.components.FeedCard
-import com.bevietnam.ui.components.LoadingIndicator
+import com.bevietnam.ui.components.*
 import com.bevietnam.ui.theme.BeVietnamTheme
 
 @Composable
@@ -30,7 +28,9 @@ fun FeedScreen(
     FeedScreenContent(
         uiState = uiState,
         onRetry = viewModel::loadFeed,
-        onLikeClick = viewModel::onLikeClick
+        onLikeClick = viewModel::onLikeClick,
+        onSearchQueryChange = viewModel::onSearchQueryChange,
+        onCategorySelect = viewModel::onCategorySelect
     )
 }
 
@@ -38,10 +38,13 @@ fun FeedScreen(
 fun FeedScreenContent(
     uiState: FeedUiState,
     onRetry: () -> Unit,
-    onLikeClick: (String) -> Unit
+    onLikeClick: (String) -> Unit,
+    onSearchQueryChange: (String) -> Unit,
+    onCategorySelect: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         color = Color(0xFFFAF5E4)
     ) {
         when {
@@ -50,18 +53,47 @@ fun FeedScreenContent(
                 message = uiState.errorMessage!!,
                 onRetry = onRetry
             )
-            uiState.feedItems.isEmpty() && !uiState.isLoading -> FeedEmptyState()
             else -> {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(uiState.feedItems) { item ->
-                        FeedCard(
-                            feedItem = item,
-                            onLikeClick = { onLikeClick(item.id) }
+                    item {
+                        SearchBar(
+                            query = uiState.searchQuery,
+                            onQueryChanged = onSearchQueryChange,
+                            placeholder = "Khám phá Việt Nam..."
                         )
+                    }
+
+                    item {
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            contentPadding = PaddingValues(vertical = 8.dp)
+                        ) {
+                            items(uiState.categories) { category ->
+                                CategoryChip(
+                                    category = category,
+                                    isSelected = uiState.selectedCategory == category,
+                                    onSelected = { onCategorySelect(category) }
+                                )
+                            }
+                        }
+                    }
+
+                    if (uiState.filteredItems.isEmpty() && !uiState.isLoading) {
+                        item {
+                            FeedEmptyState()
+                        }
+                    } else {
+                        items(uiState.filteredItems) { item ->
+                            FeedCard(
+                                feedItem = item,
+                                onLikeClick = { onLikeClick(item.id) }
+                            )
+                        }
                     }
                 }
             }
@@ -72,14 +104,16 @@ fun FeedScreenContent(
 @Composable
 private fun FeedEmptyState() {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 64.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "📭", fontSize = 64.sp)
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Chưa có bài đăng nào",
+            text = "Không tìm thấy bài đăng nào",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -93,33 +127,27 @@ fun FeedScreenPreview() {
         FeedItem(
             id = "1",
             userId = "u1",
-            userName = "Sơn Tùng M-TP",
+            userName = "Fabian",
             userAvatarUrl = "",
-            content = "Vừa ghé thăm Vịnh Hạ Long, vẻ đẹp thật hùng vĩ! 🌊",
+            content = "Hạ Long thật tuyệt!",
             imageUrl = null,
             timestamp = "2 giờ trước",
             likesCount = 1250,
             commentsCount = 45,
-            location = "Quảng Ninh"
-        ),
-        FeedItem(
-            id = "2",
-            userId = "u2",
-            userName = "H'Hen Niê",
-            userAvatarUrl = "",
-            content = "Bún đậu mắm tôm Hà Nội luôn là chân ái.",
-            imageUrl = null,
-            timestamp = "5 giờ trước",
-            likesCount = 890,
-            commentsCount = 120,
-            location = "Hà Nội"
+            location = "Hà Nội, Việt Nam",
+            category = "Travel"
         )
     )
     BeVietnamTheme {
         FeedScreenContent(
-            uiState = FeedUiState(feedItems = mockFeedItems),
+            uiState = FeedUiState(
+                feedItems = mockFeedItems,
+                filteredItems = mockFeedItems
+            ),
             onRetry = {},
-            onLikeClick = {}
+            onLikeClick = {},
+            onSearchQueryChange = {},
+            onCategorySelect = {}
         )
     }
 }
