@@ -15,7 +15,11 @@ import javax.inject.Inject
 data class FeedUiState(
     val isLoading: Boolean = false,
     val feedItems: List<FeedItem> = emptyList(),
-    val errorMessage: String? = null
+    val filteredItems: List<FeedItem> = emptyList(),
+    val errorMessage: String? = null,
+    val searchQuery: String = "",
+    val categories: List<String> = listOf("Tất cả", "Travel", "Football", "Food", "Culture", "Music"),
+    val selectedCategory: String = "Tất cả"
 )
 
 @HiltViewModel
@@ -35,7 +39,13 @@ class FeedViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 getFeedUseCase().collect { items ->
-                    _uiState.update { it.copy(isLoading = false, feedItems = items) }
+                    _uiState.update { 
+                        it.copy(
+                            isLoading = false, 
+                            feedItems = items,
+                            filteredItems = filterItems(items, it.searchQuery, it.selectedCategory)
+                        ) 
+                    }
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
@@ -43,7 +53,46 @@ class FeedViewModel @Inject constructor(
         }
     }
 
+    fun onSearchQueryChange(query: String) {
+        _uiState.update { 
+            val filtered = filterItems(it.feedItems, query, it.selectedCategory)
+            it.copy(searchQuery = query, filteredItems = filtered) 
+        }
+    }
+
+    fun onCategorySelect(category: String) {
+        _uiState.update { 
+            val filtered = filterItems(it.feedItems, it.searchQuery, category)
+            it.copy(selectedCategory = category, filteredItems = filtered) 
+        }
+    }
+
+    private fun filterItems(items: List<FeedItem>, query: String, category: String): List<FeedItem> {
+        return items.filter { item ->
+            val matchesQuery = item.content.contains(query, ignoreCase = true) || 
+                               item.userName.contains(query, ignoreCase = true)
+            val matchesCategory = if (category == "Tất cả") true else item.category == category
+            matchesQuery && matchesCategory
+        }
+    }
+
     fun onLikeClick(feedId: String) {
-        // Implementation for like logic
+        _uiState.update { currentState ->
+            val updatedItems = currentState.feedItems.map { item ->
+                if (item.id == feedId) {
+                    val newIsLiked = !item.isLiked
+                    item.copy(
+                        isLiked = newIsLiked,
+                        likesCount = if (newIsLiked) item.likesCount + 1 else item.likesCount - 1
+                    )
+                } else {
+                    item
+                }
+            }
+            currentState.copy(
+                feedItems = updatedItems,
+                filteredItems = filterItems(updatedItems, currentState.searchQuery, currentState.selectedCategory)
+            )
+        }
     }
 }
