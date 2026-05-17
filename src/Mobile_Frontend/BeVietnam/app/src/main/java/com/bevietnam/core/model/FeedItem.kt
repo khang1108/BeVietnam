@@ -10,6 +10,7 @@ data class FeedItem(
     val timestamp: String,
     val likesCount: Int = 0,
     val commentsCount: Int = 0,
+    val isLiked: Boolean = false,
     val location: String? = null,
     val category: String? = "Travel"
 )
