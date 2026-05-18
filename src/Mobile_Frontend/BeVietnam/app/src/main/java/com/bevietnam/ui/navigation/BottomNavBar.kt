@@ -1,10 +1,5 @@
 package com.bevietnam.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -12,12 +7,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
 import kotlin.reflect.KClass
 
 /**
  * Bottom navigation bar
- * Navigation logic sẽ được implement ở task sau.
  * [currentRouteClass] là route đang active để highlight tab.
  */
 @Composable
@@ -27,7 +21,7 @@ fun BottomNavBar(
 ) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = androidx.compose.ui.unit.Dp.Hairline
+        tonalElevation = Dp.Hairline
     ) {
         Screen.bottomNavItems.forEach { item ->
             val selected = currentRouteClass == item.route::class
