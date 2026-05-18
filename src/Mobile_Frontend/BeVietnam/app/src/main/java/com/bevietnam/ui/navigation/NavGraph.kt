@@ -17,11 +17,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.bevietnam.ui.screens.auth.AuthScreen
 import com.bevietnam.ui.screens.profile.ProfileScreen
-
 import com.bevietnam.MainViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bevietnam.core.model.User
 import com.bevietnam.ui.components.AppTopBar
+import com.bevietnam.ui.screens.capture.CaptureScreen
 
 @androidx.compose.material3.ExperimentalMaterial3Api
 @Composable
@@ -29,6 +30,22 @@ fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     mainViewModel: MainViewModel = hiltViewModel()
+) {
+    val currentUser by mainViewModel.currentUser.collectAsStateWithLifecycle()
+
+    AppNavHostContent(
+        navController = navController,
+        currentUser = currentUser,
+        modifier = modifier
+    )
+}
+
+@androidx.compose.material3.ExperimentalMaterial3Api
+@Composable
+fun AppNavHostContent(
+    navController: NavHostController,
+    currentUser: User?,
+    modifier: Modifier = Modifier
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -41,8 +58,6 @@ fun AppNavHost(
         currentDestination?.hasRoute(item.route::class) == true
     }?.route?.let { it::class }
 
-    val currentUser by mainViewModel.currentUser.collectAsStateWithLifecycle()
-
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -51,6 +66,16 @@ fun AppNavHost(
                     avatarUrl = currentUser?.avatarUrl,
                     onAvatarClick = {
                         navController.navigate(ProfileRoute(currentUser?.id ?: "")) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    showCreatePost = true,
+                    onCreatePostClick = {
+                        navController.navigate(CameraRoute) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }
@@ -86,8 +111,6 @@ fun AppNavHost(
             composable<AuthRoute> {
                 AuthScreen(
                     onNavigateToProfile = { userId ->
-                        // Navigate to default tab (Feed) instead of Profile 
-                        // when login is done, but since Feed isn't ready we keep Profile
                         navController.navigate(ProfileRoute(userId)) {
                             popUpTo<AuthRoute> { inclusive = true }
                         }
@@ -102,20 +125,28 @@ fun AppNavHost(
             composable<FeedRoute> { 
                 com.bevietnam.ui.screens.feed.FeedScreen() 
             }
+
+            composable<CameraRoute> {
+                CaptureScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
             
             composable<StorylineRoute> { 
                 com.bevietnam.ui.screens.storyline.StorylineScreen() 
             }
-            
-            composable<CommunityRoute> { 
-                PlaceholderScreen("Cộng đồng") 
+
+            composable<CommunityRoute> {
+                PlaceholderScreen("Cộng đồng")
             }
 
             composable<ProfileRoute> {
                 ProfileScreen(
                     onNavigateToLogin = {
                         navController.navigate(AuthRoute) {
-                            popUpTo(0) // Clear toàn bộ backstack
+                            popUpTo(0)
                         }
                     }
                 )
