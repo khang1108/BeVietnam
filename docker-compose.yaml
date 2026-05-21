@@ -1,0 +1,117 @@
+services:
+  ai:
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    container_name: bevietnam-ai
+    volumes:
+      - ./ai:/app/ai
+    environment:
+      # Local Qdrant (more reliable for demo)
+      QDRANT_HOST: vector-db
+      QDRANT_PORT: 6333
+      # Gemini LLM
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    ports:
+      - "8001:8000"
+    depends_on:
+      - vector-db
+    networks:
+      - bevietnam-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bevietnam-backend
+    volumes:
+      - ./backend/app:/app/app
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://bevietnam:bevietnam@postgres-db:5432/bevietnam}
+      AI_CORE_BASE_URL: http://ai:8000
+      AI_CORE_USE_MOCK: "false"
+      # Must exceed first-run bge-m3 download + load + Gemini (see backend app.core.config)
+      AI_CORE_TIMEOUT: "300"
+      GOONG_API_KEY: ${GOONG_API_KEY:-}
+      WEATHER_API_KEY: ${WEATHER_API_KEY:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres-db
+      - ai
+    networks:
+      - bevietnam-network
+
+  web:
+    image: node:22-alpine
+    container_name: bevietnam-web
+    working_dir: /app
+    volumes:
+      - ./web:/app
+      - web_node_modules:/app/node_modules
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+    command: sh -c "npm install && npm run dev -- --hostname 0.0.0.0"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - bevietnam-network
+
+  # Local Qdrant vector database (for cultural knowledge retrieval)
+  vector-db:
+    image: qdrant/qdrant:latest
+    container_name: bevietnam-qdrant-local
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - bevietnam-network
+
+  # Seed Qdrant with cultural data (run once, then stops)
+  # Usage: docker compose --profile seed run --rm seed-qdrant
+  seed-qdrant:
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    container_name: bevietnam-seed
+    volumes:
+      - ./ai:/app/ai
+      - ./scripts:/app/scripts
+    environment:
+      QDRANT_HOST: vector-db
+      QDRANT_PORT: 6333
+    entrypoint: python
+    command: ["/app/scripts/seed_qdrant.py"]
+    working_dir: /app
+    depends_on:
+      - vector-db
+    profiles:
+      - seed
+    networks:
+      - bevietnam-network
+
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: bevietnam-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bevietnam}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bevietnam}
+      POSTGRES_DB: ${POSTGRES_DB:-bevietnam}
+    ports:
+      - "4000:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bevietnam-network
+
+networks:
+  bevietnam-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  web_node_modules:
+  qdrant_data:

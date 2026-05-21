@@ -1,0 +1,65 @@
+"""
+AI Core Configuration.
+
+Loads settings from environment variables (via pydantic-settings).
+All external service connections (Qdrant, Gemini, embedding model)
+are configured here so agent code never hardcodes URLs or keys.
+
+Supports both:
+  - Qdrant Cloud (QDRANT_CLUSTER_ENDPOINT + QDRANT_API_KEY)
+  - Local Qdrant (QDRANT_HOST + QDRANT_PORT via Docker)
+
+Usage:
+    from ai.common.config import settings
+    print(settings.gemini_api_key)
+"""
+
+from pydantic_settings import BaseSettings
+
+
+class Settings(BaseSettings):
+    """
+    Central configuration for the AI Core service.
+
+    Environment variables override defaults.
+    For local dev, values come from the root .env file.
+    In Docker, they come from docker-compose environment section.
+    """
+
+    # ── Qdrant (Vector Database) ──────────────────────────────────────────────
+    # Option 1: Qdrant Cloud (preferred for demo — already provisioned)
+    qdrant_cluster_endpoint: str = ""
+    qdrant_api_key: str = ""
+    qdrant_cluster_id: str = ""
+
+    # Option 2: Local Qdrant (via Docker)
+    qdrant_host: str = "vector-db"
+    qdrant_port: int = 6333
+
+    # Collection name (shared between cloud and local)
+    qdrant_collection: str = "cultural_knowledge"
+
+    # ── Embedding Model (local, open source) ──────────────────────────────────
+    embedding_model_name: str = "BAAI/bge-m3"
+    embedding_dimension: int = 1024  # bge-m3 dense embedding dimension
+
+    # ── LLM (Gemini) ─────────────────────────────────────────────────────────
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-2.0-flash"
+    llm_provider: str = "gemini"  # "gemini" or "mock"
+
+    # ── General ───────────────────────────────────────────────────────────────
+    log_level: str = "INFO"
+
+    @property
+    def use_qdrant_cloud(self) -> bool:
+        """True if Qdrant Cloud credentials are configured."""
+        return bool(self.qdrant_cluster_endpoint and self.qdrant_api_key)
+
+    class Config:
+        env_file = ".env"
+        case_sensitive = False
+        extra = "ignore"
+
+
+settings = Settings()

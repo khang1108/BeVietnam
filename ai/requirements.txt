@@ -1,0 +1,19 @@
+# ── AI Core Dependencies ──────────────────────────────────────────────────────
+# Core API framework
+fastapi>=0.100
+uvicorn>=0.20
+python-multipart>=0.0.8
+pydantic-settings>=2.0
+
+# LLM integration (Gemini)
+google-genai>=1.0
+
+# Agent workflow orchestration
+langgraph>=0.2
+
+# Vector database
+qdrant-client>=1.7
+
+# Embedding model (local, open source — BAAI/bge-m3)
+sentence-transformers>=3.0
+torch>=2.0

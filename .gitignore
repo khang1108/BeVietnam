@@ -1,5 +1,26 @@
 .agents/
 .superpowers/
-decomposition_slide/
-src/app/.next/
-src/app/node_modules/
+docs/
+slides/
+.env
+.slides/
+.vscode/
+PA_Decomposition.md
+submit/
+.secrets/
+.claude/
+.venv-google-sheets/
+__pycache__/
+*.py[cod]
+
+# Web dependency and build outputs
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# Logs and local OS/editor noise
+*.log
+.DS_Store
+.idea/
