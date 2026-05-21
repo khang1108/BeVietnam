@@ -1,11 +1,11 @@
 services:
   ai:
     build:
-      context: ./src/ai
+      context: ./ai
       dockerfile: Dockerfile
     container_name: bevietnam-ai
     volumes:
-      - ./src/ai:/app/ai
+      - ./ai:/app/ai
     environment:
       # Local Qdrant (more reliable for demo)
       QDRANT_HOST: vector-db
@@ -21,15 +21,17 @@ services:
 
   backend:
     build:
-      context: ./src/backend
+      context: ./backend
       dockerfile: Dockerfile
     container_name: bevietnam-backend
     volumes:
-      - ./src/backend/app:/app/app
+      - ./backend/app:/app/app
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://bevietnam:bevietnam@postgres-db:5432/bevietnam}
       AI_CORE_BASE_URL: http://ai:8000
       AI_CORE_USE_MOCK: "false"
+      # Must exceed first-run bge-m3 download + load + Gemini (see backend app.core.config)
+      AI_CORE_TIMEOUT: "300"
       GOONG_API_KEY: ${GOONG_API_KEY:-}
       WEATHER_API_KEY: ${WEATHER_API_KEY:-}
     ports:
@@ -45,7 +47,7 @@ services:
     container_name: bevietnam-web
     working_dir: /app
     volumes:
-      - ./src/web:/app
+      - ./web:/app
       - web_node_modules:/app/node_modules
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
@@ -72,12 +74,12 @@ services:
   # Usage: docker compose --profile seed run --rm seed-qdrant
   seed-qdrant:
     build:
-      context: ./src/ai
+      context: ./ai
       dockerfile: Dockerfile
     container_name: bevietnam-seed
     volumes:
-      - ./src/ai:/app/ai
-      - ./src/scripts:/app/scripts
+      - ./ai:/app/ai
+      - ./scripts:/app/scripts
     environment:
       QDRANT_HOST: vector-db
       QDRANT_PORT: 6333

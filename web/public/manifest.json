@@ -1,0 +1,15 @@
+{
+  "name": "BeVietnam - Smart Tourism System",
+  "short_name": "BeVietnam",
+  "description": "Khám phá Việt Nam thông minh - Discover Vietnam with cultural depth",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#e6b422",
+  "orientation": "portrait-primary",
+  "icons": [],
+
+  "categories": ["travel", "tourism", "lifestyle"],
+  "lang": "vi",
+  "dir": "ltr"
+}
