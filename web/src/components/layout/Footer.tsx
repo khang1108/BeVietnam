@@ -31,6 +31,7 @@ export default function Footer() {
             <div className={styles.footerLinks}>
               <Link href="/" className={styles.footerLink}>📰 {t('nav.feed')}</Link>
               <Link href="/explore" className={styles.footerLink}>🗺️ {t('nav.explore')}</Link>
+              <Link href="/storyline" className={styles.footerLink}>🧭 {t('nav.storyline')}</Link>
               <Link href="/events" className={styles.footerLink}>
                 <span className={styles.footerIcon} aria-hidden="true">
                   <IconCalendar />

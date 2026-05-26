@@ -18,6 +18,7 @@ const mockEvents = [
         type_vi: 'Đang diễn ra',
         type_en: 'Ongoing',
         free: true,
+        image: '/images/event-aodai.png',
     },
     {
         id: 2,
@@ -31,6 +32,7 @@ const mockEvents = [
         type_vi: 'Sắp diễn ra',
         type_en: 'Upcoming',
         free: false,
+        image: '/images/event-hue.png',
     },
     {
         id: 3,
@@ -44,6 +46,7 @@ const mockEvents = [
         type_vi: 'Sắp diễn ra',
         type_en: 'Upcoming',
         free: false,
+        image: '/images/event-jazz.png',
     },
     {
         id: 4,
@@ -57,6 +60,7 @@ const mockEvents = [
         type_vi: 'Sắp diễn ra',
         type_en: 'Upcoming',
         free: true,
+        image: '/images/event-streetfood.png',
     },
     {
         id: 5,
@@ -70,6 +74,7 @@ const mockEvents = [
         type_vi: 'Sắp diễn ra',
         type_en: 'Upcoming',
         free: true,
+        image: '/images/event-art.png',
     },
 ];
 
@@ -112,6 +117,11 @@ export function EventsPage() {
             <div className={styles.eventList}>
                 {mockEvents.map((event) => (
                     <Link key={event.id} href={`/event/${event.id}`} className={styles.eventCard}>
+                        {event.image && (
+                            <div style={{ width: '80px', height: '80px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', flexShrink: 0 }}>
+                                <img src={event.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </div>
+                        )}
                         <div className={styles.eventDate}>
                             <span className={styles.eventDateMonth}>{event.month}</span>
                             <span className={styles.eventDateDay}>{event.day}</span>

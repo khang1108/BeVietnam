@@ -8,7 +8,7 @@ import styles from './page.module.css';
 
 const mockFeedItems = [
   {
-    id: 1,
+    id: 11,
     icon: '🏛️',
     category: 'culture',
     badge: 'Trending',
@@ -18,9 +18,10 @@ const mockFeedItems = [
     desc_en: 'Discover the beauty of Hoi An ancient town with its old houses, lanterns, and distinctive cuisine.',
     location: 'Quảng Nam',
     time: '2h',
+    image: '/images/hoian-lanterns.png',
   },
   {
-    id: 2,
+    id: 12,
     icon: <IconFood className={styles.feedIconSvg} />,
     category: 'food',
     badge: 'Popular',
@@ -30,9 +31,10 @@ const mockFeedItems = [
     desc_en: 'The story behind authentic Hanoi Pho with over 100 years of history.',
     location: 'Hà Nội',
     time: '5h',
+    image: '/images/hanoi-pho.png',
   },
   {
-    id: 3,
+    id: 13,
     icon: <IconMountain className={styles.feedIconSvg} />,
     category: 'nature',
     badge: 'New',
@@ -42,9 +44,10 @@ const mockFeedItems = [
     desc_en: 'The golden harvest season on the stunning terraced rice fields of the Northwest.',
     location: 'Yên Bái',
     time: '1d',
+    image: '/images/terraced-rice-fields.png',
   },
   {
-    id: 4,
+    id: 14,
     icon: '🎭',
     category: 'culture',
     badge: null,
@@ -54,9 +57,10 @@ const mockFeedItems = [
     desc_en: 'Traditional Vietnamese water puppetry with over a thousand years of history.',
     location: 'Hà Nội',
     time: '3d',
+    image: '/images/water-puppet.png',
   },
   {
-    id: 5,
+    id: 15,
     icon: '🏖️',
     category: 'nature',
     badge: 'Hot',
@@ -66,9 +70,10 @@ const mockFeedItems = [
     desc_en: 'UNESCO World Heritage site with thousands of limestone islands in turquoise waters.',
     location: 'Quảng Ninh',
     time: '6h',
+    image: '/images/halong-bay.png',
   },
   {
-    id: 6,
+    id: 16,
     icon: '☕',
     category: 'food',
     badge: null,
@@ -78,6 +83,7 @@ const mockFeedItems = [
     desc_en: 'A unique beverage born from a milk shortage era, now an iconic Hanoi symbol.',
     location: 'Hà Nội',
     time: '2d',
+    image: '/images/egg-coffee.png',
   },
 ];
 
@@ -179,8 +185,16 @@ export default function HomePage() {
               data-reveal
               style={{ ...withRevealDelay(item.id), textDecoration: 'none' }}
             >
-              <div className={styles.feedCardImage}>
-                <div className={styles.feedCardImagePlaceholder}>{item.icon}</div>
+              <div className={styles.feedCardImage} style={{ position: 'relative', overflow: 'hidden' }}>
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={locale === 'vi' ? item.title_vi : item.title_en}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div className={styles.feedCardImagePlaceholder}>{item.icon}</div>
+                )}
                 {item.badge && (
                   <span className={styles.feedCardBadge}>{item.badge}</span>
                 )}

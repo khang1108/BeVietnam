@@ -494,6 +494,42 @@
   box-shadow: var(--shadow-glow);
 }
 
+.formButtonLoading {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
+  position: relative;
+}
+
+.formError {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  border-radius: var(--radius-lg);
+  color: var(--color-red-600, #dc2626);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-normal);
+  animation: fadeIn 0.3s ease-out;
+}
+
+[data-theme="dark"] .formError {
+  background: rgba(220, 38, 38, 0.12);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #fca5a5;
+}
+
+.formInputError {
+  border-color: var(--color-red-600, #dc2626);
+}
+
+.formInputError:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
 /* Auth form */
 .authPage {
   display: flex;

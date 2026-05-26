@@ -5,13 +5,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/i18n';
 import { useTheme } from '@/hooks/useTheme';
-import { localeNames, Locale } from '@/i18n/translations';
-import { IconCalendar, IconExplore, IconFeed, IconSparkle } from '@/components/icons/UiIcons';
+import { useAuth } from '@/hooks/useAuth';
+import { localeNames } from '@/i18n/translations';
+import { IconCalendar, IconExplore, IconFeed, IconRoute, IconSparkle } from '@/components/icons/UiIcons';
 import styles from './Navbar.module.css';
 
 const navItems = [
   { key: 'feed', href: '/', icon: <IconFeed className={styles.navIconSvg} /> },
   { key: 'explore', href: '/explore', icon: <IconExplore className={styles.navIconSvg} /> },
+  { key: 'storyline', href: '/storyline', icon: <IconRoute className={styles.navIconSvg} /> },
   { key: 'events', href: '/events', icon: <IconCalendar className={styles.navIconSvg} /> },
   { key: 'contribute', href: '/contribute', icon: <IconSparkle className={styles.navIconSvg} /> },
 ];
@@ -19,6 +21,7 @@ const navItems = [
 export default function Navbar() {
   const { t, locale, setLocale } = useI18n();
   const { theme, toggleTheme } = useTheme();
+  const { user, isAuthenticated, logout } = useAuth();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -98,9 +101,15 @@ export default function Navbar() {
             {locale === 'vi' ? 'EN' : 'VI'}
           </button>
 
-          <Link href="/auth/login" className={styles.authButton}>
-            {t('nav.login')}
-          </Link>
+          {isAuthenticated ? (
+            <button className={styles.authButton} onClick={logout} id="nav-logout">
+              {user?.name?.split(' ')[0] ?? ''} · {t('nav.logout')}
+            </button>
+          ) : (
+            <Link href="/auth/login" className={styles.authButton}>
+              {t('nav.login')}
+            </Link>
+          )}
 
           {/* Hamburger */}
           <button
@@ -141,9 +150,19 @@ export default function Navbar() {
           </button>
         </div>
 
-        <Link href="/auth/login" className={styles.mobileAuthButton} onClick={closeMobile}>
-          {t('nav.login')}
-        </Link>
+        {isAuthenticated ? (
+          <button
+            className={styles.mobileAuthButton}
+            onClick={() => { logout(); closeMobile(); }}
+            id="mobile-logout"
+          >
+            {user?.name?.split(' ')[0] ?? ''} · {t('nav.logout')}
+          </button>
+        ) : (
+          <Link href="/auth/login" className={styles.mobileAuthButton} onClick={closeMobile}>
+            {t('nav.login')}
+          </Link>
+        )}
       </div>
     </nav>
   );
