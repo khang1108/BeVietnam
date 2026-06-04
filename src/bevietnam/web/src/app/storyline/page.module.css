@@ -1,291 +1,524 @@
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500&display=swap');
-
-.pageContainer {
-  min-height: 100vh;
-  padding: 60px 20px 100px;
-  /* Dark Charcoal / Black Map Background */
-  background-color: #1a1a1a;
-  background-image: 
-    radial-gradient(circle at 20% 30%, rgba(214, 141, 44, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(214, 141, 44, 0.05) 0%, transparent 50%),
-    linear-gradient(rgba(26, 26, 26, 0.9), rgba(26, 26, 26, 0.9)),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-  position: relative;
-  overflow-x: hidden;
-  font-family: 'Inter', sans-serif;
-  color: #e0e0e0;
+.container {
+  max-width: 1200px;
+  margin: 100px auto 40px auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 
-/* Subtle dark vignette */
-.pageContainer::after {
-  content: '';
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.8);
-  pointer-events: none;
-  z-index: 100;
-}
-
-.mapHeader {
+.headerPanel {
   text-align: center;
-  margin-bottom: 60px;
-  position: relative;
-  z-index: 10;
+  padding: 30px 20px;
+  border-bottom: 2px double var(--color-gold, #d49b2a);
+  margin-bottom: 10px;
+  border-radius: 4px;
+  background: rgba(17, 15, 14, 0.4);
+  backdrop-filter: blur(10px);
 }
 
-.kieuKyTag {
-  display: inline-block;
-  font-size: 0.8rem;
+.headerPanel h1 {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-size: 2.8rem;
+  color: var(--color-gold, #d49b2a);
+  letter-spacing: 2px;
   text-transform: uppercase;
-  letter-spacing: 3px;
-  color: #d68d2c;
-  margin-bottom: 15px;
-  font-weight: 600;
-  border: 1px solid rgba(214, 141, 44, 0.3);
-  padding: 4px 16px;
-  border-radius: 20px;
+  margin-bottom: 10px;
+  font-weight: 700;
 }
 
-.mainTitle {
-  font-family: 'Playfair Display', serif;
-  font-size: 5rem;
-  color: #ffffff;
-  margin: 0;
-  text-shadow: 0 0 40px rgba(214, 141, 44, 0.2);
-}
-
-.mainTitle span {
-  font-family: 'Dancing Script', cursive;
-  color: #d68d2c;
-  font-size: 6rem;
-  margin-left: 10px;
-}
-
-.subTitle {
-  font-family: 'Inter', sans-serif;
+.headerPanel p {
+  color: #e2ddd5;
   font-size: 1rem;
-  color: #a0a0a0;
-  margin-top: 20px;
+  letter-spacing: 1px;
   max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  line-height: 1.6;
-}
-
-/* The Map Area */
-.mapArea {
-  position: relative;
-  max-width: 1000px;
   margin: 0 auto;
-  min-height: 800px;
-  background-color: #121212;
-  border-radius: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(214, 141, 44, 0.05);
-  padding: 80px 0;
+  opacity: 0.9;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.progressBarContainer {
+  flex-grow: 1;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.05);
+  height: 10px;
+  border-radius: 5px;
   overflow: hidden;
+  border: 1px solid rgba(212, 155, 42, 0.3);
 }
 
-/* Background Map Drawings (Decorative) */
-.decorativeDrawing {
-  position: absolute;
-  opacity: 0.05;
-  font-size: 60px;
-  filter: grayscale(100%) sepia(100%) hue-rotate(5deg) saturate(500%) contrast(1) brightness(0.8);
-  z-index: 1;
-}
-.drawing1 { top: 10%; left: 5%; transform: rotate(15deg); }
-.drawing2 { top: 40%; right: 10%; transform: rotate(-10deg); font-size: 80px; }
-.drawing3 { bottom: 10%; left: 15%; transform: rotate(5deg); font-size: 70px; }
-.drawing4 { top: 70%; right: 20%; transform: rotate(-20deg); font-size: 50px; }
-
-/* Footprint Patterns */
-.footprint {
-  position: absolute;
-  opacity: 0.15;
-  font-size: 24px;
-  filter: sepia(100%) hue-rotate(5deg) saturate(500%) brightness(0.8);
-  z-index: 2;
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #d49b2a, #e5b842);
+  width: 20%;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* The Path (SVG line connecting nodes) */
-.journeyPath {
+.resetBtn {
+  background: transparent;
+  border: 1px dashed #736e67;
+  color: #e2ddd5;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.resetBtn:hover {
+  border-color: #b83c25;
+  color: #b83c25;
+  background: rgba(184, 60, 37, 0.05);
+}
+
+/* ACCORDION BOOK */
+.storybook {
+  display: flex;
+  width: 100%;
+  height: 580px;
+  background: #110f0e;
+  border: 12px solid #2d241c;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.storybookPage {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  min-width: 80px;
+  background-color: #fdfbf7;
+  border-right: 2px solid rgba(17, 15, 14, 0.15);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.storybookPage::before {
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 10px;
   height: 100%;
-  z-index: 2;
+  background: linear-gradient(90deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 100%);
   pointer-events: none;
-}
-.journeyPath path {
-  fill: none;
-  stroke: rgba(214, 141, 44, 0.2);
-  stroke-width: 2;
-  stroke-dasharray: 6 12;
-  stroke-linecap: round;
+  z-index: 2;
 }
 
-/* The Grid Layout for Cards */
-.questGrid {
-  position: relative;
+.storybookPage::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 100%;
+  background: linear-gradient(270deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.storybookPage.active {
+  flex: 4;
+  background-color: #fdfbf7;
+  cursor: default;
+}
+
+.storybookPage.locked {
+  background-color: #f5efeb;
+  filter: sepia(0.3) contrast(0.9) brightness(0.85);
+}
+
+.storybookPage.locked::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.04);
+  pointer-events: none;
   z-index: 10;
+}
+
+.pageWrapper {
+  padding: 30px;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  overflow-y: auto;
+}
+
+.storybookPage:not(.active) .pageWrapper {
+  padding: 20px 10px;
   align-items: center;
-  gap: 80px;
+  justify-content: flex-start;
+  gap: 20px;
+  overflow: hidden;
 }
 
-/* Alternating Left/Right alignment */
-.questRow {
+.closedHeader {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-size: 1.25rem;
+  color: #221f1e;
+  font-weight: 700;
   display: flex;
-  width: 100%;
+  align-items: center;
+  gap: 15px;
+  height: 100%;
   justify-content: center;
+  letter-spacing: 2px;
+  white-space: nowrap;
 }
-.questRow:nth-child(odd) { justify-content: flex-start; padding-left: 10%; }
-.questRow:nth-child(even) { justify-content: flex-end; padding-right: 10%; }
 
-/* Polaroid Style Card */
-.polaroidCard {
-  background: #fdfbf7;
-  padding: 12px 12px 30px 12px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 0 10px rgba(0,0,0,0.3);
-  max-width: 260px;
+.storybookPage.active .closedHeader {
+  display: none;
+}
+
+.storybookPage:not(.active) .openContent {
+  display: none;
+}
+
+.openContent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 20px;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(212, 155, 42, 0.3);
+  padding-bottom: 15px;
+}
+
+.chapterNum {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  color: #b83c25;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.taskDifficulty {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+.diffEasy {
+  background: rgba(46, 125, 50, 0.1);
+  color: #2e7d32;
+  border: 1px solid rgba(46, 125, 50, 0.2);
+}
+
+.diffMedium {
+  background: rgba(212, 155, 42, 0.1);
+  color: #d49b2a;
+  border: 1px solid rgba(212, 155, 42, 0.2);
+}
+
+.diffHard {
+  background: rgba(184, 60, 37, 0.1);
+  color: #b83c25;
+  border: 1px solid rgba(184, 60, 37, 0.2);
+}
+
+.taskTitle {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-size: 1.8rem;
+  color: #221f1e;
+  margin-top: 5px;
+  font-weight: 800;
+}
+
+.taskDetailsGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 25px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.detailsLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.taskDesc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #3e3835;
+}
+
+.culturalContext {
+  background-color: #f5efeb;
+  border-left: 3px solid #d49b2a;
+  padding: 18px 15px 15px 15px;
+  border-radius: 0 4px 4px 0;
   position: relative;
-  transition: transform 0.3s ease, filter 0.3s ease;
+  margin-top: 10px;
+}
+
+.culturalContext::after {
+  content: 'Bối cảnh văn hóa';
+  position: absolute;
+  top: -9px;
+  left: 15px;
+  background: #fdfbf7;
+  padding: 0 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #d49b2a;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(212, 155, 42, 0.3);
+  border-radius: 2px;
+}
+
+.culturalText {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  font-style: italic;
+  color: #5a524e;
+}
+
+.requirementBox {
+  border: 1px dashed rgba(184, 60, 37, 0.4);
+  background-color: rgba(184, 60, 37, 0.02);
+  padding: 12px 15px;
   border-radius: 4px;
 }
 
-/* Randomized slight rotations applied via inline styles in TSX, but hover straightens it */
-.polaroidCard:hover {
-  transform: scale(1.05) rotate(0deg) !important;
-  z-index: 20;
+.reqLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #b83c25;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
 }
 
-/* Yellow Pin / Stamp on top right */
-.polaroidCard::after {
-  content: '📍';
-  position: absolute;
-  font-size: 24px;
-  top: -12px;
-  right: -10px;
-  z-index: 10;
-  filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.3));
+.reqText {
+  font-size: 0.85rem;
+  color: #221f1e;
+}
+
+.detailsRight {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  height: 100%;
+}
+
+.polaroidFrame {
+  background: white;
+  padding: 12px 12px 25px 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0,0,0,0.06);
+  transform: rotate(-1.5deg);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.polaroidFrame:hover {
+  transform: rotate(0deg) scale(1.02);
 }
 
 .polaroidImage {
   width: 100%;
-  height: 180px;
+  height: 200px;
   object-fit: cover;
-  border: 1px solid rgba(0,0,0,0.1);
-  background: #eee;
+  filter: sepia(0.15) contrast(1.05);
+  border: 1px solid #ddd;
 }
 
-.polaroidContent {
-  margin-top: 12px;
+.polaroidCaption {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-size: 0.85rem;
+  text-align: center;
+  color: #736e67;
+  font-weight: 600;
+}
+
+.actionContainer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.completeBtn {
+  width: 100%;
+  background-color: #b83c25;
+  color: #fdfbf7;
+  border: none;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(184, 60, 37, 0.3);
+  transition: all 0.3s ease;
+  border-radius: 4px;
   text-align: center;
 }
 
-.questTitle {
-  font-family: 'Dancing Script', cursive;
-  font-size: 1.5rem;
+.completeBtn:hover {
+  background-color: #9e2f1a;
+  box-shadow: 0 6px 15px rgba(184, 60, 37, 0.4);
+  transform: translateY(-2px);
+}
+
+.completeBtn.done {
+  background-color: #2e7d32;
+  box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2);
+  cursor: default;
+  transform: none;
+}
+
+.closedIndicator {
+  font-size: 0.75rem;
   font-weight: 700;
-  color: #2c221a;
-  margin: 0;
-}
-
-.questDesc {
-  display: none; /* Hide desc on map to keep it clean, can reveal on click */
-}
-
-/* Status overlays */
-.lockedOverlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: grayscale(100%) blur(2px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-  border-radius: 4px;
-}
-.lockedIcon {
-  font-size: 2rem;
-  opacity: 0.8;
-  color: #d68d2c;
-  margin-bottom: 10px;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-}
-
-.activeCard {
-  box-shadow: 0 0 0 2px #d68d2c, 0 15px 35px rgba(0,0,0,0.8);
-  animation: pulseHighlight 2s infinite;
-}
-
-@keyframes pulseHighlight {
-  0% { box-shadow: 0 0 0 2px rgba(214, 141, 44, 0.5), 0 15px 35px rgba(0,0,0,0.8); }
-  50% { box-shadow: 0 0 0 8px rgba(214, 141, 44, 0.2), 0 20px 40px rgba(0,0,0,0.9); }
-  100% { box-shadow: 0 0 0 2px rgba(214, 141, 44, 0.5), 0 15px 35px rgba(0,0,0,0.8); }
-}
-
-.completedMark {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  font-size: 1.5rem;
-  color: #4caf50;
-  background: white;
-  border-radius: 50%;
-  width: 30px; height: 30px;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-/* Hand-written notes scattered on the map */
-.handWrittenNote {
-  position: absolute;
-  font-family: 'Dancing Script', cursive;
-  font-size: 1.5rem;
-  color: #d68d2c;
-  max-width: 200px;
-  line-height: 1.2;
-  z-index: 5;
-  opacity: 0.7;
-}
-
-.actionButton {
-  margin-top: 10px;
-  width: 100%;
-  padding: 8px;
-  background: transparent;
-  color: #d68d2c;
-  border: 1px solid #d68d2c;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.8rem;
-  font-weight: 600;
+  color: #d49b2a;
   text-transform: uppercase;
   letter-spacing: 1px;
-  cursor: pointer;
-  transition: all 0.2s;
-  border-radius: 4px;
-}
-.actionButton:hover {
-  background: #d68d2c;
-  color: #1a1a1a;
 }
 
+.storybookPage.locked .closedIndicator {
+  color: #736e67;
+}
+
+.pageDot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #d49b2a;
+  color: #110f0e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: 2px solid #221f1e;
+}
+
+.storybookPage.locked .pageDot {
+  background: #e2ddd5;
+  color: #736e67;
+  border-color: #736e67;
+}
+
+.storybookPage.completed .pageDot {
+  background: #2e7d32;
+  color: #fdfbf7;
+}
+
+.lockStamp {
+  font-size: 0.75rem;
+  border: 1px solid #736e67;
+  color: #736e67;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 10px;
+}
+
+/* RESPONSIVE & MOBILE STACK LAYOUT */
 @media (max-width: 768px) {
-  .questRow:nth-child(odd),
-  .questRow:nth-child(even) {
-    justify-content: center;
-    padding: 0;
+  .container {
+    margin-top: 60px;
   }
-  .mainTitle {
-    font-size: 3.5rem;
+
+  .headerPanel h1 {
+    font-size: 2rem;
   }
-  .decorativeDrawing, .handWrittenNote, .journeyPath {
-    display: none; /* Simplify on mobile */
+
+  .storybook {
+    flex-direction: column;
+    height: auto;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    gap: 15px;
+  }
+
+  .storybookPage {
+    min-height: 70px;
+    height: auto;
+    border-radius: 8px;
+    border: 3px solid #2d241c;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    flex: none;
+  }
+
+  .storybookPage.active {
+    min-height: 480px;
+  }
+
+  .storybookPage:not(.active) .pageWrapper {
+    padding: 15px 20px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    overflow: visible;
+    width: 100%;
+  }
+
+  .closedHeader {
+    writing-mode: horizontal-tb;
+    height: auto;
+    font-size: 1.05rem;
+    flex-direction: row;
+    gap: 12px;
+    letter-spacing: 1px;
+  }
+
+  .taskDetailsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .polaroidFrame {
+    transform: none;
+  }
+
+  .polaroidFrame:hover {
+    transform: none;
   }
 }
