@@ -13,6 +13,10 @@ submit/
 __pycache__/
 *.py[cod]
 
+# Python virtual environments
+venv/
+.venv/
+
 # Web dependency and build outputs
 node_modules/
 .next/
@@ -24,3 +28,6 @@ build/
 *.log
 .DS_Store
 .idea/
+
+# Local embedded Qdrant storage
+data/qdrant/
