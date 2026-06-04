@@ -23,7 +23,6 @@ const vi: Translations = {
   nav: {
     feed: 'Bảng tin',
     explore: 'Khám phá',
-    storyline: 'Hành trình',
     events: 'Sự kiện',
     contribute: 'Đóng góp',
     login: 'Đăng nhập',
@@ -112,53 +111,6 @@ const vi: Translations = {
       loginHere: 'Đăng nhập ngay',
     },
   },
-  storyline: {
-    kieuKyTag: 'Ký sự hành trình',
-    mainTitlePrefix: 'Di Sản',
-    mainTitleSuffix: 'Việt Nam',
-    subTitle: 'Khám phá những miền di sản, văn hóa và vẻ đẹp tiềm ẩn của dải đất hình chữ S. Mỗi chặng dừng chân là một câu chuyện vô giá.',
-    noteThangLong: 'Bắt đầu hành trình từ Thăng Long ngàn năm văn hiến...',
-    noteSea: 'Cẩn thận những cơn bão biển!',
-    exploreBtn: 'Khám phá',
-    lockedText: 'Chưa khám phá',
-    quests: {
-      quest1: {
-        title: 'Hồ Hoàn Kiếm',
-        desc: 'Trái tim của Thủ đô, nơi gắn liền với truyền thuyết rùa vàng trả gươm báu. Dạo bước quanh hồ và cảm nhận nhịp sống chậm rãi.',
-      },
-      quest2: {
-        title: 'Vịnh Hạ Long',
-        desc: 'Kỳ quan thiên nhiên thế giới với hàng ngàn đảo đá vôi kỳ vĩ vươn lên từ mặt nước xanh ngọc bích.',
-      },
-      quest3: {
-        title: 'Phố Cổ Hội An',
-        desc: 'Thương cảng sầm uất một thời, nay lung linh trong ánh đèn lồng lụa và những nếp nhà ngói âm dương rêu phong.',
-      },
-      quest4: {
-        title: 'Kinh Thành Huế',
-        desc: 'Dấu ấn triều đại xưa, nơi lăng tẩm hoàng gia và nhã nhạc cung đình đưa bạn trở về những trang sử hào hùng.',
-      },
-      quest5: {
-        title: 'Mù Cang Chải',
-        desc: 'Những thửa ruộng bậc thang kỳ vĩ dệt nên tấm thảm lụa vàng ươm vắt ngang lưng trời Tây Bắc.',
-      },
-    },
-    title: 'Hành trình BeVietnam',
-    subtitle: 'Hành trình văn hoá qua các miền di sản Việt Nam',
-    difficulty: 'Độ khó',
-    requirement: 'Yêu cầu hoàn thành',
-    completeTask: 'Hoàn Thành Nhiệm Vụ',
-    completed: '✓ Đã Hoàn Thành',
-    locked: 'Chưa mở khóa',
-    reset: 'Đặt lại Hành trình',
-    chapter: 'Chương',
-    done: 'Hoàn thành',
-    doing: 'Đang làm',
-    nextTask: 'Nhiệm vụ tiếp theo',
-    easy: 'Dễ',
-    medium: 'Trung bình',
-    hard: 'Khó'
-  },
   footer: {
     about: 'Về BeVietnam',
     aboutDesc: 'Nền tảng du lịch thông minh giúp bạn khám phá Việt Nam với chiều sâu văn hóa.',
@@ -188,7 +140,6 @@ const en: Translations = {
   nav: {
     feed: 'Feed',
     explore: 'Explore',
-    storyline: 'Storyline',
     events: 'Events',
     contribute: 'Contribute',
     login: 'Login',
@@ -276,53 +227,6 @@ const en: Translations = {
       hasAccount: 'Already have an account?',
       loginHere: 'Login here',
     },
-  },
-  storyline: {
-    kieuKyTag: 'Journey Chronicle',
-    mainTitlePrefix: 'Heritage of',
-    mainTitleSuffix: 'Vietnam',
-    subTitle: 'Explore the heritage, culture, and hidden beauty of the S-shaped land. Each stop is a priceless story.',
-    noteThangLong: 'Starting the journey from Thăng Long, a thousand years of civilization...',
-    noteSea: 'Watch out for sea storms!',
-    exploreBtn: 'Explore',
-    lockedText: 'Locked',
-    quests: {
-      quest1: {
-        title: 'Hoan Kiem Lake',
-        desc: 'The heart of the capital, tied to the legend of the golden turtle returning the sacred sword. Walk around the lake and feel the slow pace of life.',
-      },
-      quest2: {
-        title: 'Ha Long Bay',
-        desc: 'A world natural wonder with thousands of magnificent limestone islands rising from the emerald green waters.',
-      },
-      quest3: {
-        title: 'Hoi An Ancient Town',
-        desc: 'A once busy trading port, now glittering in the light of silk lanterns and old mossy houses.',
-      },
-      quest4: {
-        title: 'Imperial City of Hue',
-        desc: 'A legacy of the old dynasty, where royal tombs and imperial court music take you back to heroic pages of history.',
-      },
-      quest5: {
-        title: 'Mu Cang Chai',
-        desc: 'Magnificent terraced rice fields weaving a golden silk carpet across the Northwest sky.',
-      },
-    },
-    title: 'BeVietnam Storyline',
-    subtitle: 'A cultural journey through Vietnam\'s heritage sites',
-    difficulty: 'Difficulty',
-    requirement: 'Requirement',
-    completeTask: 'Complete Challenge',
-    completed: '✓ Completed',
-    locked: 'Locked',
-    reset: 'Reset Journey',
-    chapter: 'Chapter',
-    done: 'Done',
-    doing: 'In Progress',
-    nextTask: 'Next Challenge',
-    easy: 'Easy',
-    medium: 'Medium',
-    hard: 'Hard'
   },
   footer: {
     about: 'About BeVietnam',
