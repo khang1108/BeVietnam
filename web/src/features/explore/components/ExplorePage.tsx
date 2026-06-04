@@ -24,6 +24,7 @@ const mockPlaces = [
         desc_en: "Vietnam's most uniquely designed pagoda, built in 1049.",
         location: 'Hà Nội',
         rating: '4.8',
+        image: '/images/one-pillar-pagoda.png',
     },
     {
         id: 2,
@@ -35,6 +36,7 @@ const mockPlaces = [
         desc_en: 'Where Obama visited, famous for authentic Hanoi bun cha.',
         location: 'Hà Nội',
         rating: '4.7',
+        image: '/images/buncha-huonglien.png',
     },
     {
         id: 3,
@@ -46,6 +48,7 @@ const mockPlaces = [
         desc_en: "World's most spectacular cave system, UNESCO heritage.",
         location: 'Quảng Bình',
         rating: '4.9',
+        image: '/images/phongnha.png',
     },
     {
         id: 4,
@@ -57,6 +60,7 @@ const mockPlaces = [
         desc_en: 'World cultural heritage, center of power through many dynasties.',
         location: 'Hà Nội',
         rating: '4.6',
+        image: '/images/citadel-thanglong.png',
     },
     {
         id: 5,
@@ -68,6 +72,7 @@ const mockPlaces = [
         desc_en: 'Famous Hoi An banh mi, voted the best in the world.',
         location: 'Hội An',
         rating: '4.8',
+        image: '/images/banhmi-phuong.png',
     },
     {
         id: 6,
@@ -79,6 +84,7 @@ const mockPlaces = [
         desc_en: "Saigon's most vibrant night street with diverse entertainment.",
         location: 'TP.HCM',
         rating: '4.3',
+        image: '/images/buivien.png',
     },
 ];
 
@@ -137,7 +143,17 @@ export function ExplorePage() {
                         className={styles.card}
                         style={{ textDecoration: 'none', color: 'inherit' }}
                     >
-                        <div className={styles.cardImage}>{place.icon}</div>
+                        <div className={styles.cardImage} style={{ position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {place.image ? (
+                                <img
+                                    src={place.image}
+                                    alt={locale === 'vi' ? place.title_vi : place.title_en}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                            ) : (
+                                place.icon
+                            )}
+                        </div>
                         <div className={styles.cardBody}>
                             <div className={styles.cardCategory}>
                                 {t(`explore.categories.${place.category}`)}

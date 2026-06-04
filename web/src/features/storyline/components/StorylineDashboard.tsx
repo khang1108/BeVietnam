@@ -1,48 +1,46 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useI18n } from '@/i18n';
 import styles from '../styles/storyline.module.css';
 
-const quests = [
+const QUESTS_METADATA = [
     {
         id: 1,
-        title: 'Hồ Hoàn Kiếm',
-        desc: 'Trái tim của Thủ đô, nơi gắn liền với truyền thuyết rùa vàng trả gươm báu. Dạo bước quanh hồ và cảm nhận nhịp sống chậm rãi.',
-        image: '/images/hero-hue-citadel.png',
+        image: '/images/hanoi-pho.png',
         rotation: -4,
     },
     {
         id: 2,
-        title: 'Vịnh Hạ Long',
-        desc: 'Kỳ quan thiên nhiên thế giới với hàng ngàn đảo đá vôi kỳ vĩ vươn lên từ mặt nước xanh ngọc bích.',
         image: '/images/halong-bay.png',
         rotation: 3,
     },
     {
         id: 3,
-        title: 'Phố Cổ Hội An',
-        desc: 'Thương cảng sầm uất một thời, nay lung linh trong ánh đèn lồng lụa và những nếp nhà ngói âm dương rêu phong.',
         image: '/images/hoian-lanterns.png',
         rotation: -2,
     },
     {
         id: 4,
-        title: 'Kinh Thành Huế',
-        desc: 'Dấu ấn triều đại xưa, nơi lăng tẩm hoàng gia và nhã nhạc cung đình đưa bạn trở về những trang sử hào hùng.',
         image: '/images/hero-hue-citadel.png',
         rotation: 5,
     },
     {
         id: 5,
-        title: 'Mù Cang Chải',
-        desc: 'Những thửa ruộng bậc thang kỳ vĩ dệt nên tấm thảm lụa vàng ươm vắt ngang lưng trời Tây Bắc.',
         image: '/images/terraced-rice-fields.png',
         rotation: -3,
     },
 ];
 
 export function StorylineDashboard() {
+    const { t } = useI18n();
     const [currentStep, setCurrentStep] = useState(1);
+
+    const quests = QUESTS_METADATA.map((q) => ({
+        ...q,
+        title: t(`storyline.quests.quest${q.id}.title`),
+        desc: t(`storyline.quests.quest${q.id}.desc`),
+    }));
 
     const handleComplete = (id: number) => {
         if (id === currentStep) {
@@ -53,13 +51,12 @@ export function StorylineDashboard() {
     return (
         <div className={styles.pageContainer}>
             <header className={styles.mapHeader}>
-                <div className={styles.kieuKyTag}>Ký sự hành trình</div>
+                <div className={styles.kieuKyTag}>{t('storyline.kieuKyTag')}</div>
                 <h1 className={styles.mainTitle}>
-                    Di Sản <span>Việt Nam</span>
+                    {t('storyline.mainTitlePrefix')} <span>{t('storyline.mainTitleSuffix')}</span>
                 </h1>
                 <p className={styles.subTitle}>
-                    Khám phá những miền di sản, văn hóa và vẻ đẹp tiềm ẩn của dải đất hình chữ S.
-                    Mỗi chặng dừng chân là một câu chuyện vô giá.
+                    {t('storyline.subTitle')}
                 </p>
             </header>
 
@@ -97,10 +94,10 @@ export function StorylineDashboard() {
                 <div className={`${styles.decorativeDrawing} ${styles.drawing4}`}>🏮</div>
 
                 <div className={styles.handWrittenNote} style={{ top: '15%', right: '15%' }}>
-                    Bắt đầu hành trình từ Thăng Long ngàn năm văn hiến...
+                    {t('storyline.noteThangLong')}
                 </div>
                 <div className={styles.handWrittenNote} style={{ top: '60%', left: '10%' }}>
-                    Cẩn thận những cơn bão biển!
+                    {t('storyline.noteSea')}
                 </div>
 
                 <svg className={styles.journeyPath} preserveAspectRatio="none" viewBox="0 0 100 100">
@@ -134,7 +131,7 @@ export function StorylineDashboard() {
                                                 className={styles.actionButton}
                                                 onClick={() => handleComplete(quest.id)}
                                             >
-                                                Khám phá
+                                                {t('storyline.exploreBtn')}
                                             </button>
                                         )}
                                     </div>
@@ -149,7 +146,7 @@ export function StorylineDashboard() {
                                                     color: '#4a3219',
                                                 }}
                                             >
-                                                Chưa khám phá
+                                                {t('storyline.lockedText')}
                                             </span>
                                         </div>
                                     )}

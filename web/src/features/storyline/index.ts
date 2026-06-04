@@ -1,1 +1,1 @@
-wexport { StorylineDashboard } from './components/StorylineDashboard';
+export { StorylineDashboard } from './components/StorylineDashboard';
