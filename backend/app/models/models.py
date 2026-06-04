@@ -1,28 +1,23 @@
-"""
-SQLAlchemy DB models.
-
-TODO(Backend): Configure DB engine in core/database.py
-    from sqlalchemy import create_engine
-    from sqlalchemy.orm import DeclarativeBase, sessionmaker
-    DATABASE_URL = settings.DATABASE_URL
-"""
+import uuid
 from sqlalchemy import Column, String, Float, DateTime, Boolean, Text, ForeignKey
-from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 
-
-class Base(DeclarativeBase):
-    pass
-
+# IMPORT Base từ cấu hình database thay vì tự định nghĩa lại
+from app.core.database import Base
 
 def utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
+# Hàm hỗ trợ sinh UUID tự động thành string
+def generate_uuid() -> str:
+    return str(uuid.uuid4())
 
 class PlaceModel(Base):
     __tablename__ = "places"
 
-    id = Column(String, primary_key=True)
+    # Thêm default=generate_uuid và index=True
+    id = Column(String, primary_key=True, default=generate_uuid, index=True)
     name = Column(String(200), nullable=False)
     category = Column(String(50), nullable=False)  # temple | museum | park | district
     description = Column(Text, nullable=False)
@@ -34,11 +29,10 @@ class PlaceModel(Base):
 
     captures = relationship("CaptureModel", back_populates="place")
 
-
 class UserModel(Base):
     __tablename__ = "users"
 
-    id = Column(String, primary_key=True)
+    id = Column(String, primary_key=True, default=generate_uuid, index=True)
     name = Column(String(100), nullable=False)
     email = Column(String(200), unique=True, nullable=False, index=True)
     hashed_password = Column(String(200), nullable=False)
@@ -47,11 +41,10 @@ class UserModel(Base):
 
     captures = relationship("CaptureModel", back_populates="user")
 
-
 class CaptureModel(Base):
     __tablename__ = "captures"
 
-    id = Column(String, primary_key=True)
+    id = Column(String, primary_key=True, default=generate_uuid, index=True)
     user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     task_id = Column(String, nullable=True)
     place_id = Column(String, ForeignKey("places.id"), nullable=False, index=True)

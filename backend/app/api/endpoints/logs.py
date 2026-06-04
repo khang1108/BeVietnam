@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from datetime import datetime, timezone
-from app.schemas.schemas import LogsResponse, LogEntry
+from app.schemas import LogsResponse, LogEntry
 
 router = APIRouter()
 

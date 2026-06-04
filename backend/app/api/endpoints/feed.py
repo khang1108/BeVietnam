@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from datetime import datetime, timezone
-from app.schemas.schemas import FeedResponse, FeedItem
+from app.schemas import FeedResponse, FeedItem
 
 router = APIRouter()
 

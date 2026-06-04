@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from typing import Optional
-from app.schemas.schemas import PlacesResponse, PlaceSchema
+from app.schemas import PlacesResponse, PlaceSchema
 
 router = APIRouter()
 

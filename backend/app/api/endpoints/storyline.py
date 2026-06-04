@@ -8,7 +8,7 @@ Provides:
 """
 
 from fastapi import APIRouter, Query
-from app.schemas.schemas import (
+from app.schemas import (
     QuestChainResponse,
     QuestTask,
     StorylineNextTaskResponse,
