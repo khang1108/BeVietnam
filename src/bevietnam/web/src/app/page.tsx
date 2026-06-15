@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
+import DashboardCardEffect from '@/components/DashboardCardEffect';
 import { useI18n } from '@/i18n';
 import { IconCalendar, IconExplore, IconFlagVn, IconFood, IconGlobe, IconLocation, IconMountain } from '@/components/icons/UiIcons';
 import styles from './page.module.css';
@@ -9,9 +10,11 @@ import styles from './page.module.css';
 const mockFeedItems = [
   {
     id: 1,
+    slug: 'hoi-an',
     icon: '🏛️',
     category: 'culture',
     badge: 'Trending',
+    image: '/images/hoian-lanterns.png',
     title_vi: 'Hội An - Phố cổ ngàn năm',
     title_en: 'Hoi An - Ancient Town of a Thousand Years',
     desc_vi: 'Khám phá vẻ đẹp của phố cổ Hội An với những ngôi nhà cổ, đèn lồng và ẩm thực đặc sắc.',
@@ -21,9 +24,11 @@ const mockFeedItems = [
   },
   {
     id: 2,
+    slug: 'pho-ha-noi',
     icon: <IconFood className={styles.feedIconSvg} />,
     category: 'food',
     badge: 'Popular',
+    image: '/images/hanoi-pho.png',
     title_vi: 'Phở Hà Nội - Tinh hoa ẩm thực Việt',
     title_en: 'Hanoi Pho - The Essence of Vietnamese Cuisine',
     desc_vi: 'Câu chuyện đằng sau tô phở Hà Nội chính gốc với hơn 100 năm lịch sử.',
@@ -33,9 +38,11 @@ const mockFeedItems = [
   },
   {
     id: 3,
+    slug: 'ruong-bac-thang',
     icon: <IconMountain className={styles.feedIconSvg} />,
     category: 'nature',
     badge: 'New',
+    image: '/images/terraced-rice-fields.png',
     title_vi: 'Ruộng bậc thang Mù Cang Chải',
     title_en: 'Mu Cang Chai Terraced Rice Fields',
     desc_vi: 'Mùa lúa chín vàng óng trên những thửa ruộng bậc thang tuyệt đẹp của Tây Bắc.',
@@ -45,9 +52,11 @@ const mockFeedItems = [
   },
   {
     id: 4,
+    slug: 'mua-roi-nuoc',
     icon: '🎭',
     category: 'culture',
     badge: null,
+    image: '/images/water-puppet.png',
     title_vi: 'Múa rối nước - Nghệ thuật độc đáo',
     title_en: 'Water Puppetry - A Unique Art Form',
     desc_vi: 'Nghệ thuật múa rối nước truyền thống Việt Nam với hơn nghìn năm lịch sử.',
@@ -57,9 +66,11 @@ const mockFeedItems = [
   },
   {
     id: 5,
+    slug: 'vinh-ha-long',
     icon: '🏖️',
     category: 'nature',
     badge: 'Hot',
+    image: '/images/halong-bay.png',
     title_vi: 'Vịnh Hạ Long - Kỳ quan thiên nhiên',
     title_en: 'Ha Long Bay - Natural Wonder',
     desc_vi: 'Di sản thiên nhiên thế giới UNESCO với hàng ngàn đảo đá vôi giữa biển xanh.',
@@ -69,9 +80,11 @@ const mockFeedItems = [
   },
   {
     id: 6,
+    slug: 'ca-phe-trung',
     icon: '☕',
     category: 'food',
     badge: null,
+    image: '/images/egg-coffee.png',
     title_vi: 'Cà phê trứng Hà Nội',
     title_en: 'Hanoi Egg Coffee',
     desc_vi: 'Thức uống độc đáo ra đời từ thời kỳ khan hiếm sữa, nay trở thành biểu tượng Hà Nội.',
@@ -152,6 +165,7 @@ export default function HomePage() {
               data-reveal
               style={withRevealDelay(i)}
             >
+              <DashboardCardEffect className={styles.threeCardCanvas} />
               <div className={styles.statIcon}>{stat.icon}</div>
               <div className={styles.statValue}>{stat.value}</div>
               <div className={styles.statLabel}>{stat.label}</div>
@@ -162,6 +176,17 @@ export default function HomePage() {
 
       {/* Feed */}
       <section className={styles.feedSection} id="feed-section">
+        {/* Animated Dragon Video Background */}
+        <div className={styles.dragonVideoWrap} aria-hidden="true">
+          <video
+            className={styles.dragonVideo}
+            src="/videos/dragon-video.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+        </div>
         <div className={styles.sectionHeader} data-reveal>
           <h2 className={styles.sectionTitle}>
             {t('feed.recommended')} ✨
@@ -174,13 +199,22 @@ export default function HomePage() {
           {mockFeedItems.map((item) => (
             <Link
               key={item.id}
-              href={`/place/${item.id}`}
+              href={`/place/${item.slug}`}
               className={styles.feedCard}
               data-reveal
               style={{ ...withRevealDelay(item.id), textDecoration: 'none' }}
             >
+              <DashboardCardEffect className={styles.threeCardCanvas} />
               <div className={styles.feedCardImage}>
-                <div className={styles.feedCardImagePlaceholder}>{item.icon}</div>
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={locale === 'vi' ? item.title_vi : item.title_en}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className={styles.feedCardImagePlaceholder}>{item.icon}</div>
+                )}
                 {item.badge && (
                   <span className={styles.feedCardBadge}>{item.badge}</span>
                 )}
@@ -216,6 +250,7 @@ export default function HomePage() {
         </div>
         <div className={styles.featuresGrid}>
           <div className={styles.featureCard} data-reveal style={withRevealDelay(0)}>
+            <DashboardCardEffect className={styles.threeCardCanvas} />
             <div className={`${styles.featureIcon} ${styles.featureIconGold}`}>🤖</div>
             <h3 className={styles.featureTitle}>
               {locale === 'vi' ? 'AI Văn hóa' : 'Cultural AI'}
@@ -228,6 +263,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className={styles.featureCard} data-reveal style={withRevealDelay(1)}>
+            <DashboardCardEffect className={styles.threeCardCanvas} />
             <div className={`${styles.featureIcon} ${styles.featureIconRed}`}>🌏</div>
             <h3 className={styles.featureTitle}>
               {locale === 'vi' ? 'Song ngữ 100%' : '100% Bilingual'}
@@ -240,6 +276,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className={styles.featureCard} data-reveal style={withRevealDelay(2)}>
+            <DashboardCardEffect className={styles.threeCardCanvas} />
             <div className={`${styles.featureIcon} ${styles.featureIconGreen}`}>🔄</div>
             <h3 className={styles.featureTitle}>
               {locale === 'vi' ? 'Luôn cập nhật' : 'Always Fresh'}
