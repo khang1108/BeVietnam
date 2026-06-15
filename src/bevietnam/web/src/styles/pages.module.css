@@ -323,6 +323,22 @@
   line-height: 1;
 }
 
+.eventImage {
+  width: 180px;
+  min-height: 128px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg-tertiary);
+}
+
+.eventImage img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
 .eventInfo {
   flex: 1;
   min-width: 0;
@@ -352,10 +368,39 @@
   border-radius: var(--radius-full);
   font-size: var(--fs-xs);
   font-weight: var(--fw-semibold);
-  background: rgba(45, 157, 111, 0.1);
-  color: var(--color-emerald-600);
+  border: 1px solid transparent;
   align-self: center;
   flex-shrink: 0;
+}
+
+.eventBadgeOngoing {
+  background: rgba(45, 157, 111, 0.12);
+  border-color: rgba(45, 157, 111, 0.24);
+  color: var(--color-emerald-600);
+}
+
+.eventBadgeCompleted {
+  background: rgba(201, 48, 44, 0.1);
+  border-color: rgba(201, 48, 44, 0.22);
+  color: var(--color-accent-600);
+}
+
+.eventBadgeUpcoming {
+  background: rgba(230, 180, 34, 0.14);
+  border-color: rgba(230, 180, 34, 0.28);
+  color: var(--color-primary-700);
+}
+
+[data-theme="dark"] .eventBadgeOngoing {
+  color: var(--color-emerald-300);
+}
+
+[data-theme="dark"] .eventBadgeCompleted {
+  color: var(--color-accent-300);
+}
+
+[data-theme="dark"] .eventBadgeUpcoming {
+  color: var(--color-primary-300);
 }
 
 /* Detail page */
@@ -370,6 +415,36 @@
   opacity: 0.3;
   margin: calc(-1 * var(--space-8)) calc(-1 * var(--space-4)) var(--space-8);
   border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
+}
+
+.detailHeroImage {
+  padding: 0;
+  overflow: hidden;
+  opacity: 1;
+}
+
+.detailHeroImage img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.eventPhoto {
+  margin-top: var(--space-4);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-tertiary);
+}
+
+.eventPhoto img {
+  width: 100%;
+  height: auto;
+  min-height: 260px;
+  max-height: 420px;
+  display: block;
+  object-fit: cover;
 }
 
 .detailContent {
@@ -595,6 +670,11 @@
   .eventCard {
     flex-direction: column;
     gap: var(--space-3);
+  }
+
+  .eventImage {
+    width: 100%;
+    height: 180px;
   }
 
   .eventDate {

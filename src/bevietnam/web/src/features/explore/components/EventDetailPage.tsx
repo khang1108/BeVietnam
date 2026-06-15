@@ -1,23 +1,32 @@
 'use client';
 
+import { useParams } from 'next/navigation';
 import { useI18n } from '@/i18n';
 import { IconCalendar, IconLink } from '@/components/icons/UiIcons';
 import styles from '@/styles/pages.module.css';
+import { events } from '../data/events';
 
 export function EventDetailPage() {
     const { locale } = useI18n();
+    const params = useParams<{ id?: string }>();
+    const event = events.find((item) => item.id === params.id) ?? events[0];
 
     return (
         <div className={styles.pageContainer} id="event-detail-page">
-            <div className={styles.detailHero}>🎉</div>
+            <div className={`${styles.detailHero} ${styles.detailHeroImage}`}>
+                <img
+                    src={event.image}
+                    alt={event.name[locale]}
+                />
+            </div>
 
             <div className={styles.pageHeader}>
                 <div className={styles.pageTag}>🎉 {locale === 'vi' ? 'Sự kiện' : 'Event'}</div>
                 <h1 className={styles.pageTitle}>
-                    {locale === 'vi' ? 'Lễ hội Áo dài TP.HCM 2026' : 'HCMC Ao Dai Festival 2026'}
+                    {event.name[locale]}
                 </h1>
                 <p className={styles.pageSubtitle}>
-                    {locale === 'vi' ? 'TP. Hồ Chí Minh, Việt Nam' : 'Ho Chi Minh City, Vietnam'}
+                    {event.place.location[locale]}
                 </p>
             </div>
 
@@ -25,45 +34,31 @@ export function EventDetailPage() {
                 <div className={styles.detailMain}>
                     <h2>{locale === 'vi' ? 'Về sự kiện' : 'About the Event'}</h2>
                     <p>
-                        {locale === 'vi'
-                            ? 'Lễ hội Áo dài TP.HCM 2026 là sự kiện văn hóa thường niên tôn vinh vẻ đẹp của trang phục truyền thống Việt Nam. Chương trình bao gồm trình diễn thời trang, triển lãm áo dài qua các thời kỳ, workshop thiết kế và nhiều hoạt động nghệ thuật phong phú.'
-                            : 'HCMC Ao Dai Festival 2026 is an annual cultural event celebrating the beauty of traditional Vietnamese dress. The program includes fashion shows, exhibitions of ao dai through the ages, design workshops, and various art activities.'}
-                    </p>
-                    <p>
-                        {locale === 'vi'
-                            ? 'Sự kiện quy tụ hơn 100 nhà thiết kế và hàng ngàn người tham dự từ khắp cả nước và quốc tế. Đây là cơ hội tuyệt vời để trải nghiệm và tìm hiểu về văn hóa Việt Nam.'
-                            : "The event gathers over 100 designers and thousands of attendees from across the country and internationally. It's a wonderful opportunity to experience and learn about Vietnamese culture."}
+                        {event.about[locale]}
                     </p>
 
-                    <div className={styles.placeholderSection}>
-                        <div className={styles.placeholderIcon}>📸</div>
-                        <div className={styles.placeholderTitle}>
-                            {locale === 'vi' ? 'Hình ảnh sự kiện' : 'Event Photos'}
-                        </div>
-                        <div className={styles.placeholderDesc}>
-                            {locale === 'vi'
-                                ? 'Hình ảnh sẽ được tải từ API'
-                                : 'Photos will be loaded from API'}
-                        </div>
-                        <div className={styles.placeholderBadge}>
-                            🔌 {locale === 'vi' ? 'Sẵn sàng tích hợp' : 'Ready for integration'}
-                        </div>
+                    <h2 style={{ marginTop: 'var(--space-8)' }}>
+                        {locale === 'vi' ? 'Hình ảnh sự kiện' : 'Event Photos'}
+                    </h2>
+                    <div className={styles.eventPhoto}>
+                        <img
+                            src={event.image}
+                            alt={event.name[locale]}
+                        />
                     </div>
                 </div>
 
                 <div className={styles.detailSidebar}>
                     <div className={styles.sidebarCard}>
                         <h3>{locale === 'vi' ? 'Thông tin' : 'Details'}</h3>
-                        <div className={styles.sidebarItem}>📅 15-20 May 2026</div>
+                        <div className={styles.sidebarItem}>📅 {event.date.label}</div>
                         <div className={styles.sidebarItem}>
                             📍{' '}
-                            {locale === 'vi'
-                                ? 'Phố đi bộ Nguyễn Huệ'
-                                : 'Nguyen Hue Walking Street'}
+                            {event.place.venue[locale]}
                         </div>
-                        <div className={styles.sidebarItem}>🕐 18:00 - 22:00</div>
+                        <div className={styles.sidebarItem}>🕐 {event.date.time}</div>
                         <div className={styles.sidebarItem}>
-                            💰 {locale === 'vi' ? 'Miễn phí' : 'Free admission'}
+                            💰 {event.price.label[locale]}
                         </div>
                     </div>
 
