@@ -55,6 +55,23 @@ export function IconSparkle(props: IconProps) {
   );
 }
 
+export function IconStoryline(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" {...baseProps} {...props}>
+      <path d="M5 6.5h5" />
+      <path d="M14 6.5h5" />
+      <path d="M5 17.5h5" />
+      <path d="M14 17.5h5" />
+      <path d="M10 6.5c2.7 0 4 1.8 4 5.5s-1.3 5.5-4 5.5" />
+      <path d="M14 6.5c-2.7 0-4 1.8-4 5.5s1.3 5.5 4 5.5" />
+      <circle cx="5" cy="6.5" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="19" cy="6.5" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="5" cy="17.5" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="19" cy="17.5" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 export function IconFood(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" {...baseProps} {...props}>
