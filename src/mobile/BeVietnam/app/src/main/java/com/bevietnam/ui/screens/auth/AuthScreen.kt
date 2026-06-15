@@ -61,14 +61,26 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import com.bevietnam.ui.theme.BeVietnamTheme
 
+/**
+ * Màn hình Xác thực tài khoản (Auth Screen) của ứng dụng BeVietnam.
+ *
+ * Tích hợp cả hai luồng nghiệp vụ Đăng nhập và Đăng ký trên một giao diện thống nhất qua thanh trượt Tab Switcher.
+ * Kết nối dữ liệu dạng luồng quan sát từ [AuthViewModel] và gom nhóm các LaunchedEffect để xử lý các sự kiện một lần mượt mà.
+ *
+ * @param onNavigateToProfile Callback điều hướng người dùng sang màn hình Hồ sơ cá nhân sau khi xác thực thành công, nhận tham số là ID người dùng.
+ * @param viewModel ViewModel quản lý nghiệp vụ đăng nhập/đăng ký ([AuthViewModel]). Mặc định là [hiltViewModel].
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ */
 @Composable
 fun AuthScreen(
-    onNavigateToProfile: (String) -> Unit,
-    viewModel: AuthViewModel = hiltViewModel()
+    onNavigateToProfile: (Int) -> Unit,
+    viewModel: AuthViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // Lắng nghe và điều phối các sự kiện một lần (One-off UI Events)
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -79,6 +91,7 @@ fun AuthScreen(
     }
 
     Scaffold(
+        modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
@@ -93,9 +106,10 @@ fun AuthScreen(
             verticalArrangement = Arrangement.Top
         ) {
             Spacer(Modifier.height(32.dp))
+            // Logo thương hiệu
             Image(
-                painter=painterResource(id = R.drawable.smarttravellogo),
-                contentDescription = null,
+                painter = painterResource(id = R.drawable.smarttravellogo),
+                contentDescription = "Logo BeVietnam",
                 modifier = Modifier.size(100.dp)
             )
             Spacer(Modifier.height(16.dp))
@@ -116,6 +130,7 @@ fun AuthScreen(
 
             Spacer(Modifier.height(28.dp))
 
+            // Thẻ chứa form nhập liệu nổi bật (Surface Card)
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
@@ -124,6 +139,7 @@ fun AuthScreen(
             ) {
                 Column(modifier = Modifier.padding(24.dp)) {
 
+                    // Bộ chuyển đổi Tab Đăng nhập / Đăng ký
                     AuthTabSwitcher(
                         selectedTab = uiState.selectedTab,
                         onTabChange = viewModel::selectTab
@@ -169,6 +185,11 @@ fun AuthScreen(
     }
 }
 
+/**
+ * Thanh chuyển đổi Tab chọn Đăng nhập hoặc Đăng ký (Auth Tab Switcher).
+ *
+ * Thiết kế mượt mà dạng con nhộng (pill shape), hỗ trợ hiệu ứng động chuyển sắc.
+ */
 @Composable
 private fun AuthTabSwitcher(
     selectedTab: AuthTab,
@@ -223,6 +244,9 @@ private fun AuthTabSwitcher(
     }
 }
 
+/**
+ * Form điền thông tin đăng nhập tài khoản (Login Form).
+ */
 @Composable
 private fun LoginForm(
     email: String,
@@ -278,28 +302,32 @@ private fun LoginForm(
         PrimaryLoadingButton(
             text = stringResource(R.string.login),
             isLoading = isLoading,
-        onClick = onLoginClick
-    )
-
-    Spacer(Modifier.height(16.dp))
-    OrDivider()
-    Spacer(Modifier.height(16.dp))
-
-    OutlinedButton(
-        onClick = onSwitchToRegister,
-        modifier = Modifier.fillMaxWidth().height(50.dp),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary)
-    ) {
-        Text(
-            text = stringResource(R.string.create_account),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary
+            onClick = onLoginClick,
+            modifier = Modifier.fillMaxWidth()
         )
-    }
+
+        Spacer(Modifier.height(16.dp))
+        OrDivider()
+        Spacer(Modifier.height(16.dp))
+
+        OutlinedButton(
+            onClick = onSwitchToRegister,
+            modifier = Modifier.fillMaxWidth().height(50.dp),
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary)
+        ) {
+            Text(
+                text = stringResource(R.string.create_account),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
     }
 }
 
+/**
+ * Form điền thông tin đăng ký tài khoản mới (Register Form).
+ */
 @Composable
 private fun RegisterForm(
     name: String,
@@ -380,29 +408,32 @@ private fun RegisterForm(
         PrimaryLoadingButton(
             text = stringResource(R.string.register),
             isLoading = isLoading,
-        onClick = onRegisterClick
-    )
-
-    Spacer(Modifier.height(16.dp))
-    OrDivider()
-    Spacer(Modifier.height(16.dp))
-
-    OutlinedButton(
-        onClick = onSwitchToLogin,
-        modifier = Modifier.fillMaxWidth().height(50.dp),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary)
-    ) {
-        Text(
-            text = stringResource(R.string.already_have_account),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary
+            onClick = onRegisterClick,
+            modifier = Modifier.fillMaxWidth()
         )
-    }
+
+        Spacer(Modifier.height(16.dp))
+        OrDivider()
+        Spacer(Modifier.height(16.dp))
+
+        OutlinedButton(
+            onClick = onSwitchToLogin,
+            modifier = Modifier.fillMaxWidth().height(50.dp),
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary)
+        ) {
+            Text(
+                text = stringResource(R.string.already_have_account),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
     }
 }
 
-
+/**
+ * Đường chia ngang "Hoặc" (Or Divider) trang nhã.
+ */
 @Composable
 private fun OrDivider(modifier: Modifier = Modifier) {
     Row(

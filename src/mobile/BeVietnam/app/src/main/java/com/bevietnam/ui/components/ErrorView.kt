@@ -10,6 +10,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
+/**
+ * Thành phần hiển thị giao diện báo lỗi (Error View) của ứng dụng BeVietnam.
+ *
+ * Cung cấp biểu tượng cảnh báo lỗi trực quan, hiển thị thông điệp lỗi chi tiết từ hệ thống,
+ * và tích hợp tùy chọn nút bấm "Thử lại" giúp người dùng thực thi lại các tác vụ thất bại.
+ *
+ * @param message Thông điệp lỗi chi tiết cần hiển thị lên màn hình.
+ * @param modifier [Modifier] dùng để căn chỉnh, định hình kích thước layout bên ngoài truyền vào.
+ * @param onRetry Callback tùy chọn kích hoạt khi người dùng nhấn nút "Thử lại". Nếu là `null`, nút này sẽ ẩn. Mặc định là `null`.
+ */
 @Composable
 fun ErrorView(
     message: String,
@@ -17,13 +27,13 @@ fun ErrorView(
     onRetry: (() -> Unit)? = null
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
             imageVector = Icons.Outlined.ErrorOutline,
-            contentDescription = null,
+            contentDescription = "Biểu tượng lỗi",
             tint = MaterialTheme.colorScheme.error,
             modifier = Modifier.size(48.dp)
         )

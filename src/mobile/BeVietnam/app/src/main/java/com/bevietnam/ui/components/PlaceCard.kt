@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -13,16 +11,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.bevietnam.core.model.Place
 
+/**
+ * Thẻ hiển thị địa điểm du lịch văn hóa (Place Card) của ứng dụng BeVietnam.
+ *
+ * Hiển thị tóm tắt thông tin của địa điểm bao gồm hình ảnh thu nhỏ (thumbnail), tên địa điểm,
+ * danh mục phân loại, mô tả ngắn và nút nhấn lưu trữ nhanh.
+ *
+ * @param place Đối tượng chứa dữ liệu thông tin địa điểm ([Place]).
+ * @param onClick Sự kiện click kích hoạt khi người dùng nhấn chọn thẻ địa điểm (để điều hướng sang chi tiết).
+ * @param modifier [Modifier] dùng để căn chỉnh, định hình kích thước layout bên ngoài truyền vào.
+ * @param index Chỉ số thứ tự tùy chọn (ví dụ: hiển thị số thứ tự trong bảng xếp hạng). Mặc định là `null`.
+ */
 @Composable
 fun PlaceCard(
     place: Place,
@@ -30,6 +41,8 @@ fun PlaceCard(
     modifier: Modifier = Modifier,
     index: Int? = null
 ) {
+    val context = LocalContext.current
+
     Card(
         onClick = onClick,
         modifier = modifier
@@ -54,9 +67,13 @@ fun PlaceCard(
                     .size(90.dp)
                     .clip(RoundedCornerShape(12.dp))
             ) {
+                // Tải ảnh mượt mà với Coil AsyncImage và hiệu ứng crossfade
                 AsyncImage(
-                    model = place.imageUrl,
-                    contentDescription = place.name,
+                    model = ImageRequest.Builder(context)
+                        .data(place.imageUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Hình ảnh của ${place.name}",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -90,54 +107,30 @@ fun PlaceCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = null,
-                        tint = Color(0xFFF5A623),
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Text(
-                        text = "${place.rating}",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(text = "·", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-                    Text(
-                        text = place.category,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                // Danh mục phân loại
+                Text(
+                    text = place.category,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(13.dp)
-                    )
-                    Text(
-                        text = place.location,
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+                // Mô tả ngắn
+                Text(
+                    text = place.description,
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
 
-            IconButton(onClick = { /* Save action */ }) {
+            IconButton(
+                onClick = { /* Hành động lưu trữ */ },
+                modifier = Modifier.size(48.dp) // Kích thước chuẩn Touch Target 48dp (Accessibility)
+            ) {
                 Icon(
                     imageVector = Icons.Outlined.BookmarkBorder,
-                    contentDescription = "Save",
+                    contentDescription = "Lưu địa điểm này",
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
                 )
@@ -145,3 +138,4 @@ fun PlaceCard(
         }
     }
 }
+

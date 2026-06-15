@@ -28,20 +28,23 @@ import com.bevietnam.ui.components.ErrorView
 import com.bevietnam.ui.components.PlaceCard
 import com.bevietnam.ui.components.SearchBar
 import com.bevietnam.ui.theme.BeVietnamTheme
+import com.bevietnam.ui.theme.LocalCulturalColors
 
-// ── Color Tokens ─────────────────────────────────────────────────────────────
-private val PrimaryRed = Color(0xFFC0392B)
-private val Background = Color(0xFFFAF5E4)
-private val CardBackground = Color(0xFFFFFFFF)
-private val TextPrimary = Color(0xFF1A1A1A)
-private val TextSecondary = Color(0xFF6B6B6B)
-private val ShimmerLight = Color(0xFFE0E0E0)
-private val ShimmerDark = Color(0xFFC8C8C8)
-
+/**
+ * Màn hình Khám phá địa điểm du lịch văn hóa (Explore Screen) của ứng dụng BeVietnam.
+ *
+ * Hiển thị danh sách các danh lam thắng cảnh, di sản lịch sử của Việt Nam kèm bộ lọc nhanh theo danh mục.
+ * Kết nối dữ liệu dạng luồng quan sát từ [ExploreViewModel] và tuân thủ quy chuẩn Unidirectional Data Flow (UDF).
+ *
+ * @param viewModel ViewModel quản lý trạng thái dữ liệu màn hình Khám phá ([ExploreViewModel]). Mặc định là [hiltViewModel].
+ * @param onPlaceClick Sự kiện click chọn xem chi tiết một địa điểm cụ thể ([Place]).
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ */
 @Composable
 fun ExploreScreen(
     viewModel: ExploreViewModel = hiltViewModel(),
-    onPlaceClick: (Place) -> Unit = {}
+    onPlaceClick: (Place) -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -50,21 +53,36 @@ fun ExploreScreen(
         onRetry = viewModel::loadPlaces,
         onCategorySelected = viewModel::onCategorySelected,
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
-        onPlaceClick = onPlaceClick
+        onPlaceClick = onPlaceClick,
+        modifier = modifier
     )
 }
 
+/**
+ * Triển khai phân phối giao diện chính của màn hình Khám phá.
+ *
+ * Tự động chuyển mạch hiển thị giữa trạng thái đang tải (Shimmer loading), trạng thái rỗng,
+ * trạng thái báo lỗi mạng và trạng thái tải dữ liệu thành công chứa danh sách địa điểm.
+ *
+ * @param uiState Đối tượng đại diện cho các trạng thái màn hình ([ExploreUiState]).
+ * @param onRetry Callback nhấn thử lại khi tải dữ liệu gặp sự cố.
+ * @param onCategorySelected Callback nhấn chọn danh mục bộ lọc nhanh.
+ * @param onSearchQueryChanged Callback gõ tìm kiếm từ khóa địa điểm.
+ * @param onPlaceClick Callback xem chi tiết địa điểm.
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ */
 @Composable
 fun ExploreScreenContent(
     uiState: ExploreUiState,
     onRetry: () -> Unit,
     onCategorySelected: (String) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
-    onPlaceClick: (Place) -> Unit
+    onPlaceClick: (Place) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Background
+        modifier = modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
         when (uiState) {
             is ExploreUiState.Loading -> ExploreLoadingState()
@@ -85,7 +103,11 @@ fun ExploreScreenContent(
     }
 }
 
-
+/**
+ * Giao diện khi tải dữ liệu thành công (Success State) của màn hình Khám phá.
+ *
+ * Chứa thanh tìm kiếm địa danh, thanh trượt ngang bộ lọc danh mục và danh sách cuộn các địa điểm phù hợp.
+ */
 @Composable
 private fun ExploreSuccessContent(
     state: ExploreUiState.Success,
@@ -97,15 +119,19 @@ private fun ExploreSuccessContent(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
+        // Ô Tìm kiếm (Search Bar)
         item {
             SearchBar(
                 query = state.searchQuery,
                 onQueryChanged = onSearchQueryChanged,
                 placeholder = "Tìm kiếm địa điểm...",
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }
 
+        // Bộ lọc nhanh danh mục (Category filter row)
         item {
             CategoryFilterRow(
                 categories = categories,
@@ -114,20 +140,23 @@ private fun ExploreSuccessContent(
             )
         }
 
+        // Dòng hiển thị tổng số kết quả
         item {
             Text(
                 text = "${state.filteredPlaces.size} địa điểm",
                 fontSize = 13.sp,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }
 
+        // Kết quả tìm kiếm hoặc trạng thái trống
         if (state.filteredPlaces.isEmpty()) {
             item {
                 SearchEmptyState(query = state.searchQuery)
             }
         } else {
+            // Sử dụng itemsIndexed có tích hợp stable key để tối ưu hóa hiệu năng recomposition
             itemsIndexed(
                 items = state.filteredPlaces,
                 key = { _, place -> place.id }
@@ -144,6 +173,11 @@ private fun ExploreSuccessContent(
     }
 }
 
+/**
+ * Thanh cuộn ngang các mục danh mục bộ lọc nhanh.
+ *
+ * Tích hợp stable key cho hiệu năng render danh sách mượt mà nhất.
+ */
 @Composable
 private fun CategoryFilterRow(
     categories: List<String>,
@@ -154,13 +188,17 @@ private fun CategoryFilterRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(categories) { category ->
+        // Tối ưu hóa Recomposition bằng cách cung cấp stable key là tên danh mục duy nhất
+        items(
+            items = categories,
+            key = { it }
+        ) { category ->
             val isSelected = category == selectedCategory
             Surface(
                 onClick = { onCategorySelected(category) },
                 shape = RoundedCornerShape(20.dp),
-                color = if (isSelected) PrimaryRed else CardBackground,
-                border = if (!isSelected) BorderStroke(1.dp, Color(0xFFE0D5C5)) else null,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+                border = if (!isSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant) else null,
                 modifier = Modifier.animateContentSize()
             ) {
                 Text(
@@ -168,16 +206,20 @@ private fun CategoryFilterRow(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     fontSize = 13.sp,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (isSelected) Color.White else TextPrimary
+                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
                 )
             }
         }
     }
 }
 
+/**
+ * Trạng thái đang tải dữ liệu (Loading State) hiển thị hiệu ứng Shimmer mượt mà.
+ */
 @Composable
 private fun ExploreLoadingState() {
-    val shimmerColors = listOf(ShimmerLight, ShimmerDark, ShimmerLight)
+    val culturalColors = LocalCulturalColors.current
+    val shimmerColors = listOf(culturalColors.shimmerLight, culturalColors.shimmerDark, culturalColors.shimmerLight)
     val transition = rememberInfiniteTransition(label = "shimmer")
     val translateAnim by transition.animateFloat(
         initialValue = 0f,
@@ -213,6 +255,9 @@ private fun ExploreLoadingState() {
     }
 }
 
+/**
+ * Trạng thái trống (Empty State) hiển thị khi chưa có bất kỳ địa điểm nào trên hệ thống.
+ */
 @Composable
 private fun ExploreEmptyState(message: String = "Chưa có địa điểm nào", onRetry: () -> Unit) {
     Column(
@@ -224,14 +269,17 @@ private fun ExploreEmptyState(message: String = "Chưa có địa điểm nào",
     ) {
         Text(text = "🗺️", fontSize = 64.sp)
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = message, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        Text(text = message, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
         Spacer(modifier = Modifier.height(24.dp))
-        Button(onClick = onRetry, colors = ButtonDefaults.buttonColors(containerColor = PrimaryRed)) {
+        Button(onClick = onRetry, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
             Text(text = "Thử lại", color = Color.White)
         }
     }
 }
 
+/**
+ * Trạng thái trống của kết quả tìm kiếm (Search Empty State) hiển thị khi không có địa danh nào khớp từ khóa.
+ */
 @Composable
 private fun SearchEmptyState(query: String) {
     Column(
@@ -263,8 +311,8 @@ fun ExploreScreenLoadingPreview() {
 @Composable
 fun ExploreScreenSuccessPreview() {
     val mockPlaces = listOf(
-        Place(id = "1", name = "Vịnh Hạ Long", location = "Quảng Ninh", category = "Thiên nhiên", rating = 4.9f, description = "Di sản thiên nhiên thế giới", imageUrl = ""),
-        Place(id = "2", name = "Phố cổ Hội An", location = "Quảng Nam", category = "Lịch sử", rating = 4.8f, description = "Thành phố cổ kính bên sông Hoài", imageUrl = "")
+        Place(id = 1, name = "Vịnh Hạ Long", category = "Thiên nhiên", description = "Di sản thiên nhiên thế giới", latitude = 20.9101, longitude = 107.1839, imageUrl = ""),
+        Place(id = 2, name = "Phố cổ Hội An", category = "Lịch sử", description = "Thành phố cổ kính bên sông Hoài", latitude = 15.8801, longitude = 108.3380, imageUrl = "")
     )
     BeVietnamTheme {
         ExploreScreenContent(

@@ -33,27 +33,43 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.bevietnam.ui.components.BeVietnamTextField
 import com.bevietnam.ui.components.PrimaryLoadingButton
+import com.bevietnam.ui.theme.LocalCulturalColors
 
+/**
+ * Màn hình Đăng bài viết khám phá (Capture Screen) của ứng dụng BeVietnam.
+ *
+ * Cho phép người dùng chụp ảnh hoặc chọn ảnh phong cảnh từ thư viện, tự động kiểm tra và yêu cầu
+ * cấp quyền hệ thống (Camera & GPS Location) và đăng bài viết chia sẻ kèm tọa độ thực tế.
+ * Kết nối chặt chẽ với [CaptureViewModel] theo chuẩn Unidirectional Data Flow (UDF).
+ *
+ * @param onNavigateBack Callback điều hướng quay trở lại màn hình trước đó.
+ * @param viewModel ViewModel quản lý trạng thái màn hình Đăng bài ([CaptureViewModel]). Mặc định là [hiltViewModel].
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CaptureScreen(
     onNavigateBack: () -> Unit,
-    viewModel: CaptureViewModel = hiltViewModel()
+    viewModel: CaptureViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var description by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
 
-    // Permission Launchers
+    // Bệ phóng yêu cầu Cấp quyền Máy ảnh
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         viewModel.onPermissionResult(Manifest.permission.CAMERA, isGranted)
     }
 
+    // Bệ phóng yêu cầu Cấp quyền Truy cập Vị trí địa lý (GPS)
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -61,37 +77,41 @@ fun CaptureScreen(
         viewModel.onPermissionResult(Manifest.permission.ACCESS_FINE_LOCATION, granted)
     }
 
-    // Activity Result Launchers
+    // Bệ phóng chọn tệp hình ảnh từ Thư viện (Gallery)
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         viewModel.onImageCaptured(uri)
     }
 
-    // Effect for success navigation
+    // Lắng nghe trạng thái đăng bài thành công để điều hướng quay lại
     LaunchedEffect(uiState.uploadSuccess) {
         if (uiState.uploadSuccess) {
-            Toast.makeText(context, "Đăng bài thành công!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Đăng bài viết thành công!", Toast.LENGTH_SHORT).show()
             onNavigateBack()
             viewModel.resetState()
         }
     }
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Đăng bài mới", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
-                    TextButton(onClick = onNavigateBack) {
+                    TextButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.minimumInteractiveComponentSize() // Đảm bảo Touch Target 48dp
+                    ) {
                         Text("Hủy")
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFFFAF5E4)
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         },
-        containerColor = Color(0xFFFAF5E4)
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -104,7 +124,7 @@ fun CaptureScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Image Preview Area
+            // Khu vực xem trước hình ảnh (Image Preview Area)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -112,13 +132,20 @@ fun CaptureScreen(
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.White)
                     .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
-                    .clickable { galleryLauncher.launch("image/*") },
+                    .clickable(
+                        onClickLabel = "Chọn hình ảnh từ thư viện",
+                        onClick = { galleryLauncher.launch("image/*") }
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 if (uiState.imageUri != null) {
+                    // Tải ảnh mượt mà với Coil AsyncImage và crossfade
                     AsyncImage(
-                        model = uiState.imageUri,
-                        contentDescription = "Preview",
+                        model = ImageRequest.Builder(context)
+                            .data(uiState.imageUri)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Xem trước ảnh đã chọn",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
@@ -135,7 +162,7 @@ fun CaptureScreen(
                 }
             }
 
-            // Options Row
+            // Dòng tùy chọn chọn nguồn ảnh (Thư viện / Máy ảnh)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -151,14 +178,13 @@ fun CaptureScreen(
                     label = "Máy ảnh",
                     onClick = {
                         cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                        // In a real app, you'd launch a camera intent or custom camera screen here
                         Toast.makeText(context, "Tính năng máy ảnh đang được tích hợp", Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier.weight(1f)
                 )
             }
 
-            // Permission Status
+            // Các mục trạng thái và yêu cầu cấp quyền hệ thống
             PermissionStatusItem(
                 label = "Quyền máy ảnh",
                 isGranted = uiState.cameraPermissionGranted,
@@ -166,7 +192,7 @@ fun CaptureScreen(
             )
 
             PermissionStatusItem(
-                label = "Quyền vị trí",
+                label = "Quyền vị trí địa lý",
                 isGranted = uiState.locationPermissionGranted,
                 onRequest = {
                     locationPermissionLauncher.launch(
@@ -178,7 +204,7 @@ fun CaptureScreen(
                 }
             )
 
-            // Metadata Input
+            // Trường nhập nội dung cảm nghĩ/mô tả bài viết
             BeVietnamTextField(
                 label = "Nội dung bài viết",
                 value = description,
@@ -188,9 +214,9 @@ fun CaptureScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            if (uiState.errorMessage != null) {
+            uiState.errorMessage?.let { error ->
                 Text(
-                    text = uiState.errorMessage!!,
+                    text = error,
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -198,6 +224,7 @@ fun CaptureScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Nút đăng bài viết
             PrimaryLoadingButton(
                 text = "Đăng bài",
                 isLoading = uiState.isUploading,
@@ -210,6 +237,16 @@ fun CaptureScreen(
     }
 }
 
+/**
+ * Nút nhấn chọn nguồn ảnh (Capture Option Button) như Thư viện hay Máy ảnh.
+ *
+ * Tối ưu hóa hiệu ứng Ripple và Touch Target bằng cách dùng `Card(onClick = ...)` trực tiếp.
+ *
+ * @param icon Biểu tượng vectơ hiển thị trên thẻ ([ImageVector]).
+ * @param label Nhãn chuỗi hiển thị tên tùy chọn.
+ * @param onClick Callback nhấn nút.
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ */
 @Composable
 fun CaptureOptionButton(
     icon: ImageVector,
@@ -218,7 +255,8 @@ fun CaptureOptionButton(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.clickable { onClick() },
+        onClick = onClick, // Ripple mượt mà ôm sát bo góc Card theo đúng chuẩn Material 3
+        modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -229,24 +267,36 @@ fun CaptureOptionButton(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            Icon(
+                imageVector = icon, 
+                contentDescription = null, 
+                tint = MaterialTheme.colorScheme.primary
+            )
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = label, fontWeight = FontWeight.Medium, fontSize = 14.sp)
         }
     }
 }
 
+/**
+ * Mục hiển thị trạng thái cấp quyền hệ thống (Permission Status Item).
+ *
+ * @param label Tên quyền cần hiển thị (ví dụ: Quyền vị trí).
+ * @param isGranted Trạng thái quyền đã được cấp hay chưa.
+ * @param onRequest Callback kích hoạt yêu cầu cấp quyền khi nhấn nút.
+ */
 @Composable
 fun PermissionStatusItem(
     label: String,
     isGranted: Boolean,
     onRequest: () -> Unit
 ) {
+    val culturalColors = LocalCulturalColors.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .background(if (isGranted) Color(0xFFE8F5E9) else Color(0xFFFFF3E0))
+            .background(if (isGranted) culturalColors.permissionGreenBg else culturalColors.permissionOrangeBg)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -255,22 +305,25 @@ fun PermissionStatusItem(
             Icon(
                 imageVector = if (isGranted) Icons.Default.CheckCircle else Icons.Default.LocationOn,
                 contentDescription = null,
-                tint = if (isGranted) Color(0xFF4CAF50) else Color(0xFFF57C00),
+                tint = if (isGranted) culturalColors.permissionGreenText else culturalColors.permissionOrangeText,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (isGranted) Color(0xFF2E7D32) else Color(0xFFE65100)
+                color = if (isGranted) culturalColors.permissionGreenText else culturalColors.permissionOrangeText
             )
         }
         if (!isGranted) {
-            TextButton(onClick = onRequest) {
+            TextButton(
+                onClick = onRequest,
+                modifier = Modifier.minimumInteractiveComponentSize()
+            ) {
                 Text("Cấp quyền", fontSize = 12.sp)
             }
         } else {
-            Text("Đã cấp", fontSize = 12.sp, color = Color(0xFF4CAF50))
+            Text("Đã cấp", fontSize = 12.sp, color = culturalColors.permissionGreenText)
         }
     }
 }

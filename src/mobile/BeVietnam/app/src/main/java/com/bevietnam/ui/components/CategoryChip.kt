@@ -7,6 +7,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+/**
+ * Nhãn lựa chọn danh mục bộ lọc (Category Chip) của ứng dụng BeVietnam.
+ *
+ * Cung cấp giao diện bộ lọc nhanh trực quan dưới dạng Chip, tự động thay đổi màu sắc, đường viền
+ * dựa trên trạng thái được chọn hay không được chọn bởi người dùng.
+ *
+ * @param category Tên danh mục hiển thị trên Chip bộ lọc.
+ * @param isSelected Trạng thái xác định nhãn này đang được chọn hay không.
+ * @param onSelected Sự kiện click kích hoạt khi người dùng nhấn chọn nhãn danh mục.
+ * @param modifier [Modifier] dùng để căn chỉnh, định hình kích thước layout bên ngoài truyền vào.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryChip(

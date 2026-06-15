@@ -10,29 +10,109 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+/**
+ * Lớp cấu trúc chứa các màu sắc ngữ nghĩa và đặc thù phi tiêu chuẩn của BeVietnam.
+ */
+data class CulturalColors(
+    val easyColor: Color,
+    val mediumColor: Color,
+    val hardColor: Color,
+    val completedGray: Color,
+    val completionBlue: Color,
+    val amberColor: Color,
+    val goldColor: Color,
+    val shimmerLight: Color,
+    val shimmerDark: Color,
+    val permissionGreenBg: Color,
+    val permissionGreenText: Color,
+    val permissionOrangeBg: Color,
+    val permissionOrangeText: Color
+)
+
+/**
+ * Local dùng để cung cấp và truy cập bảng màu đặc thù ở bất kỳ Composable con nào.
+ */
+val LocalCulturalColors = staticCompositionLocalOf {
+    CulturalColors(
+        easyColor = Color.Unspecified,
+        mediumColor = Color.Unspecified,
+        hardColor = Color.Unspecified,
+        completedGray = Color.Unspecified,
+        completionBlue = Color.Unspecified,
+        amberColor = Color.Unspecified,
+        goldColor = Color.Unspecified,
+        shimmerLight = Color.Unspecified,
+        shimmerDark = Color.Unspecified,
+        permissionGreenBg = Color.Unspecified,
+        permissionGreenText = Color.Unspecified,
+        permissionOrangeBg = Color.Unspecified,
+        permissionOrangeText = Color.Unspecified
+    )
+}
+
+private val LightCulturalColors = CulturalColors(
+    easyColor = EasyGreen,
+    mediumColor = MediumOrange,
+    hardColor = HardRed,
+    completedGray = CompletedGray,
+    completionBlue = CompletionBlue,
+    amberColor = CulturalAmber,
+    goldColor = CulturalGold,
+    shimmerLight = Color(0xFFE0E0E0),
+    shimmerDark = Color(0xFFC8C8C8),
+    permissionGreenBg = PermissionGreenBg,
+    permissionGreenText = PermissionGreenText,
+    permissionOrangeBg = PermissionOrangeBg,
+    permissionOrangeText = PermissionOrangeText
+)
+
+private val DarkCulturalColors = CulturalColors(
+    easyColor = EasyGreen.copy(alpha = 0.8f),
+    mediumColor = MediumOrange.copy(alpha = 0.8f),
+    hardColor = HardRed.copy(alpha = 0.8f),
+    completedGray = CompletedGray.copy(alpha = 0.6f),
+    completionBlue = CompletionBlue.copy(alpha = 0.8f),
+    amberColor = CulturalAmber.copy(alpha = 0.8f),
+    goldColor = CulturalGold.copy(alpha = 0.8f),
+    shimmerLight = Color(0xFF3A3A3A),
+    shimmerDark = Color(0xFF222222),
+    permissionGreenBg = PermissionGreenBg.copy(alpha = 0.2f),
+    permissionGreenText = PermissionGreenText.copy(alpha = 0.9f),
+    permissionOrangeBg = PermissionOrangeBg.copy(alpha = 0.2f),
+    permissionOrangeText = PermissionOrangeText.copy(alpha = 0.9f)
+)
+
 private val DarkColorScheme = darkColorScheme(
-    primary = PrimaryRed,
+    primary = PrimaryRedLight,
+    onPrimary = Color.Black,
+    primaryContainer = PrimaryRed,
+    onPrimaryContainer = Color.White,
     secondary = PrimaryRedLight,
-    tertiary = Pink80,
-    background = Color(0xFF1A1A1A),
-    surface = Color(0xFF2A2A2A)
+    onSecondary = Color.Black,
+    background = Color(0xFF1E1B18), // Xám tối pha tông ấm đặc trưng Việt Nam
+    onBackground = Color(0xFFF8EFE5),
+    surface = Color(0xFF2A2624),
+    onSurface = Color(0xFFF8EFE5),
+    onSurfaceVariant = Color(0xFFDDC0BA)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = md_theme_light_primary,
-    onPrimary = md_theme_light_onPrimary,
-    primaryContainer = md_theme_light_primaryContainer,
-    onPrimaryContainer = md_theme_light_onPrimaryContainer,
-    secondary = md_theme_light_secondary,
-    onSecondary = md_theme_light_onSecondary,
-    secondaryContainer = md_theme_light_secondaryContainer,
-    onSecondaryContainer = md_theme_light_onSecondaryContainer,
+    primary = PrimaryRed,
+    onPrimary = Color.White,
+    primaryContainer = PrimaryRedLight,
+    onPrimaryContainer = Color.White,
+    secondary = PrimaryRedLight,
+    onSecondary = Color.White,
+    secondaryContainer = Color(0xFFE3DFD5),
+    onSecondaryContainer = Color(0xFF64635A),
     tertiary = md_theme_light_tertiary,
     onTertiary = md_theme_light_onTertiary,
     tertiaryContainer = md_theme_light_tertiaryContainer,
@@ -41,18 +121,18 @@ private val LightColorScheme = lightColorScheme(
     errorContainer = md_theme_light_errorContainer,
     onError = md_theme_light_onError,
     onErrorContainer = md_theme_light_onErrorContainer,
-    background = md_theme_light_background,
-    onBackground = md_theme_light_onBackground,
-    surface = md_theme_light_surface,
-    onSurface = md_theme_light_onSurface,
+    background = Background, // Màu vàng cát giấy dó ấm áp
+    onBackground = TextPrimary,
+    surface = CardBackground, // Màu trắng cho Card nổi bật
+    onSurface = TextPrimary,
     surfaceVariant = md_theme_light_surfaceVariant,
-    onSurfaceVariant = md_theme_light_onSurfaceVariant,
+    onSurfaceVariant = TextSecondary,
     outline = md_theme_light_outline,
+    outlineVariant = Color(0xFFE0D5C5), // Màu viền nhẹ
     inverseOnSurface = md_theme_light_inverseOnSurface,
     inverseSurface = md_theme_light_inverseSurface,
     inversePrimary = md_theme_light_inversePrimary,
     surfaceTint = md_theme_light_surfaceTint,
-    outlineVariant = md_theme_light_outlineVariant,
     scrim = md_theme_light_scrim
 )
 
@@ -71,6 +151,7 @@ fun BeVietnamTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+    val culturalColors = if (darkTheme) DarkCulturalColors else LightCulturalColors
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -80,9 +161,13 @@ fun BeVietnamTheme(
         }
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    CompositionLocalProvider(
+        LocalCulturalColors provides culturalColors
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
+    }
 }

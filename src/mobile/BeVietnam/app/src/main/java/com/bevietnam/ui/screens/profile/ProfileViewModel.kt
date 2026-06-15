@@ -17,13 +17,26 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Trạng thái giao diện (UI State) cho màn hình Hồ sơ cá nhân (Profile).
+ *
+ * @property isLoading Trạng thái đang tải dữ liệu thông tin người dùng.
+ * @property user Đối tượng chứa thông tin đầy đủ của người dùng ([User]) hiện tại.
+ * @property errorMessage Thông điệp lỗi chi tiết khi không tải được dữ liệu.
+ * @property isEditMode Trạng thái màn hình đang ở chế độ chỉnh sửa thông tin hay chỉ đọc.
+ * @property isSaving Trạng thái đang thực hiện lưu thông tin chỉnh sửa lên server.
+ * @property editName Trường chỉnh sửa Họ và tên.
+ * @property editBio Trường chỉnh sửa thông tin mô tả giới thiệu bản thân.
+ * @property editGender Trường chỉnh sửa Giới tính.
+ * @property editDateOfBirth Trường chỉnh sửa Ngày sinh nhật.
+ * @property editLocation Trường chỉnh sửa Địa điểm sinh sống.
+ */
 data class ProfileUiState(
     val isLoading: Boolean = false,
     val user: User? = null,
     val errorMessage: String? = null,
     val isEditMode: Boolean = false,
     val isSaving: Boolean = false,
-    // Fields for editing
     val editName: String = "",
     val editBio: String = "",
     val editGender: Gender? = null,
@@ -31,11 +44,31 @@ data class ProfileUiState(
     val editLocation: String = ""
 )
 
+/**
+ * Các sự kiện giao diện diễn ra một lần (One-off UI Events) của màn hình Hồ sơ cá nhân.
+ */
 sealed class ProfileUiEvent {
+    /** 
+     * Sự kiện hiển thị thông báo nhanh (Snackbar) lên màn hình.
+     * 
+     * @property message Nội dung thông báo cần hiển thị.
+     */
     data class ShowSnackbar(val message: String) : ProfileUiEvent()
+    
+    /** Sự kiện điều hướng người dùng quay trở lại màn hình Đăng nhập (khi Đăng xuất) */
     data object NavigateToLogin : ProfileUiEvent()
 }
 
+/**
+ * ViewModel chịu trách nhiệm quản lý logic nghiệp vụ và trạng thái dữ liệu cho màn hình Hồ sơ cá nhân (Profile Screen).
+ *
+ * Lớp này sử dụng quy chuẩn Unidirectional Data Flow (UDF), điều phối luồng chỉnh sửa thông tin cá nhân,
+ * lưu trữ cập nhật hồ sơ, và điều hướng đăng xuất tài khoản một cách an toàn.
+ *
+ * @property getUserUseCase UseCase lấy thông tin tài khoản người dùng chi tiết ([GetUserUseCase]).
+ * @property updateUserUseCase UseCase thực hiện cập nhật thông tin tài khoản ([UpdateUserUseCase]).
+ * @property sessionManager Quản lý phiên tài khoản người dùng hiện tại đang đăng nhập ([SessionManager]).
+ */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
@@ -53,6 +86,9 @@ class ProfileViewModel @Inject constructor(
         loadUserProfile()
     }
 
+    /**
+     * Tải thông tin hồ sơ của người dùng hiện tại đang đăng nhập từ Domain layer.
+     */
     private fun loadUserProfile() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -67,30 +103,60 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Nhận sự kiện thay đổi họ tên chỉnh sửa từ UI.
+     *
+     * @param value Tên mới.
+     */
     fun onNameChange(value: String) {
         _uiState.update { it.copy(editName = value) }
     }
 
+    /**
+     * Nhận sự kiện thay đổi lời giới thiệu bản thân chỉnh sửa từ UI.
+     *
+     * @param value Lời tự giới thiệu mới.
+     */
     fun onBioChange(value: String) {
         _uiState.update { it.copy(editBio = value) }
     }
 
+    /**
+     * Nhận sự kiện thay đổi giới tính chỉnh sửa từ UI.
+     *
+     * @param value Lựa chọn giới tính ([Gender]).
+     */
     fun onGenderChange(value: Gender) {
         _uiState.update { it.copy(editGender = value) }
     }
 
+    /**
+     * Nhận sự kiện thay đổi ngày sinh chỉnh sửa từ UI.
+     *
+     * @param value Chuỗi ngày sinh mới.
+     */
     fun onDateOfBirthChange(value: String) {
         _uiState.update { it.copy(editDateOfBirth = value) }
     }
 
+    /**
+     * Nhận sự kiện thay đổi vị trí sinh sống chỉnh sửa từ UI.
+     *
+     * @param value Địa điểm mới.
+     */
     fun onLocationChange(value: String) {
         _uiState.update { it.copy(editLocation = value) }
     }
 
+    /**
+     * Chuyển đổi trạng thái giữa Chế độ chỉnh sửa (Edit Mode) và Chế độ chỉ đọc (View Mode).
+     *
+     * Khi chuyển sang Chế độ chỉnh sửa, sao chép toàn bộ thông tin hiện tại của [User]
+     * vào các trường chỉnh sửa tạm thời trên form để hiển thị lên UI.
+     */
     fun toggleEditMode() {
         _uiState.update { state ->
             if (!state.isEditMode) {
-                // Khi bắt đầu edit, copy data hiện tại vào form
                 state.copy(
                     isEditMode = true,
                     editName = state.user?.name.orEmpty(),
@@ -105,6 +171,11 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Thực hiện nghiệp vụ lưu thông tin hồ sơ đã chỉnh sửa.
+     * Sao chép các thông tin thay đổi vào đối tượng [User] hiện tại, gọi UseCase cập nhật,
+     * và phát ra Snackbar thông báo kết quả.
+     */
     fun saveProfile() {
         val currentState = _uiState.value
         val currentUser = currentState.user ?: return
@@ -134,6 +205,11 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Thực hiện nghiệp vụ đăng xuất tài khoản.
+     * Xóa sạch phiên đăng nhập lưu trữ trong [SessionManager] và phát ra sự kiện
+     * điều hướng người dùng quay về màn hình Đăng nhập.
+     */
     fun logout() {
         viewModelScope.launch {
             sessionManager.logout()

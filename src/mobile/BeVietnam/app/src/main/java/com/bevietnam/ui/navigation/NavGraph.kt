@@ -24,6 +24,16 @@ import com.bevietnam.core.model.User
 import com.bevietnam.ui.components.AppTopBar
 import com.bevietnam.ui.screens.capture.CaptureScreen
 
+/**
+ * Điểm điều hướng chính (Main App Navigation Host) của ứng dụng BeVietnam.
+ *
+ * Nhận `MainViewModel` ở phạm vi toàn cục để theo dõi thông tin tài khoản người dùng hiện tại,
+ * và điều phối luồng giao diện thông qua [AppNavHostContent].
+ *
+ * @param navController Đối tượng quản lý điều hướng chính của ứng dụng ([NavHostController]).
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ * @param mainViewModel ViewModel toàn cục theo dõi thông tin người dùng ([MainViewModel]). Mặc định là [hiltViewModel].
+ */
 @androidx.compose.material3.ExperimentalMaterial3Api
 @Composable
 fun AppNavHost(
@@ -40,6 +50,16 @@ fun AppNavHost(
     )
 }
 
+/**
+ * Triển khai giao diện Scaffold và cấu hình biểu đồ điều hướng (NavHost) của BeVietnam.
+ *
+ * Quản lý tự động việc hiển thị/ẩn thanh TopAppBar và BottomNavBar dựa trên tuyến đường (Route) hiện tại,
+ * đồng thời cấu hình Backstack điều hướng an toàn và hiệu quả cho các tab.
+ *
+ * @param navController Đối tượng quản lý điều hướng chính của ứng dụng ([NavHostController]).
+ * @param currentUser Đối tượng thông tin người dùng hiện tại đang đăng nhập ([User]).
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ */
 @androidx.compose.material3.ExperimentalMaterial3Api
 @Composable
 fun AppNavHostContent(
@@ -50,10 +70,12 @@ fun AppNavHostContent(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
+    // Xác định xem màn hình hiện tại có thuộc nhóm Bottom Navigation Bar hay không
     val isBottomBarVisible = currentDestination?.let { dest ->
         Screen.bottomNavItems.any { item -> dest.hasRoute(item.route::class) }
     } ?: false
 
+    // Xác định KClass đại diện cho Route của màn hình đang hiển thị để làm nổi bật tab điều hướng tương ứng
     val currentRouteClass = Screen.bottomNavItems.find { item ->
         currentDestination?.hasRoute(item.route::class) == true
     }?.route?.let { it::class }
@@ -65,7 +87,7 @@ fun AppNavHostContent(
                 AppTopBar(
                     avatarUrl = currentUser?.avatarUrl,
                     onAvatarClick = {
-                        navController.navigate(ProfileRoute(currentUser?.id ?: "")) {
+                        navController.navigate(ProfileRoute(currentUser?.id ?: -1)) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }
@@ -138,9 +160,7 @@ fun AppNavHostContent(
                 com.bevietnam.ui.screens.storyline.StorylineScreen() 
             }
 
-            composable<CommunityRoute> {
-                PlaceholderScreen("Cộng đồng")
-            }
+
 
             composable<ProfileRoute> {
                 ProfileScreen(
@@ -155,6 +175,11 @@ fun AppNavHostContent(
     }
 }
 
+/**
+ * Giao diện màn hình giữ chỗ (Placeholder Screen) hiển thị cho các tính năng đang phát triển.
+ *
+ * @param title Tiêu đề hiển thị của màn hình đang phát triển.
+ */
 @Composable
 fun PlaceholderScreen(title: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

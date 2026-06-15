@@ -28,21 +28,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 
+/**
+ * Thanh tiêu đề trên cùng toàn cục (App Bar) của ứng dụng BeVietnam.
+ *
+ * Cung cấp tiêu đề thương hiệu chính giữa, nút bấm chức năng tạo bài viết mới (nếu được kích hoạt),
+ * và nút nhấn truy cập hồ sơ cá nhân qua ảnh đại diện (avatar) của người dùng ở góc phải.
+ *
+ * @param avatarUrl Đường dẫn ảnh hoặc tài nguyên ảnh đại diện của người dùng ([Any]).
+ * @param onAvatarClick Sự kiện click vào ảnh đại diện để truy cập hồ sơ cá nhân.
+ * @param onCreatePostClick Sự kiện click vào nút đăng bài viết mới. Mặc định là rỗng.
+ * @param showCreatePost Xác định có hiển thị nút thêm bài viết mới hay không. Mặc định là `false`.
+ * @param modifier [Modifier] dùng để căn chỉnh, định hình kích thước layout bên ngoài truyền vào.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopBar(
     avatarUrl: Any?,
     onAvatarClick: () -> Unit,
+    modifier: Modifier = Modifier,
     onCreatePostClick: () -> Unit = {},
     showCreatePost: Boolean = false
 ) {
     TopAppBar(
+        modifier = modifier,
         navigationIcon = {
             if (showCreatePost) {
                 IconButton(onClick = onCreatePostClick) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Create Post",
+                        contentDescription = "Đăng bài viết mới",
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -61,21 +75,31 @@ fun AppTopBar(
             }
         },
         actions = {
+            // Tối ưu hóa Touch Target lên tối thiểu 48x48dp để đảm bảo khả năng tiếp cận (Accessibility)
             Box(
                 modifier = Modifier
-                    .padding(end = 8.dp)
-                    .size(32.dp)
+                    .size(48.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .clickable { onAvatarClick() }
+                    .clickable(
+                        onClickLabel = "Truy cập hồ sơ cá nhân",
+                        onClick = onAvatarClick
+                    ),
+                contentAlignment = Alignment.Center
             ) {
-                if (avatarUrl != null) {
-                    AsyncImage(
-                        model = avatarUrl,
-                        contentDescription = "Avatar",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    if (avatarUrl != null) {
+                        AsyncImage(
+                            model = avatarUrl,
+                            contentDescription = "Ảnh đại diện người dùng",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
             }
         },

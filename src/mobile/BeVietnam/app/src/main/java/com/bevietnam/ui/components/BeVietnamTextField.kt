@@ -17,6 +17,20 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
+/**
+ * Ô nhập liệu tùy chỉnh (Custom Text Field) mang phong cách thiết kế đặc trưng của BeVietnam.
+ *
+ * Tích hợp nhãn mô tả (Label), biểu tượng dẫn đầu (Leading Icon) và gợi ý nhập liệu (Placeholder).
+ * Hỗ trợ các cơ chế biến đổi trực quan như ẩn mật khẩu khi nhập liệu.
+ *
+ * @param label Nhãn tiêu đề hiển thị phía trên ô nhập liệu.
+ * @param value Giá trị chuỗi văn bản hiện tại trong ô nhập liệu.
+ * @param onValueChange Callback kích hoạt khi người dùng thay đổi nội dung văn bản nhập vào.
+ * @param placeholder Văn bản gợi ý mờ hiển thị khi ô nhập liệu còn trống.
+ * @param leadingIcon Biểu tượng vectơ hiển thị ở góc trái của ô nhập liệu ([ImageVector]).
+ * @param modifier [Modifier] dùng để căn chỉnh, định hình kích thước layout bên ngoài truyền vào.
+ * @param visualTransformation Quy tắc biến đổi hiển thị văn bản nhập liệu (ví dụ: ẩn mật khẩu). Mặc định là không biến đổi.
+ */
 @Composable
 fun BeVietnamTextField(
     label: String,
@@ -48,7 +62,7 @@ fun BeVietnamTextField(
             leadingIcon = {
                 Icon(
                     imageVector = leadingIcon,
-                    contentDescription = null,
+                    contentDescription = null, // Icon mang tính chất trang trí minh họa, để null cho TalkBack bỏ qua
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
                 )
