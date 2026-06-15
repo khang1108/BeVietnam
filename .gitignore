@@ -1,37 +1,56 @@
+# ─── Agent/IDE tooling ─────────────────────────────────
 .agents/
-.superpowers/
-docs/
-slides/
-.env
-.slides/
-.vscode/
-PA_Decomposition.md
-submit/
-.secrets/
 .claude/
-.venv-google-sheets/
+.codex/
+.vscode/
+.idea/
+.superpowers/
+.secrets/
+
+# ─── Environment & secrets ─────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── Python ────────────────────────────────────────────
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
+.Python
 
 # Python virtual environments
 venv/
 .venv/
+bevietnam/            # root-level venv (legacy)
+.venv-google-sheets/
 
-# Web dependency and build outputs
+# ─── Web / Node ────────────────────────────────────────
 node_modules/
 .next/
 out/
 dist/
 build/
+*.tsbuildinfo
 
-# Logs and local OS/editor noise
+# ─── Mobile / Android ──────────────────────────────────
+mobile/.gradle/
+mobile/build/
+mobile/local.properties
+mobile/app/build/
+
+# ─── Data & generated ──────────────────────────────────
+data/qdrant/          # local embedded Qdrant storage
 *.log
-.DS_Store
-.idea/
+*.sqlite3
 
-# Local embedded Qdrant storage
-data/qdrant/
-.codex/
+# ─── OS noise ──────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── Docs & submissions (academic artifacts) ───────────
 docs/
-bevietnam/
-data/
+slides/
+.slides/
+submit/
+PA_Decomposition.md
