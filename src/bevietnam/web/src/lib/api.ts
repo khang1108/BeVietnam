@@ -153,16 +153,125 @@ export interface StorylineNextTaskResponse {
   fallback: boolean;
 }
 
+export interface StorylineNextTaskParams {
+  latitude?: number;
+  longitude?: number;
+  timeOfDay?: string;
+}
+
+export interface QuestionPoolItem {
+  question_id: string;
+  title: string;
+  question_text: string;
+  cultural_explanation: string;
+  source_text?: string;
+  source?: string;
+  place_name?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  radius_meters: number;
+  categories: string[];
+  difficulty: string;
+  required_media: string;
+  indoor_outdoor: string;
+  weather_tags: string[];
+  time_tags: string[];
+  estimated_duration_minutes: number;
+  language: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface RuntimeContext {
+  latitude: number;
+  longitude: number;
+  weather: string;
+  time_of_day: string;
+  formatted_address: string;
+  place_name: string;
+  source: string;
+  resolved_at: string;
+}
+
+export interface SelectedQuestion {
+  question: QuestionPoolItem;
+  score: number;
+  reasons: string[];
+  distance_meters?: number | null;
+}
+
+export interface QuestionPoolSelectionResponse {
+  context: RuntimeContext;
+  selected: SelectedQuestion[];
+  total_pool_size: number;
+  fallback: boolean;
+}
+
+export interface QuestionPoolSelectRequest {
+  user_id: string;
+  latitude: number;
+  longitude: number;
+  weather?: string;
+  time_of_day?: string;
+  interests?: string[];
+  completed_question_ids?: string[];
+  limit?: number;
+}
+
+export const questionPoolApi = {
+  select: (body: QuestionPoolSelectRequest) =>
+    apiRequest<QuestionPoolSelectionResponse>('/question-pool/select', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+};
+
+export type WeatherCondition = 'sunny' | 'cloudy' | 'rainy' | 'hot' | 'any';
+
+export interface WeatherResponse {
+  condition: WeatherCondition;
+  temp: number | null;
+  source: string;
+}
+
+export interface WeatherCoord {
+  lat: number;
+  lng: number;
+}
+
+export interface WeatherBatchResult extends WeatherCoord {
+  condition: WeatherCondition;
+  temp: number | null;
+}
+
+export interface WeatherBatchResponse {
+  results: WeatherBatchResult[];
+}
+
+export const weatherApi = {
+  getWeather: (lat: number, lng: number) =>
+    apiRequest<WeatherResponse>('/weather', {
+      params: { lat: String(lat), lng: String(lng) },
+    }),
+  getBatch: (coordinates: WeatherCoord[]) =>
+    apiRequest<WeatherBatchResponse>('/weather/batch', {
+      method: 'POST',
+      body: JSON.stringify({ coordinates }),
+    }),
+};
+
 // Storyline
 export const storylineApi = {
   getQuestChain: (userId = 'demo-user', questId = 'quest-hue-imperial') =>
     apiRequest<QuestChainResponse>('/storyline/quest', {
       params: { user_id: userId, quest_id: questId },
     }),
-  getNextTask: (userId = 'demo-user') =>
-    apiRequest<StorylineNextTaskResponse>('/storyline/next-task', {
-      params: { user_id: userId },
-    }),
+  getNextTask: (context: StorylineNextTaskParams = {}, userId = 'demo-user') => {
+    const params: Record<string, string> = { user_id: userId };
+    if (context.latitude !== undefined) params.latitude = String(context.latitude);
+    if (context.longitude !== undefined) params.longitude = String(context.longitude);
+    if (context.timeOfDay) params.time_of_day = context.timeOfDay;
+    return apiRequest<StorylineNextTaskResponse>('/storyline/next-task', { params });
+  },
 };
 
 export default apiRequest;

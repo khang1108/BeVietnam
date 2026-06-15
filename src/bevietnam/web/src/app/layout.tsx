@@ -57,7 +57,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <ClientProviders>
           <Navbar />
           <main className="page-wrapper">{children}</main>

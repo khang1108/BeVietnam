@@ -1,3 +1,3 @@
-from ai.culture_scout.agent import CultureScout
+from src.bevietnam.ai.agents.culture_scout.agent import CultureScout
 
 __all__ = ["CultureScout"]

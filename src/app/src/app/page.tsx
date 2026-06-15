@@ -87,7 +87,7 @@ export default function HomePage() {
         <a className={styles.socialItem}>YT</a>
       </div>
 
-      {/* Hero Body Split */}
+      {/* Hero Body Centered Layout */}
       <div className={styles.mainLayout}>
         <div className={styles.leftColumn}>
           <div className={styles.tagline}>{homepageContent.tagline}</div>
@@ -98,40 +98,6 @@ export default function HomePage() {
           <p className={styles.description}>
             {homepageContent.desc}
           </p>
-        </div>
-
-        {/* Interactive Map */}
-        <div className={styles.rightColumn}>
-          <div className={styles.mapContainer}>
-            {/* Vietnam S-Shape SVG */}
-            <svg viewBox="0 0 100 100" className={styles.mapSvg}>
-              {/* Background map coast silhouette */}
-              <path 
-                d="M 44,15 C 33,18 36,23 45,26 C 50,28 49,33 46,38 C 42,43 36,47 37,53 C 38,59 48,65 52,70 C 54,73 54,77 52,82 C 49,87 40,94 42,98 C 43,100 48,102 46,105 C 44,108 35,112 36,115"
-                className={styles.mapOutline}
-              />
-              
-              {/* Connected pulsing dotted path */}
-              <path 
-                d={pathD}
-                className={styles.activePath}
-              />
-            </svg>
-
-            {/* Check-in Nodes */}
-            {mapCheckins.map((coord) => (
-              <div
-                key={coord.id}
-                className={`${styles.mapNode} ${styles.nodeActive}`}
-                style={{ left: coord.x, top: coord.y }}
-              >
-                <div className={styles.mapNodeInner}></div>
-                <span className={styles.nodeLabel}>
-                  {locale === 'vi' ? coord.name_vi : coord.name_en}
-                </span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 

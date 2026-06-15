@@ -13,17 +13,20 @@ All endpoints follow the same pattern:
 
 from fastapi import APIRouter
 
-from ai.capture_judge import verify_capture_workflow
+from src.bevietnam.ai.agents.capture_judge import verify_capture_workflow
 from src.bevietnam.ai.common.schemas import (
     ExplainRecommendationRequest,
+    GenerateQuestionPoolRequest,
     GenerateTaskRequest,
     GenerateVlogRequest,
     VerifyCaptureRequest,
 )
-from ai.quest_maker import generate_task_workflow
-from ai.quest_maker.fallback import get_fallback_chain
-from ai.story_weaver import generate_vlog_workflow
-from ai.trip_advisor import explain_recommendation_workflow
+from src.bevietnam.ai.agents.publisher import PublisherAgent
+from src.bevietnam.ai.agents.question_pool_maker import QuestionPoolMaker
+from src.bevietnam.ai.agents.quest_maker import generate_task_workflow
+from src.bevietnam.ai.agents.quest_maker.fallback import get_fallback_chain
+from src.bevietnam.ai.agents.story_weaver import generate_vlog_workflow
+from src.bevietnam.ai.agents.trip_advisor import explain_recommendation_workflow
 
 router = APIRouter()
 
@@ -39,6 +42,28 @@ def generate_task(request: GenerateTaskRequest) -> dict:
     Falls back to a curated task if any step fails.
     """
     return generate_task_workflow(request.model_dump())
+
+
+@router.post("/generate-question-pool")
+def generate_question_pool(request: GenerateQuestionPoolRequest) -> dict:
+    """
+    Generate a reusable pool of cultural questions from book-derived facts.
+
+    This is an offline/administrative workflow. Runtime selection happens in
+    the backend based on user location, Goong context, weather, and time.
+    """
+    maker = QuestionPoolMaker()
+    questions = maker.generate(
+        facts=request.facts,
+        place_name=request.place_name,
+        language=request.language,
+        max_questions=request.max_questions,
+    )
+    return PublisherAgent().publish_response(
+        payload={"questions": questions, "total": len(questions)},
+        status="ok",
+        metadata={"ai_generated": not maker.used_fallback, "fallback": maker.used_fallback},
+    )
 
 
 @router.get("/quest-chain")

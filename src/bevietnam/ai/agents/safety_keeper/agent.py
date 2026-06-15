@@ -6,7 +6,7 @@ Currently uses rule-based checks (field presence, length limits, safe content).
 Can be extended with LLM-based safety checks later.
 
 Usage:
-    from ai.safety_keeper import SafetyKeeper
+    from src.bevietnam.ai.agents.safety_keeper import SafetyKeeper
 
     keeper = SafetyKeeper()
     is_valid = keeper.validate_required_fields(task, ["title", "description"])

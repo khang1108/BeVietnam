@@ -6,12 +6,13 @@ import { usePathname } from 'next/navigation';
 import { useI18n } from '@/i18n';
 import { useTheme } from '@/hooks/useTheme';
 import { localeNames } from '@/i18n/translations';
-import { IconCalendar, IconExplore, IconFeed, IconSparkle } from '@/components/icons/UiIcons';
+import { IconCalendar, IconExplore, IconFeed, IconFlagVn, IconSparkle } from '@/components/icons/UiIcons';
 import styles from './Navbar.module.css';
 
 const navItems = [
   { key: 'feed', href: '/', icon: <IconFeed className={styles.navIconSvg} /> },
   { key: 'explore', href: '/explore', icon: <IconExplore className={styles.navIconSvg} /> },
+  { key: 'storyline', href: '/storyline', icon: <IconFlagVn className={styles.navIconSvg} /> },
   { key: 'events', href: '/events', icon: <IconCalendar className={styles.navIconSvg} /> },
   { key: 'contribute', href: '/contribute', icon: <IconSparkle className={styles.navIconSvg} /> },
 ];

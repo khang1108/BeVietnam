@@ -5,7 +5,7 @@ Prepares final AI workflow output for backend consumption.
 Wraps task data in a standard envelope with status and metadata.
 
 Usage:
-    from ai.publisher import PublisherAgent
+    from src.bevietnam.ai.agents.publisher import PublisherAgent
 
     publisher = PublisherAgent()
     response = publisher.publish_response(task, status="ok")

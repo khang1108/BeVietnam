@@ -23,6 +23,7 @@ const vi: Translations = {
   nav: {
     feed: 'Bảng tin',
     explore: 'Khám phá',
+    storyline: 'Lộ trình',
     events: 'Sự kiện',
     contribute: 'Đóng góp',
     login: 'Đăng nhập',
@@ -119,6 +120,23 @@ const vi: Translations = {
     copyright: '© 2026 BeVietnam. Bản quyền thuộc về nhóm phát triển.',
     madeWith: 'Được xây dựng với ❤️ tại Việt Nam',
   },
+  storyline: {
+    title: 'Hành trình BeVietnam',
+    subtitle: 'Hành trình văn hoá qua các miền di sản Việt Nam',
+    difficulty: 'Độ khó',
+    requirement: 'Yêu cầu hoàn thành',
+    completeTask: 'Hoàn Thành Nhiệm Vụ',
+    completed: '✓ Đã Hoàn Thành',
+    locked: 'Chưa mở khóa',
+    reset: 'Đặt lại Hành trình',
+    chapter: 'Chương',
+    done: 'Hoàn thành',
+    doing: 'Đang làm',
+    nextTask: 'Nhiệm vụ tiếp theo',
+    easy: 'Dễ',
+    medium: 'Trung bình',
+    hard: 'Khó'
+  },
 };
 
 const en: Translations = {
@@ -140,6 +158,7 @@ const en: Translations = {
   nav: {
     feed: 'Feed',
     explore: 'Explore',
+    storyline: 'Storyline',
     events: 'Events',
     contribute: 'Contribute',
     login: 'Login',
@@ -235,6 +254,23 @@ const en: Translations = {
     contact: 'Contact',
     copyright: '© 2026 BeVietnam. All rights reserved.',
     madeWith: 'Built with ❤️ in Vietnam',
+  },
+  storyline: {
+    title: 'BeVietnam Storyline',
+    subtitle: 'A cultural journey through Vietnam\'s heritage sites',
+    difficulty: 'Difficulty',
+    requirement: 'Requirement',
+    completeTask: 'Complete Challenge',
+    completed: '✓ Completed',
+    locked: 'Locked',
+    reset: 'Reset Journey',
+    chapter: 'Chapter',
+    done: 'Done',
+    doing: 'In Progress',
+    nextTask: 'Next Challenge',
+    easy: 'Easy',
+    medium: 'Medium',
+    hard: 'Hard'
   },
 };
 

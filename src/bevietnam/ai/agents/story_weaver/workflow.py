@@ -1,6 +1,6 @@
-from ai.memory_curator import MemoryCurator
-from ai.publisher import PublisherAgent
-from ai.story_weaver.agent import StoryWeaver
+from src.bevietnam.ai.agents.memory_curator import MemoryCurator
+from src.bevietnam.ai.agents.publisher import PublisherAgent
+from src.bevietnam.ai.agents.story_weaver.agent import StoryWeaver
 
 
 def generate_vlog_workflow(context: dict) -> dict:

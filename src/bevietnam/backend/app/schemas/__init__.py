@@ -17,6 +17,21 @@ from src.bevietnam.backend.app.schemas.storyline import (
     VerifyTaskCaptureResponse,
 )
 from src.bevietnam.backend.app.schemas.capture import CaptureCreateRequest, CaptureResponse
+from src.bevietnam.backend.app.schemas.question_pool import (
+    QuestionPoolItem,
+    QuestionPoolResponse,
+    RuntimeContext,
+    RuntimeContextRequest,
+    SelectedQuestion,
+    SelectQuestionResponse,
+)
+from src.bevietnam.backend.app.schemas.weather import (
+    WeatherBatchRequest,
+    WeatherBatchResponse,
+    WeatherBatchResult,
+    WeatherCoord,
+    WeatherResponse,
+)
 from src.bevietnam.backend.app.schemas.user import (
     UserRegisterRequest,
     UserLoginRequest,
@@ -34,6 +49,11 @@ __all__ = [
     "StorylineTask", "StorylineNextTaskResponse",
     "VerifyTaskCaptureBody", "VerifyTaskCaptureResponse",
     "CaptureCreateRequest", "CaptureResponse",
+    "QuestionPoolItem", "QuestionPoolResponse",
+    "RuntimeContext", "RuntimeContextRequest",
+    "SelectedQuestion", "SelectQuestionResponse",
+    "WeatherResponse", "WeatherCoord", "WeatherBatchRequest", "WeatherBatchResult",
+    "WeatherBatchResponse",
     "UserRegisterRequest", "UserLoginRequest", "UserResponse", "TokenResponse",
     "LogEntry", "LogsResponse",
 ]

@@ -31,3 +31,5 @@ build/
 
 # Local embedded Qdrant storage
 data/qdrant/
+.codex/
+docs/

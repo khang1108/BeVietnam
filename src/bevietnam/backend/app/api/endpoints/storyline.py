@@ -11,12 +11,14 @@ from fastapi import APIRouter, Query
 from src.bevietnam.backend.app.schemas import (
     QuestChainResponse,
     QuestTask,
+    RuntimeContextRequest,
     StorylineNextTaskResponse,
     StorylineTask,
     VerifyTaskCaptureBody,
     VerifyTaskCaptureResponse,
 )
 from src.bevietnam.backend.app.core.ai_core_client import ai_core_client
+from src.bevietnam.backend.app.services.question_pool_service import question_pool_service
 
 router = APIRouter()
 
@@ -140,15 +142,59 @@ async def verify_task_capture(body: VerifyTaskCaptureBody):
 
 
 @router.get("/storyline/next-task", response_model=StorylineNextTaskResponse, tags=["Storyline"])
-async def get_next_task(user_id: str = Query(..., description="ID của người dùng")):
+async def get_next_task(
+    user_id: str = Query(..., description="ID của người dùng"),
+    latitude: float | None = Query(None, description="Current user latitude"),
+    longitude: float | None = Query(None, description="Current user longitude"),
+    weather: str | None = Query(None, description="sunny | rainy | hot | cloudy | any"),
+    time_of_day: str | None = Query(None, description="morning | afternoon | evening | night"),
+    interests: list[str] | None = Query(None),
+    completed_question_ids: list[str] | None = Query(None),
+):
     """
-    GET /storyline/next-task — Generate the next cultural task via AI Core.
+    GET /storyline/next-task — Return the next cultural task.
 
-    Calls the Quest Maker pipeline:
-    Culture Scout (Qdrant) → Quest Maker (Gemini) → Safety Keeper → Publisher.
+    If latitude/longitude are provided, this selects from the pre-generated
+    book-derived question pool using current context. Without location, it keeps
+    the legacy AI generation fallback for old clients.
 
     Falls back to mock task if AI Core is unavailable.
     """
+    if latitude is not None and longitude is not None:
+        selection = await question_pool_service.select(
+            RuntimeContextRequest(
+                user_id=user_id,
+                latitude=latitude,
+                longitude=longitude,
+                weather=weather,
+                time_of_day=time_of_day,
+                interests=interests or [],
+                completed_question_ids=completed_question_ids or [],
+                limit=1,
+            )
+        )
+        if selection.selected:
+            selected = selection.selected[0]
+            question = selected.question
+            task = StorylineTask(
+                task_id=question.question_id,
+                title=question.title,
+                description=question.question_text,
+                cultural_explanation=question.cultural_explanation,
+                difficulty=question.difficulty,
+                completion_requirement=(
+                    "Hoàn thành theo yêu cầu và gửi minh chứng: "
+                    f"{question.required_media}."
+                ),
+                place_id=question.place_name or None,
+                score=max(0.0, min(1.0, selected.score / 100)),
+            )
+            return StorylineNextTaskResponse(
+                task=task,
+                ai_generated=False,
+                fallback=selection.fallback,
+            )
+
     # Call AI Core to generate a task
     raw = await ai_core_client.generate_task(user_id=user_id)
     fallback = raw.get("fallback", False)

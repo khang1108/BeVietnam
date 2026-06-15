@@ -87,25 +87,30 @@
   text-shadow: 0 0 8px rgba(212, 155, 42, 0.5);
 }
 
-/* Main Content Split */
+/* Main Content Split - Centered Layout */
 .mainLayout {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
   max-width: 1200px;
   width: 100%;
-  margin: 100px auto 30px auto;
-  padding: 0 20px 0 80px;
+  margin: 120px auto 30px auto;
+  padding: 0 80px;
   flex-grow: 1;
-  align-items: center;
+  text-align: center;
 }
 
-/* Left Side: Hero Title */
+/* Left Side: Hero Title Centered */
 .leftColumn {
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
-  height: 100%;
+  text-align: center;
+  width: 100%;
+  max-width: 800px;
   gap: 15px;
 }
 
@@ -143,12 +148,13 @@
 }
 
 .description {
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 1.1rem;
+  line-height: 1.7;
   color: rgba(226, 221, 213, 0.85);
-  max-width: 480px;
+  max-width: 680px;
   margin-top: 10px;
   text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  text-align: center;
 }
 
 /* Right Side: Map of Vietnam */

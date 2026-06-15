@@ -49,6 +49,20 @@ class GeneratedTask(BaseModel):
     reason_codes: list[str] = []
 
 
+# ── Question Pool Generation ─────────────────────────────────────────────────
+
+class GenerateQuestionPoolRequest(BaseModel):
+    """Request body for POST /generate-question-pool."""
+
+    facts: list[dict] = Field(
+        default_factory=list,
+        description="Grounded cultural facts extracted from books.",
+    )
+    place_name: str = ""
+    language: str = "vi"
+    max_questions: int = Field(default=20, ge=1, le=100)
+
+
 # ── Recommendation Explanation ────────────────────────────────────────────────
 
 class ExplainRecommendationRequest(BaseModel):

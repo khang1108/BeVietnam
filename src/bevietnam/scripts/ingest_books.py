@@ -18,6 +18,7 @@ Usage:
     python scripts/ingest_books.py --file path/to/book.pdf  # single file
     python scripts/ingest_books.py --clear                  # wipe collection first
     python scripts/ingest_books.py --dry-run                # extract only, no upload
+    python scripts/ingest_books.py --generate-questions     # write data/question_pool.json
     python scripts/ingest_books.py --delay 0.5              # seconds between Gemini calls
     python scripts/ingest_books.py --preview 10             # show first N extracted facts
 """
@@ -255,7 +256,7 @@ def ingest_file(
     delay: float,
     dry_run: bool,
     preview_remaining: list[int],  # mutable counter [N] — shows first N facts
-) -> tuple[int, int, int]:
+) -> tuple[int, int, int, list[dict]]:
     """
     Process one book file.
     Returns (chunks_total, facts_extracted, facts_uploaded).
@@ -265,13 +266,14 @@ def ingest_file(
     raw = parse_file(path)
     if not raw.strip():
         logger.warning("    No text extracted — skipping")
-        return 0, 0, 0
+        return 0, 0, 0, []
 
     chunks = chunk_text(raw)
     logger.info("    %d chars → %d chunks", len(raw), len(chunks))
 
     source = path.stem
     batch: list[dict] = []
+    facts: list[dict] = []
     extracted = 0
     uploaded = 0
 
@@ -281,6 +283,7 @@ def ingest_file(
         if fact is not None:
             extracted += 1
             batch.append(fact)
+            facts.append(fact)
 
             # Show preview facts
             if preview_remaining[0] > 0:
@@ -312,7 +315,40 @@ def ingest_file(
         "    ✅  %d extracted, %d skipped, %d uploaded",
         extracted, len(chunks) - extracted, uploaded,
     )
-    return len(chunks), extracted, uploaded
+    return len(chunks), extracted, uploaded, facts
+
+
+def write_question_pool(
+    facts: list[dict],
+    output_path: Path,
+    place_name: str,
+    language: str,
+    max_questions: int,
+) -> int:
+    """Generate reusable questions from facts and write them as backend JSON."""
+    from src.bevietnam.ai.agents.question_pool_maker import QuestionPoolMaker
+
+    maker = QuestionPoolMaker()
+    questions = maker.generate(
+        facts=facts,
+        place_name=place_name,
+        language=language,
+        max_questions=max_questions,
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "version": 1,
+        "source": "book_ingestion",
+        "place_name": place_name,
+        "language": language,
+        "facts_count": len(facts),
+        "questions": questions,
+    }
+    output_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return len(questions)
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
@@ -341,6 +377,33 @@ def main() -> None:
     parser.add_argument(
         "--preview", type=int, default=0, metavar="N",
         help="Print the first N extracted facts to stdout",
+    )
+    parser.add_argument(
+        "--generate-questions",
+        action="store_true",
+        help="Generate a reusable question pool JSON from extracted facts",
+    )
+    parser.add_argument(
+        "--question-pool-out",
+        default="data/question_pool.json",
+        help="Question pool output path (default: data/question_pool.json)",
+    )
+    parser.add_argument(
+        "--place-name",
+        default="",
+        help="Optional default place name for generated questions",
+    )
+    parser.add_argument(
+        "--language",
+        default="vi",
+        choices=["vi", "en"],
+        help="Question language (default: vi)",
+    )
+    parser.add_argument(
+        "--max-questions",
+        type=int,
+        default=40,
+        help="Maximum questions to generate when --generate-questions is used",
     )
     args = parser.parse_args()
 
@@ -389,9 +452,10 @@ def main() -> None:
     preview_counter = [args.preview]  # mutable list so ingest_file can decrement it
 
     total_chunks = total_extracted = total_uploaded = 0
+    all_facts: list[dict] = []
 
     for file_path in files:
-        c, e, u = ingest_file(
+        c, e, u, facts = ingest_file(
             path=file_path,
             extractor=extractor,
             delay=args.delay,
@@ -401,6 +465,22 @@ def main() -> None:
         total_chunks += c
         total_extracted += e
         total_uploaded += u
+        all_facts.extend(facts)
+
+    questions_written = 0
+    if args.generate_questions and all_facts:
+        questions_written = write_question_pool(
+            facts=all_facts,
+            output_path=Path(args.question_pool_out),
+            place_name=args.place_name,
+            language=args.language,
+            max_questions=args.max_questions,
+        )
+        logger.info(
+            "Generated %d question-pool items at %s",
+            questions_written,
+            args.question_pool_out,
+        )
 
     # ── Summary ───────────────────────────────────────────────────────────────
     print(
@@ -411,6 +491,7 @@ def main() -> None:
         f"({100 * total_extracted // total_chunks if total_chunks else 0}% yield)\n"
         f"  Facts skipped   : {total_chunks - total_extracted}\n"
         f"  Facts uploaded  : {'(dry-run)' if args.dry_run else total_uploaded}\n"
+        f"  Questions       : {questions_written}\n"
         f"{'─'*50}"
     )
 

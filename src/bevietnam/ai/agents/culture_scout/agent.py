@@ -10,7 +10,7 @@ If retrieval returns weak results, it reports low confidence
 so downstream agents can use fallback behavior.
 
 Usage:
-    from ai.culture_scout import CultureScout
+    from src.bevietnam.ai.agents.culture_scout import CultureScout
 
     scout = CultureScout()
     facts = scout.retrieve(
@@ -24,7 +24,7 @@ import logging
 from typing import Any
 
 from src.bevietnam.ai.common.qdrant_store import qdrant_store
-from ai.culture_scout.fallback import get_fallback_facts
+from src.bevietnam.ai.agents.culture_scout.fallback import get_fallback_facts
 
 logger = logging.getLogger(__name__)
 

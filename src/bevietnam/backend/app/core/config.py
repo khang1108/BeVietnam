@@ -16,6 +16,19 @@ class Settings(BaseSettings):
     AI_CORE_TIMEOUT: int = 300  # seconds
     AI_CORE_USE_MOCK: bool = True  # True = dùng mock thay vì gọi thật
 
+    # Context-aware question selection
+    QUESTION_POOL_PATH: str = "data/question_pool.json"
+
+    # Goong context enrichment. Leave GOONG_API_KEY empty for local fallback mode.
+    GOONG_API_KEY: str = ""
+    GOONG_BASE_URL: str = "https://rsapi.goong.io"
+    GOONG_TIMEOUT: int = 10
+
+    # OpenWeather context enrichment. Leave key empty for local fallback mode.
+    OPENWEATHER_API_KEY: str = ""
+    OPENWEATHER_BASE_URL: str = "https://api.openweathermap.org/data/2.5"
+    OPENWEATHER_TIMEOUT: int = 10
+
     class Config:
         env_file = ".env"
         case_sensitive = True

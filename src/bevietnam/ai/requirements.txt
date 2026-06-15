@@ -15,9 +15,8 @@ langgraph>=0.2
 # Vector database
 qdrant-client>=1.7
 
-# Embedding model (local, open source — BAAI/bge-m3)
-sentence-transformers>=3.0
-torch>=2.0
+# Embedding via HuggingFace Inference API (no local model — no torch/GPU needed)
+httpx>=0.27.0
 
 # Book ingestion pipeline (scripts/ingest_books.py)
 pypdf>=4.0.0

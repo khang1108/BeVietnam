@@ -1,5 +1,5 @@
-from ai.publisher import PublisherAgent
-from ai.trip_advisor.agent import TripAdvisorAgent
+from src.bevietnam.ai.agents.publisher import PublisherAgent
+from src.bevietnam.ai.agents.trip_advisor.agent import TripAdvisorAgent
 
 
 def explain_recommendation_workflow(context: dict) -> dict:

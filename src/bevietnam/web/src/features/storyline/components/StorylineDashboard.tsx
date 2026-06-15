@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from '../styles/storyline.module.css';
-import { storylineApi, QuestTask, StorylineTaskDetail } from '@/lib/api';
+import { storylineApi, type QuestTask, type StorylineTaskDetail } from '@/lib/api';
 
 const QUEST_IMAGES = [
     '/images/hero-hue-citadel.png',
@@ -39,12 +39,7 @@ export function StorylineDashboard() {
     const [generatingTask, setGeneratingTask] = useState(false);
     const [activeTask, setActiveTask] = useState<ActiveTaskState | null>(null);
 
-    useEffect(() => {
-        loadQuestChain();
-    }, []);
-
-    async function loadQuestChain() {
-        setLoading(true);
+    const loadQuestChain = useCallback(async () => {
         const res = await storylineApi.getQuestChain();
         if (res.data && res.data.tasks.length > 0) {
             setTasks(res.data.tasks);
@@ -52,13 +47,32 @@ export function StorylineDashboard() {
             setCurrentStep(activeIdx >= 0 ? activeIdx + 1 : 1);
         }
         setLoading(false);
-    }
+    }, []);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadQuestChain();
+    }, [loadQuestChain]);
 
     async function handleKhamPha(stepIndex: number) {
         if (stepIndex !== currentStep) return;
         setGeneratingTask(true);
-        const res = await storylineApi.getNextTask();
-        setGeneratingTask(false);
+        let res: Awaited<ReturnType<typeof storylineApi.getNextTask>>;
+        try {
+            if (!navigator.geolocation) {
+                res = await storylineApi.getNextTask();
+            } else {
+                const position = await getCurrentPosition();
+                res = await storylineApi.getNextTask({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                });
+            }
+        } catch {
+            res = await storylineApi.getNextTask();
+        } finally {
+            setGeneratingTask(false);
+        }
         if (res.data) {
             setActiveTask({ ...res.data.task, ai_generated: res.data.ai_generated });
         }
@@ -205,4 +219,14 @@ export function StorylineDashboard() {
             )}
         </div>
     );
+}
+
+function getCurrentPosition(): Promise<GeolocationPosition> {
+    return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 8000,
+            maximumAge: 0,
+        });
+    });
 }

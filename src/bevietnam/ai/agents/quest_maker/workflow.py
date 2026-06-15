@@ -17,7 +17,7 @@ Orchestrates the full task generation pipeline:
     └─────────┘
 
 Usage:
-    from ai.quest_maker.workflow import generate_task_workflow
+    from src.bevietnam.ai.agents.quest_maker.workflow import generate_task_workflow
 
     result = generate_task_workflow({
         "user_id": "user-001",
@@ -29,15 +29,15 @@ import logging
 
 from langgraph.graph import END, StateGraph
 
-from ai.publisher import PublisherAgent
-from ai.quest_maker.nodes import (
+from src.bevietnam.ai.agents.publisher import PublisherAgent
+from src.bevietnam.ai.agents.quest_maker.nodes import (
     fallback_task,
     generate_task,
     prepare_context,
     retrieve_culture,
     validate_task,
 )
-from ai.quest_maker.state import QuestMakerState
+from src.bevietnam.ai.agents.quest_maker.state import QuestMakerState
 
 logger = logging.getLogger(__name__)
 
@@ -142,7 +142,7 @@ def generate_task_workflow(context: dict) -> dict:
         logger.error("Quest Maker workflow crashed: %s", exc, exc_info=True)
 
         # Ultimate fallback — return a safe task even if the graph crashes
-        from ai.quest_maker.fallback import get_fallback_task
+        from src.bevietnam.ai.agents.quest_maker.fallback import get_fallback_task
 
         publisher = PublisherAgent()
         return publisher.publish_response(

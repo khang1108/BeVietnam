@@ -10,6 +10,8 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY app ./src/bevietnam/backend/app
+COPY alembic ./src/bevietnam/backend/alembic
+COPY alembic.ini ./src/bevietnam/backend/alembic.ini
 
 ENV PYTHONPATH=/app
 

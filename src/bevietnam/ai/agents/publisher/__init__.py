@@ -1,3 +1,3 @@
-from ai.publisher.agent import PublisherAgent
+from src.bevietnam.ai.agents.publisher.agent import PublisherAgent
 
 __all__ = ["PublisherAgent"]

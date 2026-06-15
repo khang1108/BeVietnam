@@ -6,7 +6,7 @@ This module defines the base state shared across agents.
 Each agent module may extend this with its own fields in a local state.py.
 
 Usage:
-    from ai.common.state import AgentState
+    from src.bevietnam.ai.common.state import AgentState
 """
 
 from __future__ import annotations

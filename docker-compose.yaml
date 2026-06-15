@@ -1,24 +1,4 @@
 services:
-  ai:
-    build:
-      context: ./src/bevietnam/ai
-      dockerfile: Dockerfile
-    container_name: bevietnam-ai
-    volumes:
-      - ./src/bevietnam/ai:/app/src/bevietnam/ai
-    environment:
-      QDRANT_CLUSTER_ENDPOINT: ${QDRANT_CLUSTER_ENDPOINT:-}
-      QDRANT_API_KEY: ${QDRANT_API_KEY:-}
-      QDRANT_HOST: vector-db
-      QDRANT_PORT: 6333
-      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-    ports:
-      - "8001:8000"
-    depends_on:
-      - vector-db
-    networks:
-      - bevietnam-network
-
   backend:
     build:
       context: ./src/bevietnam/backend
@@ -26,16 +6,21 @@ services:
     container_name: bevietnam-backend
     volumes:
       - ./src/bevietnam/backend/app:/app/src/bevietnam/backend/app
+      - ./data:/app/data:ro
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://bevietnam:bevietnam@postgres-db:5432/bevietnam}
-      AI_CORE_BASE_URL: http://ai:8000
+      # AI Core runs locally outside Docker — reachable via host.docker.internal
+      AI_CORE_BASE_URL: http://host.docker.internal:8001
       AI_CORE_USE_MOCK: "false"
       AI_CORE_TIMEOUT: "300"
+      QUESTION_POOL_PATH: /app/data/question_pool.json
+      GOONG_API_KEY: ${GOONG_API_KEY:-}
+      GOONG_BASE_URL: ${GOONG_BASE_URL:-https://rsapi.goong.io}
+      GOONG_TIMEOUT: ${GOONG_TIMEOUT:-10}
     ports:
       - "8000:8000"
     depends_on:
       - postgres-db
-      - ai
     networks:
       - bevietnam-network
 
@@ -56,39 +41,6 @@ services:
     networks:
       - bevietnam-network
 
-  vector-db:
-    image: qdrant/qdrant:latest
-    container_name: bevietnam-qdrant-local
-    ports:
-      - "6333:6333"
-    volumes:
-      - qdrant_data:/qdrant/storage
-    networks:
-      - bevietnam-network
-
-  seed-qdrant:
-    build:
-      context: ./src/bevietnam/ai
-      dockerfile: Dockerfile
-    container_name: bevietnam-seed
-    volumes:
-      - ./src/bevietnam/ai:/app/src/bevietnam/ai
-      - ./scripts:/app/scripts
-    environment:
-      QDRANT_CLUSTER_ENDPOINT: ${QDRANT_CLUSTER_ENDPOINT:-}
-      QDRANT_API_KEY: ${QDRANT_API_KEY:-}
-      QDRANT_HOST: vector-db
-      QDRANT_PORT: 6333
-    entrypoint: python
-    command: ["/app/scripts/seed_qdrant.py"]
-    working_dir: /app
-    depends_on:
-      - vector-db
-    profiles:
-      - seed
-    networks:
-      - bevietnam-network
-
   postgres-db:
     image: postgres:15-alpine
     container_name: bevietnam-postgres
@@ -103,6 +55,12 @@ services:
     networks:
       - bevietnam-network
 
+  # AI Core — chạy ngoài Docker bằng lệnh bên dưới, không build trong compose
+  # PYTHONPATH=. uvicorn src.bevietnam.ai.main:app --host 0.0.0.0 --port 8001
+
+  # Seed Qdrant Cloud với 32 docs văn hóa (chạy 1 lần)
+  # PYTHONPATH=. python src/bevietnam/scripts/seed_qdrant.py
+
 networks:
   bevietnam-network:
     driver: bridge
@@ -110,4 +68,3 @@ networks:
 volumes:
   postgres_data:
   web_node_modules:
-  qdrant_data:

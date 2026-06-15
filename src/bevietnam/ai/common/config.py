@@ -11,7 +11,7 @@ Supports both:
   - Local Qdrant server (QDRANT_HOST + QDRANT_PORT via Docker or binary)
 
 Usage:
-    from ai.common.config import settings
+    from src.bevietnam.ai.common.config import settings
     print(settings.gemini_api_key)
 """
 
@@ -44,9 +44,10 @@ class Settings(BaseSettings):
     # Collection name (shared between cloud and local)
     qdrant_collection: str = "cultural_knowledge"
 
-    # ── Embedding Model (local, open source) ──────────────────────────────────
+    # ── Embedding (HuggingFace Inference API — no local model needed) ────────
     embedding_model_name: str = "BAAI/bge-m3"
     embedding_dimension: int = 1024  # bge-m3 dense embedding dimension
+    hf_token: str = ""               # HuggingFace token — get free at hf.co/settings/tokens
 
     # ── LLM (Gemini) ─────────────────────────────────────────────────────────
     gemini_api_key: str = ""

@@ -94,6 +94,31 @@ _MOCK_RESPONSES: Dict[str, Any] = {
         },
         "metadata": {"ai_generated": False, "fallback": True},
     },
+    "generate_question_pool": {
+        "status": "ok",
+        "data": {
+            "questions": [
+                {
+                    "question_id": "mock-question-001",
+                    "title": "Khám phá chi tiết văn hóa",
+                    "question_text": "Tìm một chi tiết văn hóa tại địa điểm hiện tại và chụp ảnh lại.",
+                    "cultural_explanation": "Demo question generated from mock AI Core.",
+                    "source_text": "Mock cultural fact.",
+                    "source": "mock",
+                    "place_name": "Việt Nam",
+                    "categories": ["culture"],
+                    "difficulty": "easy",
+                    "required_media": "photo",
+                    "indoor_outdoor": "any",
+                    "weather_tags": ["any"],
+                    "time_tags": ["any"],
+                    "estimated_duration_minutes": 15,
+                }
+            ],
+            "total": 1,
+        },
+        "metadata": {"ai_generated": False, "fallback": True},
+    },
 }
 
 # ── Fallback response when AI Core is unreachable ─────────────────────────────
@@ -201,6 +226,22 @@ class AICoreClient:
         """Capture Judge — xác minh ảnh / minh chứng hoàn thành task."""
         payload = {"user_id": user_id, "task": task, "capture": capture}
         return await self._post("/verify-capture", payload)
+
+    async def generate_question_pool(
+        self,
+        facts: list[Dict],
+        place_name: str = "",
+        language: str = "vi",
+        max_questions: int = 20,
+    ) -> Dict:
+        """Generate reusable question-pool items from grounded book facts."""
+        payload = {
+            "facts": facts,
+            "place_name": place_name,
+            "language": language,
+            "max_questions": max_questions,
+        }
+        return await self._post("/generate-question-pool", payload)
 
 
 # Singleton instance

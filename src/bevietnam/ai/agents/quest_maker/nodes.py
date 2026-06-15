@@ -17,11 +17,11 @@ import logging
 import uuid
 
 from src.bevietnam.ai.common.llm import llm_gateway
-from ai.culture_scout import CultureScout
-from ai.quest_maker.fallback import get_fallback_task
-from ai.quest_maker.prompts import SYSTEM_PROMPT, build_user_prompt
-from ai.quest_maker.state import QuestMakerState
-from ai.safety_keeper import SafetyKeeper
+from src.bevietnam.ai.agents.culture_scout import CultureScout
+from src.bevietnam.ai.agents.quest_maker.fallback import get_fallback_task
+from src.bevietnam.ai.agents.quest_maker.prompts import SYSTEM_PROMPT, build_user_prompt
+from src.bevietnam.ai.agents.quest_maker.state import QuestMakerState
+from src.bevietnam.ai.agents.safety_keeper import SafetyKeeper
 
 logger = logging.getLogger(__name__)
 

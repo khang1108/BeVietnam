@@ -7,7 +7,15 @@ To add a new feature:
 """
 from fastapi import APIRouter
 from src.bevietnam.backend.app.api.endpoints import storyline
-from src.bevietnam.backend.app.api.endpoints import captures, feed, health, logs, places
+from src.bevietnam.backend.app.api.endpoints import (
+    captures,
+    feed,
+    health,
+    logs,
+    places,
+    question_pool,
+    weather,
+)
 
 api_router = APIRouter()
 
@@ -17,3 +25,5 @@ api_router.include_router(feed.router)
 api_router.include_router(storyline.router)
 api_router.include_router(captures.router)
 api_router.include_router(logs.router)
+api_router.include_router(question_pool.router)
+api_router.include_router(weather.router)

@@ -5,13 +5,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/i18n';
 import { useTheme } from '@/hooks/useTheme';
-import { localeNames, Locale } from '@/i18n/translations';
-import { IconCalendar, IconExplore, IconFeed, IconSparkle } from '@/components/icons/UiIcons';
+import { localeNames } from '@/i18n/translations';
+import { IconCalendar, IconExplore, IconFeed, IconFlagVn, IconSparkle } from '@/components/icons/UiIcons';
 import styles from './Navbar.module.css';
 
 const navItems = [
   { key: 'feed', href: '/', icon: <IconFeed className={styles.navIconSvg} /> },
   { key: 'explore', href: '/explore', icon: <IconExplore className={styles.navIconSvg} /> },
+  { key: 'storyline', href: '/storyline', icon: <IconFlagVn className={styles.navIconSvg} /> },
   { key: 'events', href: '/events', icon: <IconCalendar className={styles.navIconSvg} /> },
   { key: 'contribute', href: '/contribute', icon: <IconSparkle className={styles.navIconSvg} /> },
 ];
@@ -85,6 +86,7 @@ export default function Navbar() {
             onClick={toggleTheme}
             aria-label={t('nav.theme')}
             title={t('nav.theme')}
+            suppressHydrationWarning
           >
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
@@ -133,7 +135,7 @@ export default function Navbar() {
         <div className={styles.mobileDivider}></div>
 
         <div className={styles.mobileControls}>
-          <button className={styles.navControl} onClick={toggleTheme}>
+          <button className={styles.navControl} onClick={toggleTheme} suppressHydrationWarning>
             {theme === 'light' ? '🌙' : '☀️'} {t('nav.theme')}
           </button>
           <button className={`${styles.navControl} ${styles.langSwitch}`} onClick={toggleLocale}>
