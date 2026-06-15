@@ -33,3 +33,5 @@ build/
 data/qdrant/
 .codex/
 docs/
+bevietnam/
+data/

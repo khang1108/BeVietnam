@@ -1,11 +1,11 @@
 services:
   backend:
     build:
-      context: ./src/bevietnam/backend
+      context: ./services/backend
       dockerfile: Dockerfile
     container_name: bevietnam-backend
     volumes:
-      - ./src/bevietnam/backend/app:/app/src/bevietnam/backend/app
+      - ./services/backend/app:/app/services/backend/app
       - ./data:/app/data:ro
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://bevietnam:bevietnam@postgres-db:5432/bevietnam}
@@ -29,7 +29,7 @@ services:
     container_name: bevietnam-web
     working_dir: /app
     volumes:
-      - ./src/bevietnam/web:/app
+      - ./services/web:/app
       - web_node_modules:/app/node_modules
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
@@ -56,10 +56,10 @@ services:
       - bevietnam-network
 
   # AI Core — chạy ngoài Docker bằng lệnh bên dưới, không build trong compose
-  # PYTHONPATH=. uvicorn src.bevietnam.ai.main:app --host 0.0.0.0 --port 8001
+  # PYTHONPATH=. uvicorn services.ai.main:app --host 0.0.0.0 --port 8001
 
   # Seed Qdrant Cloud với 32 docs văn hóa (chạy 1 lần)
-  # PYTHONPATH=. python src/bevietnam/scripts/seed_qdrant.py
+  # PYTHONPATH=. python scripts/data-pipeline/seed_qdrant.py
 
 networks:
   bevietnam-network:
