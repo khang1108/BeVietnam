@@ -253,6 +253,45 @@
 /* Feed section */
 .feedSection {
   padding: var(--space-16) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.feedSection > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dragonVideoWrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  mix-blend-mode: screen;
+}
+
+.dragonVideo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: cover;
+  opacity: 0.3;
+}
+
+[data-theme="dark"] .dragonVideo {
+  opacity: 0.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dragonVideo {
+    display: none;
+  }
 }
 
 .sectionHeader {

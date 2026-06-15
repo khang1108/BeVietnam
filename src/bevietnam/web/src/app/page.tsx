@@ -162,6 +162,16 @@ export default function HomePage() {
 
       {/* Feed */}
       <section className={styles.feedSection} id="feed-section">
+        <div className={styles.dragonVideoWrap} aria-hidden="true">
+          <video
+            className={styles.dragonVideo}
+            src="/videos/dragon-video.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+        </div>
         <div className={styles.sectionHeader} data-reveal>
           <h2 className={styles.sectionTitle}>
             {t('feed.recommended')} ✨
