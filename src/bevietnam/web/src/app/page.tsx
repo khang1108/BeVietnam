@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
+import DashboardCardEffect from '@/components/DashboardCardEffect';
 import { useI18n } from '@/i18n';
 import { IconCalendar, IconExplore, IconFlagVn, IconFood, IconGlobe, IconLocation, IconMountain } from '@/components/icons/UiIcons';
 import styles from './page.module.css';
@@ -152,6 +153,7 @@ export default function HomePage() {
               data-reveal
               style={withRevealDelay(i)}
             >
+              <DashboardCardEffect className={styles.threeCardCanvas} />
               <div className={styles.statIcon}>{stat.icon}</div>
               <div className={styles.statValue}>{stat.value}</div>
               <div className={styles.statLabel}>{stat.label}</div>
@@ -179,6 +181,7 @@ export default function HomePage() {
               data-reveal
               style={{ ...withRevealDelay(item.id), textDecoration: 'none' }}
             >
+              <DashboardCardEffect className={styles.threeCardCanvas} />
               <div className={styles.feedCardImage}>
                 <div className={styles.feedCardImagePlaceholder}>{item.icon}</div>
                 {item.badge && (
@@ -216,6 +219,7 @@ export default function HomePage() {
         </div>
         <div className={styles.featuresGrid}>
           <div className={styles.featureCard} data-reveal style={withRevealDelay(0)}>
+            <DashboardCardEffect className={styles.threeCardCanvas} />
             <div className={`${styles.featureIcon} ${styles.featureIconGold}`}>🤖</div>
             <h3 className={styles.featureTitle}>
               {locale === 'vi' ? 'AI Văn hóa' : 'Cultural AI'}
@@ -228,6 +232,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className={styles.featureCard} data-reveal style={withRevealDelay(1)}>
+            <DashboardCardEffect className={styles.threeCardCanvas} />
             <div className={`${styles.featureIcon} ${styles.featureIconRed}`}>🌏</div>
             <h3 className={styles.featureTitle}>
               {locale === 'vi' ? 'Song ngữ 100%' : '100% Bilingual'}
@@ -240,6 +245,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className={styles.featureCard} data-reveal style={withRevealDelay(2)}>
+            <DashboardCardEffect className={styles.threeCardCanvas} />
             <div className={`${styles.featureIcon} ${styles.featureIconGreen}`}>🔄</div>
             <h3 className={styles.featureTitle}>
               {locale === 'vi' ? 'Luôn cập nhật' : 'Always Fresh'}
