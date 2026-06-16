@@ -6,8 +6,8 @@ To add a new feature:
     2. Import and include router here
 """
 from fastapi import APIRouter
-from src.bevietnam.backend.app.api.endpoints import storyline
-from src.bevietnam.backend.app.api.endpoints import (
+from services.backend.app.api.endpoints import storyline
+from services.backend.app.api.endpoints import (
     captures,
     feed,
     health,

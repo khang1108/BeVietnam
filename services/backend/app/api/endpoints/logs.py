@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from datetime import datetime, timezone
-from src.bevietnam.backend.app.schemas import LogsResponse, LogEntry
+from services.backend.app.schemas import LogsResponse, LogEntry
 
 router = APIRouter()
 

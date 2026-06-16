@@ -10,7 +10,7 @@ This client handles:
 
 import httpx
 import logging
-from src.bevietnam.backend.app.core.config import settings
+from services.backend.app.core.config import settings
 from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)

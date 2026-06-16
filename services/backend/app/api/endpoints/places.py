@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from typing import Optional
-from src.bevietnam.backend.app.schemas import PlacesResponse, PlaceSchema
+from services.backend.app.schemas import PlacesResponse, PlaceSchema
 
 router = APIRouter()
 

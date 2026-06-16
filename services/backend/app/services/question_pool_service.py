@@ -11,8 +11,8 @@ from typing import Any
 
 import httpx
 
-from src.bevietnam.backend.app.core.config import settings
-from src.bevietnam.backend.app.schemas.question_pool import (
+from services.backend.app.core.config import settings
+from services.backend.app.schemas.question_pool import (
     QuestionPoolItem,
     QuestionPoolResponse,
     RuntimeContext,
@@ -20,7 +20,7 @@ from src.bevietnam.backend.app.schemas.question_pool import (
     SelectQuestionResponse,
     SelectedQuestion,
 )
-from src.bevietnam.backend.app.services.weather_service import weather_service
+from services.backend.app.services.weather_service import weather_service
 
 logger = logging.getLogger(__name__)
 

@@ -9,7 +9,7 @@ from typing import Any
 
 import httpx
 
-from src.bevietnam.backend.app.core.config import settings
+from services.backend.app.core.config import settings
 
 logger = logging.getLogger(__name__)
 

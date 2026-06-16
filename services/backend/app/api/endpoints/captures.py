@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from src.bevietnam.backend.app.schemas.capture import CaptureCreateRequest, CaptureResponse
-from src.bevietnam.backend.app.services.services import capture_service
+from services.backend.app.schemas.capture import CaptureCreateRequest, CaptureResponse
+from services.backend.app.services.services import capture_service
 
 router = APIRouter()
 

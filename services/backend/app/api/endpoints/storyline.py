@@ -8,7 +8,7 @@ Provides:
 """
 
 from fastapi import APIRouter, Query
-from src.bevietnam.backend.app.schemas import (
+from services.backend.app.schemas import (
     QuestChainResponse,
     QuestTask,
     RuntimeContextRequest,
@@ -17,8 +17,8 @@ from src.bevietnam.backend.app.schemas import (
     VerifyTaskCaptureBody,
     VerifyTaskCaptureResponse,
 )
-from src.bevietnam.backend.app.core.ai_core_client import ai_core_client
-from src.bevietnam.backend.app.services.question_pool_service import question_pool_service
+from services.backend.app.core.ai_core_client import ai_core_client
+from services.backend.app.services.question_pool_service import question_pool_service
 
 router = APIRouter()
 

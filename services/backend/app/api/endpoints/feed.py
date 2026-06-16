@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from datetime import datetime, timezone
-from src.bevietnam.backend.app.schemas import FeedResponse, FeedItem
+from services.backend.app.schemas import FeedResponse, FeedItem
 
 router = APIRouter()
 

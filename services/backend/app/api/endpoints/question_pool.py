@@ -2,12 +2,12 @@
 
 from fastapi import APIRouter
 
-from src.bevietnam.backend.app.schemas.question_pool import (
+from services.backend.app.schemas.question_pool import (
     QuestionPoolResponse,
     RuntimeContextRequest,
     SelectQuestionResponse,
 )
-from src.bevietnam.backend.app.services.question_pool_service import question_pool_service
+from services.backend.app.services.question_pool_service import question_pool_service
 
 router = APIRouter(prefix="/question-pool", tags=["Question Pool"])
 

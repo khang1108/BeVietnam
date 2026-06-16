@@ -5,10 +5,10 @@ Import directly from sub-modules for new code:
     from app.schemas.feed import FeedItem, FeedResponse
     ...
 """
-from src.bevietnam.backend.app.schemas.base import HealthResponse
-from src.bevietnam.backend.app.schemas.place import PlaceSchema, PlacesResponse
-from src.bevietnam.backend.app.schemas.feed import FeedItem, FeedResponse
-from src.bevietnam.backend.app.schemas.storyline import (
+from services.backend.app.schemas.base import HealthResponse
+from services.backend.app.schemas.place import PlaceSchema, PlacesResponse
+from services.backend.app.schemas.feed import FeedItem, FeedResponse
+from services.backend.app.schemas.storyline import (
     QuestTask,
     QuestChainResponse,
     StorylineTask,
@@ -16,8 +16,8 @@ from src.bevietnam.backend.app.schemas.storyline import (
     VerifyTaskCaptureBody,
     VerifyTaskCaptureResponse,
 )
-from src.bevietnam.backend.app.schemas.capture import CaptureCreateRequest, CaptureResponse
-from src.bevietnam.backend.app.schemas.question_pool import (
+from services.backend.app.schemas.capture import CaptureCreateRequest, CaptureResponse
+from services.backend.app.schemas.question_pool import (
     QuestionPoolItem,
     QuestionPoolResponse,
     RuntimeContext,
@@ -25,14 +25,14 @@ from src.bevietnam.backend.app.schemas.question_pool import (
     SelectedQuestion,
     SelectQuestionResponse,
 )
-from src.bevietnam.backend.app.schemas.weather import (
+from services.backend.app.schemas.weather import (
     WeatherBatchRequest,
     WeatherBatchResponse,
     WeatherBatchResult,
     WeatherCoord,
     WeatherResponse,
 )
-from src.bevietnam.backend.app.schemas.user import (
+from services.backend.app.schemas.user import (
     UserRegisterRequest,
     UserLoginRequest,
     UserResponse,

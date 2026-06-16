@@ -13,7 +13,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
-from src.bevietnam.backend.app.schemas.capture import CaptureCreateRequest, CaptureResponse
+from services.backend.app.schemas.capture import CaptureCreateRequest, CaptureResponse
 
 # ── In-memory fallback (Sprint 1 only — replace with DB calls) ──────────────
 _captures_store: list[CaptureResponse] = []

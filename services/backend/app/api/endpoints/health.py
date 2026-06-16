@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from datetime import datetime, timezone
-from src.bevietnam.backend.app.schemas import HealthResponse
-from src.bevietnam.backend.app.core.config import settings
+from services.backend.app.schemas import HealthResponse
+from services.backend.app.core.config import settings
 
 router = APIRouter()
 

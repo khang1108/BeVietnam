@@ -2,13 +2,13 @@
 
 from fastapi import APIRouter, Query
 
-from src.bevietnam.backend.app.schemas.weather import (
+from services.backend.app.schemas.weather import (
     WeatherBatchRequest,
     WeatherBatchResponse,
     WeatherBatchResult,
     WeatherResponse,
 )
-from src.bevietnam.backend.app.services.weather_service import weather_service
+from services.backend.app.services.weather_service import weather_service
 
 router = APIRouter(prefix="/weather", tags=["Weather"])
 
