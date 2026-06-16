@@ -1,4 +1,4 @@
-package com.bevietnam.core.session
+package com.bevietnam.core.domain.session
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

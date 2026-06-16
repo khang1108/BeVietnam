@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.bevietnam.R
 import com.bevietnam.core.model.Gender
 import com.bevietnam.ui.components.ErrorView
@@ -44,16 +46,29 @@ import com.bevietnam.ui.components.PrimaryLoadingButton
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
+/**
+ * Màn hình Hồ sơ cá nhân (Profile Screen) của ứng dụng BeVietnam.
+ *
+ * Cho phép người dùng theo dõi cấp độ, điểm số hành trình, chỉnh sửa thông tin cá nhân (Họ tên, Bio, Giới tính, Ngày sinh, Vị trí)
+ * và thực hiện đăng xuất khỏi hệ thống.
+ * Kết nối luồng dữ liệu từ [ProfileViewModel] và phát ra các sự kiện một lần an toàn thông qua LaunchedEffect.
+ *
+ * @param onNavigateToLogin Callback điều hướng người dùng sang màn hình Đăng nhập khi đăng xuất tài khoản.
+ * @param viewModel ViewModel quản lý thông tin hồ sơ người dùng ([ProfileViewModel]). Mặc định là [hiltViewModel].
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     onNavigateToLogin: () -> Unit,
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
+    // Lắng nghe và xử lý các sự kiện giao diện diễn ra một lần (One-off Events)
     LaunchedEffect(viewModel.uiEvent) {
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -66,19 +81,25 @@ fun ProfileScreen(
     }
 
     Scaffold(
+        modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp)
     ) { paddingValues ->
+        val errorMessage = uiState.errorMessage
+        val user = uiState.user
+
         when {
             uiState.isLoading -> LoadingIndicator(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            )
+            errorMessage != null -> ErrorView(
+                message = errorMessage,
                 modifier = Modifier.padding(paddingValues)
             )
-            uiState.errorMessage != null -> ErrorView(
-                message = uiState.errorMessage!!,
-                modifier = Modifier.padding(paddingValues)
-            )
-            uiState.user != null -> ProfileContent(
+            user != null -> ProfileContent(
                 uiState = uiState,
                 onNameChange = viewModel::onNameChange,
                 onBioChange = viewModel::onBioChange,
@@ -89,7 +110,7 @@ fun ProfileScreen(
                 onSaveClick = viewModel::saveProfile,
                 onCancelClick = viewModel::toggleEditMode,
                 onShareClick = {
-                    Toast.makeText(context, "Share — coming soon!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Tính năng chia sẻ đang phát triển!", Toast.LENGTH_SHORT).show()
                 },
                 onLogoutClick = viewModel::logout,
                 modifier = Modifier.padding(paddingValues)
@@ -98,7 +119,11 @@ fun ProfileScreen(
     }
 }
 
-
+/**
+ * Bố cục nội dung hiển thị chính (Content Layout) của màn hình Hồ sơ cá nhân.
+ *
+ * Chứa thẻ Avatar và các chỉ số cấp độ/điểm số, cùng form chỉnh sửa thông tin cá nhân khi được chuyển sang Chế độ chỉnh sửa (Edit Mode).
+ */
 @Composable
 private fun ProfileContent(
     uiState: ProfileUiState,
@@ -115,6 +140,7 @@ private fun ProfileContent(
     modifier: Modifier = Modifier
 ) {
     val user = uiState.user!!
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -122,6 +148,7 @@ private fun ProfileContent(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Thẻ thông tin cá nhân cốt lõi (Core Card)
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -134,8 +161,12 @@ private fun ProfileContent(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Tải ảnh đại diện mượt mà với Coil AsyncImage và crossfade
                 AsyncImage(
-                    model = user.avatarUrl,
+                    model = ImageRequest.Builder(context)
+                        .data(user.avatarUrl)
+                        .crossfade(true)
+                        .build(),
                     contentDescription = stringResource(R.string.avatar),
                     modifier = Modifier
                         .size(88.dp)
@@ -161,7 +192,7 @@ private fun ProfileContent(
                         Icon(
                             imageVector = if (user.gender == Gender.MALE)
                                 Icons.Default.Male else Icons.Default.Female,
-                            contentDescription = null,
+                            contentDescription = if (user.gender == Gender.MALE) "Nam" else "Nữ",
                             tint = if (user.gender == Gender.MALE)
                                 MaterialTheme.colorScheme.primary
                             else MaterialTheme.colorScheme.tertiary,
@@ -216,6 +247,7 @@ private fun ProfileContent(
 
                 Spacer(modifier = Modifier.height(18.dp))
 
+                // Chỉ số thành tựu trong game (Gamified Stats)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -234,6 +266,7 @@ private fun ProfileContent(
 
                 Spacer(modifier = Modifier.height(18.dp))
 
+                // Nút chỉnh sửa và chia sẻ (ở View Mode)
                 if (!uiState.isEditMode) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -264,6 +297,7 @@ private fun ProfileContent(
             }
         }
 
+        // Thẻ thông tin địa lý và ngày tham gia
         if (!uiState.isEditMode) {
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -275,6 +309,7 @@ private fun ProfileContent(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
+        // Form Chỉnh sửa thông tin hồ sơ (Edit Mode)
         if (uiState.isEditMode) {
             Surface(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -315,7 +350,6 @@ private fun ProfileContent(
                     )
                     Spacer(Modifier.height(12.dp))
 
-                    Spacer(Modifier.height(12.dp))
                     GenderSelector(
                         selected = uiState.editGender,
                         onSelect = onGenderChange
@@ -348,6 +382,7 @@ private fun ProfileContent(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
+        // Nút Đăng xuất (Logout Button)
         OutlinedButton(
             onClick = onLogoutClick,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(48.dp),
@@ -365,6 +400,9 @@ private fun ProfileContent(
     }
 }
 
+/**
+ * Chỉ số thành tựu riêng lẻ (Stat Item).
+ */
 @Composable
 private fun ProfileStatItem(label: String, value: String, icon: ImageVector) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -374,6 +412,9 @@ private fun ProfileStatItem(label: String, value: String, icon: ImageVector) {
     }
 }
 
+/**
+ * Thẻ hiển thị thông tin tĩnh (Info Card) như Vị trí địa lý hay Ngày tham gia.
+ */
 @Composable
 private fun ProfileInfoCard(title: String, content: String, icon: ImageVector) {
     Surface(

@@ -28,100 +28,83 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-
 import com.bevietnam.core.model.Task
 import com.bevietnam.core.model.TaskDifficulty
 import com.bevietnam.ui.theme.BeVietnamTheme
+import com.bevietnam.ui.theme.LocalCulturalColors
 
-// ── Color Tokens ──────────────────────────────────────────────────────────────
-
-private val PrimaryRed = Color(0xFFC0392B)
-private val Background = Color(0xFFFAF5E4)
-private val CardBackground = Color(0xFFFFFFFF)
-private val TextPrimary = Color(0xFF1A1A1A)
-private val TextSecondary = Color(0xFF6B6B6B)
-private val EasyGreen = Color(0xFF27AE60)
-private val MediumOrange = Color(0xFFE67E22)
-private val HardRed = Color(0xFFC0392B)
-private val CulturalAmber = Color(0xFFF39C12)
-private val CompletionBlue = Color(0xFF2980B9)
-private val ShimmerLight = Color(0xFFE0E0E0)
-private val ShimmerDark = Color(0xFFC8C8C8)
-private val CompletedGray = Color(0xFFBDBDBD)
-
+/**
+ * Màn hình Hành trình cốt truyện & Nhiệm vụ (Storyline Screen) của ứng dụng BeVietnam.
+ *
+ * Cung cấp hành trình trò chơi hóa (gamification) tìm hiểu văn hóa Việt Nam của người dùng.
+ * Cho phép xem nhiệm vụ hiện tại, theo dõi tiến độ tổng thể và mở rộng xem giải thích chi tiết về văn hóa lịch sử Việt Nam.
+ *
+ * @param viewModel ViewModel quản lý trạng thái dữ liệu màn hình cốt truyện ([StorylineViewModel]). Mặc định là [hiltViewModel].
+ * @param onTaskClick Callback kích hoạt khi người dùng nhấn chọn một thẻ nhiệm vụ ([Task]).
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ */
 @Composable
 fun StorylineScreen(
     viewModel: StorylineViewModel = hiltViewModel(),
-    onTaskClick: (Task) -> Unit = {}
+    onTaskClick: (Task) -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Background
-    ) {
-        Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-            StorylineTopBar()
-
-            when (val state = uiState) {
-                is StorylineUiState.Loading -> StorylineLoadingState()
-                is StorylineUiState.Empty -> StorylineEmptyState(
-                    onRetry = { viewModel.loadTasks() }
-                )
-                is StorylineUiState.Error -> StorylineEmptyState(
-                    message = state.message,
-                    onRetry = { viewModel.loadTasks() }
-                )
-                is StorylineUiState.Success -> StorylineSuccessContent(
-                    state = state,
-                    onTaskClick = onTaskClick,
-                    onTaskCompleted = viewModel::onTaskCompleted
-                )
-            }
-        }
-    }
+    StorylineScreenContent(
+        uiState = uiState,
+        onRetry = viewModel::loadTasks,
+        onTaskClick = onTaskClick,
+        onTaskCompleted = viewModel::onTaskCompleted,
+        modifier = modifier
+    )
 }
 
+/**
+ * Triển khai phân phối giao diện chính của màn hình Cốt truyện & Nhiệm vụ.
+ *
+ * Tự động chuyển đổi giữa các giao diện đang tải (Shimmer), giao diện lỗi/rỗng và giao diện danh sách nhiệm vụ thành công.
+ *
+ * @param uiState Đối tượng đại diện cho trạng thái màn hình ([StorylineUiState]).
+ * @param onRetry Callback nhấn thử lại khi tải dữ liệu gặp sự cố.
+ * @param onTaskClick Callback nhấn xem thông tin thẻ nhiệm vụ.
+ * @param onTaskCompleted Callback nhấn xác nhận hoàn thành nhiệm vụ.
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ */
 @Composable
-private fun StorylineTopBar() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Background)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+fun StorylineScreenContent(
+    uiState: StorylineUiState,
+    onRetry: () -> Unit,
+    onTaskClick: (Task) -> Unit,
+    onTaskCompleted: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        Column {
-            Text(
-                text = "Hành Trình",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary
+        when (uiState) {
+            is StorylineUiState.Loading -> StorylineLoadingState()
+            is StorylineUiState.Empty -> StorylineEmptyState(onRetry = onRetry)
+            is StorylineUiState.Error -> StorylineEmptyState(
+                message = uiState.message,
+                onRetry = onRetry
             )
-            Text(
-                text = "Khám phá văn hóa Việt Nam",
-                fontSize = 13.sp,
-                color = TextSecondary
-            )
-        }
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(PrimaryRed),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.EmojiEvents,
-                contentDescription = "Achievements",
-                tint = Color.White,
-                modifier = Modifier.size(20.dp)
+            is StorylineUiState.Success -> StorylineSuccessContent(
+                state = uiState,
+                onTaskClick = onTaskClick,
+                onTaskCompleted = onTaskCompleted
             )
         }
     }
 }
 
+/**
+ * Giao diện khi tải dữ liệu thành công (Success State) của màn hình Cốt truyện.
+ *
+ * Hiển thị Banner nhiệm vụ tiếp theo nổi bật trên cùng, thanh tiến độ tổng thể,
+ * và danh sách cuộn mượt mà tất cả nhiệm vụ đã được giao.
+ */
 @Composable
 private fun StorylineSuccessContent(
     state: StorylineUiState.Success,
@@ -132,6 +115,7 @@ private fun StorylineSuccessContent(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
+        // Banner hiển thị nổi bật Nhiệm vụ tiếp theo cần làm
         state.nextTask?.let {
             item {
                 NextTaskBanner(
@@ -141,6 +125,7 @@ private fun StorylineSuccessContent(
             }
         }
 
+        // Thanh tiến độ tổng thể hành trình
         item {
             val completedCount = state.tasks.count { it.isCompleted }
             TaskProgressBar(
@@ -150,16 +135,18 @@ private fun StorylineSuccessContent(
             )
         }
 
+        // Tiêu đề danh sách
         item {
             Text(
                 text = "Tất cả nhiệm vụ",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }
 
+        // Danh sách tất cả các nhiệm vụ với stable key đảm bảo hiệu năng
         itemsIndexed(
             items = state.tasks,
             key = { _, task -> task.id }
@@ -174,6 +161,11 @@ private fun StorylineSuccessContent(
     }
 }
 
+/**
+ * Banner hiển thị nổi bật Nhiệm vụ tiếp theo cần làm (Next Task Banner).
+ *
+ * Sử dụng hình nền dải màu chuyển sắc (gradient) đỏ nổi bật mang bản sắc văn hóa Việt Nam.
+ */
 @Composable
 private fun NextTaskBanner(
     task: Task,
@@ -192,7 +184,7 @@ private fun NextTaskBanner(
                 .fillMaxWidth()
                 .background(
                     Brush.linearGradient(
-                        colors = listOf(PrimaryRed, Color(0xFFE74C3C)),
+                        colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primaryContainer),
                         start = Offset.Zero,
                         end = Offset(Float.POSITIVE_INFINITY, 0f)
                     )
@@ -204,10 +196,11 @@ private fun NextTaskBanner(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    val culturalColors = LocalCulturalColors.current
                     Icon(
                         imageVector = Icons.Default.EmojiEvents,
-                        contentDescription = null,
-                        tint = Color(0xFFFFD700),
+                        contentDescription = null, // Icon trang trí
+                        tint = culturalColors.goldColor,
                         modifier = Modifier.size(18.dp)
                     )
                     Text(
@@ -273,7 +266,7 @@ private fun NextTaskBanner(
                 ) {
                     Text(
                         text = "Bắt đầu nhiệm vụ",
-                        color = PrimaryRed,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -282,6 +275,9 @@ private fun NextTaskBanner(
     }
 }
 
+/**
+ * Thanh chỉ báo tiến độ tổng thể của Hành trình (Task Progress Bar).
+ */
 @Composable
 private fun TaskProgressBar(
     completed: Int,
@@ -298,13 +294,13 @@ private fun TaskProgressBar(
             Text(
                 text = "Tiến độ hành trình",
                 fontSize = 13.sp,
-                color = TextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = "$completed/$total nhiệm vụ",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = PrimaryRed
+                color = MaterialTheme.colorScheme.primary
             )
         }
         LinearProgressIndicator(
@@ -313,12 +309,21 @@ private fun TaskProgressBar(
                 .fillMaxWidth()
                 .height(8.dp)
                 .clip(RoundedCornerShape(4.dp)),
-            color = PrimaryRed,
-            trackColor = Color(0xFFE0D5C5)
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = MaterialTheme.colorScheme.outlineVariant
         )
     }
 }
 
+/**
+ * Thẻ hiển thị một nhiệm vụ cụ thể (Task Card).
+ *
+ * Cho phép nhấn để mở rộng/thu gọn hiển thị phần giải thích văn hóa bổ sung.
+ *
+ * @param task Đối tượng dữ liệu chứa thông tin chi tiết nhiệm vụ ([Task]).
+ * @param onClick Callback kích hoạt khi người dùng nhấn chọn thẻ.
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ */
 @Composable
 fun TaskCard(
     task: Task,
@@ -326,6 +331,8 @@ fun TaskCard(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
+
+    val culturalColors = LocalCulturalColors.current
 
     Card(
         onClick = {
@@ -335,7 +342,7 @@ fun TaskCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (task.isCompleted) Color(0xFFF5F5F5) else CardBackground
+            containerColor = if (task.isCompleted) culturalColors.shimmerLight else MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = if (task.isCompleted) 0.dp else 3.dp
@@ -356,8 +363,8 @@ fun TaskCard(
                         Icons.Default.CheckCircle
                     else
                         Icons.Default.RadioButtonUnchecked,
-                    contentDescription = null,
-                    tint = if (task.isCompleted) EasyGreen else CompletedGray,
+                    contentDescription = if (task.isCompleted) "Nhiệm vụ đã hoàn thành" else "Nhiệm vụ chưa hoàn thành",
+                    tint = if (task.isCompleted) culturalColors.easyColor else culturalColors.completedGray,
                     modifier = Modifier.size(22.dp)
                 )
 
@@ -366,7 +373,7 @@ fun TaskCard(
                         text = task.title,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (task.isCompleted) TextSecondary else TextPrimary,
+                        color = if (task.isCompleted) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -378,31 +385,38 @@ fun TaskCard(
             Text(
                 text = task.description,
                 fontSize = 13.sp,
-                color = if (task.isCompleted) CompletedGray else TextSecondary,
+                color = if (task.isCompleted) culturalColors.completedGray else MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 18.sp,
                 maxLines = if (expanded) Int.MAX_VALUE else 2,
                 overflow = if (expanded) TextOverflow.Visible else TextOverflow.Ellipsis
             )
 
+            // Phần giải thích ý nghĩa văn hóa hấp dẫn
             InfoSection(
                 icon = Icons.Outlined.Lightbulb,
                 label = "Giải thích văn hóa",
                 content = task.culturalExplanation,
-                accentColor = CulturalAmber,
+                accentColor = culturalColors.amberColor,
                 isCompleted = task.isCompleted
             )
 
+            // Phần yêu cầu chụp ảnh check-in
             InfoSection(
                 icon = Icons.Outlined.TaskAlt,
                 label = "Yêu cầu hoàn thành",
                 content = task.completionRequirement,
-                accentColor = CompletionBlue,
+                accentColor = culturalColors.completionBlue,
                 isCompleted = task.isCompleted
             )
         }
     }
 }
 
+/**
+ * Mục thông tin bổ sung (Info Section) nằm bên trong thẻ nhiệm vụ.
+ *
+ * Phân tách màu sắc trực quan tùy chọn (ví dụ màu vàng hổ phách cho Giải thích văn hóa).
+ */
 @Composable
 private fun InfoSection(
     icon: ImageVector,
@@ -411,7 +425,8 @@ private fun InfoSection(
     accentColor: Color,
     isCompleted: Boolean
 ) {
-    val effectiveAccent = if (isCompleted) CompletedGray else accentColor
+    val culturalColors = LocalCulturalColors.current
+    val effectiveAccent = if (isCompleted) culturalColors.completedGray else accentColor
 
     Row(
         modifier = Modifier
@@ -442,22 +457,29 @@ private fun InfoSection(
             Text(
                 text = content,
                 fontSize = 12.sp,
-                color = if (isCompleted) CompletedGray else TextSecondary,
+                color = if (isCompleted) culturalColors.completedGray else MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 17.sp
             )
         }
     }
 }
 
+/**
+ * Nhãn mức độ khó (Difficulty Badge) của từng thử thách nhiệm vụ.
+ *
+ * @param difficulty Mức độ khó của nhiệm vụ ([TaskDifficulty]).
+ * @param onDark Xác định xem có vẽ trên nền dải màu tối hay không để căn chỉnh tương phản. Mặc định là `false`.
+ */
 @Composable
 fun DifficultyBadge(
     difficulty: TaskDifficulty,
     onDark: Boolean = false
 ) {
+    val culturalColors = LocalCulturalColors.current
     val (label, color) = when (difficulty) {
-        TaskDifficulty.EASY -> "Dễ" to EasyGreen
-        TaskDifficulty.MEDIUM -> "Trung bình" to MediumOrange
-        TaskDifficulty.HARD -> "Khó" to HardRed
+        TaskDifficulty.EASY -> "Dễ" to culturalColors.easyColor
+        TaskDifficulty.MEDIUM -> "Trung bình" to culturalColors.mediumColor
+        TaskDifficulty.HARD -> "Khó" to culturalColors.hardColor
     }
 
     val bgColor = if (onDark) Color.White.copy(alpha = 0.2f) else color.copy(alpha = 0.12f)
@@ -477,6 +499,9 @@ fun DifficultyBadge(
     }
 }
 
+/**
+ * Trạng thái đang tải hành trình nhiệm vụ (Shimmer Loading State).
+ */
 @Composable
 private fun StorylineLoadingState() {
     val transition = rememberInfiniteTransition(label = "shimmer")
@@ -490,8 +515,9 @@ private fun StorylineLoadingState() {
         label = "shimmer_translate"
     )
 
+    val culturalColors = LocalCulturalColors.current
     val brush = Brush.linearGradient(
-        colors = listOf(ShimmerLight, ShimmerDark, ShimmerLight),
+        colors = listOf(culturalColors.shimmerLight, culturalColors.shimmerDark, culturalColors.shimmerLight),
         start = Offset.Zero,
         end = Offset(translateAnim, translateAnim)
     )
@@ -528,6 +554,9 @@ private fun StorylineLoadingState() {
     }
 }
 
+/**
+ * Trạng thái rỗng (Empty State) hiển thị khi chưa có nhiệm vụ nào được giao.
+ */
 @Composable
 private fun StorylineEmptyState(
     message: String = "Chưa có nhiệm vụ nào",
@@ -546,18 +575,18 @@ private fun StorylineEmptyState(
             text = message,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = TextPrimary
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Hành trình của bạn sắp bắt đầu. Hãy thử lại sau!",
             fontSize = 14.sp,
-            color = TextSecondary
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onRetry,
-            colors = ButtonDefaults.buttonColors(containerColor = PrimaryRed),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(text = "Thử lại", color = Color.White)
@@ -565,13 +594,49 @@ private fun StorylineEmptyState(
     }
 }
 
-// ── Preview ───────────────────────────────────────────────────────────────────
+@Preview(showBackground = true)
+@Composable
+fun StorylineScreenSuccessPreview() {
+    val mockTasks = listOf(
+        Task(
+            id = "1",
+            title = "Thử thách Phở",
+            description = "Tìm và thưởng thức một bát phở truyền thống.",
+            culturalExplanation = "Phở là món ăn quốc hồn quốc túy của Việt Nam.",
+            completionRequirement = "Chụp ảnh bát phở của bạn.",
+            difficulty = TaskDifficulty.EASY,
+            isCompleted = true
+        ),
+        Task(
+            id = "2",
+            title = "Khám phá Văn Miếu",
+            description = "Ghé thăm trường đại học đầu tiên của Việt Nam.",
+            culturalExplanation = "Nơi thờ Khổng Tử và các bậc hiền triết.",
+            completionRequirement = "Check-in tại cổng Văn Miếu.",
+            difficulty = TaskDifficulty.MEDIUM,
+            isCompleted = false
+        )
+    )
+    BeVietnamTheme {
+        StorylineScreenContent(
+            uiState = StorylineUiState.Success(tasks = mockTasks, nextTask = mockTasks[1]),
+            onRetry = {},
+            onTaskClick = {},
+            onTaskCompleted = {}
+        )
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
-fun StorylineScreenPreview() {
+fun StorylineScreenLoadingPreview() {
     BeVietnamTheme {
-        StorylineScreen()
+        StorylineScreenContent(
+            uiState = StorylineUiState.Loading,
+            onRetry = {},
+            onTaskClick = {},
+            onTaskCompleted = {}
+        )
     }
 }
 
@@ -579,7 +644,7 @@ fun StorylineScreenPreview() {
 @Composable
 fun TaskCardPreview() {
     BeVietnamTheme {
-        Surface(color = Background) {
+        Surface(color = MaterialTheme.colorScheme.background) {
             TaskCard(
                 task = Task(
                     id = "preview",

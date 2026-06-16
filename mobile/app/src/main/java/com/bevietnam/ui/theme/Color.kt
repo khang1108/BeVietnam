@@ -9,6 +9,23 @@ val CardBackground = Color(0xFFFFFFFF)
 val TextPrimary = Color(0xFF1A1A1A)
 val TextSecondary = Color(0xFF6B6B6B)
 
+// Các màu sắc đặc trưng mang đậm bản sắc văn hóa Việt Nam
+val CulturalAmber = Color(0xFFF39C12)
+val CulturalGold = Color(0xFFFFD700)
+val CompletionBlue = Color(0xFF2980B9)
+
+// Các màu sắc hiển thị cấp độ khó của nhiệm vụ trong game (Gamification)
+val EasyGreen = Color(0xFF27AE60)
+val MediumOrange = Color(0xFFE67E22)
+val HardRed = Color(0xFFC0392B)
+val CompletedGray = Color(0xFFBDBDBD)
+
+// Các màu sắc biểu thị trạng thái cấp quyền hệ thống
+val PermissionGreenBg = Color(0xFFE8F5E9)
+val PermissionGreenText = Color(0xFF2E7D32)
+val PermissionOrangeBg = Color(0xFFFFF3E0)
+val PermissionOrangeText = Color(0xFFE65100)
+
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)

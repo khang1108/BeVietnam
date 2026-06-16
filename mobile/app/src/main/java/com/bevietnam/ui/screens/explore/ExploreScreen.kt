@@ -10,120 +10,104 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil3.compose.AsyncImage
-
 import com.bevietnam.core.model.Place
+import com.bevietnam.ui.components.ErrorView
+import com.bevietnam.ui.components.PlaceCard
+import com.bevietnam.ui.components.SearchBar
+import com.bevietnam.ui.theme.BeVietnamTheme
+import com.bevietnam.ui.theme.LocalCulturalColors
 
-// ── Color Tokens ─────────────────────────────────────────────────────────────
-
-private val PrimaryRed = Color(0xFFC0392B)
-private val Background = Color(0xFFFAF5E4)
-private val CardBackground = Color(0xFFFFFFFF)
-private val TextPrimary = Color(0xFF1A1A1A)
-private val TextSecondary = Color(0xFF6B6B6B)
-private val StarYellow = Color(0xFFF5A623)
-private val ShimmerLight = Color(0xFFE0E0E0)
-private val ShimmerDark = Color(0xFFC8C8C8)
-
+/**
+ * Màn hình Khám phá địa điểm du lịch văn hóa (Explore Screen) của ứng dụng BeVietnam.
+ *
+ * Hiển thị danh sách các danh lam thắng cảnh, di sản lịch sử của Việt Nam kèm bộ lọc nhanh theo danh mục.
+ * Kết nối dữ liệu dạng luồng quan sát từ [ExploreViewModel] và tuân thủ quy chuẩn Unidirectional Data Flow (UDF).
+ *
+ * @param viewModel ViewModel quản lý trạng thái dữ liệu màn hình Khám phá ([ExploreViewModel]). Mặc định là [hiltViewModel].
+ * @param onPlaceClick Sự kiện click chọn xem chi tiết một địa điểm cụ thể ([Place]).
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ */
 @Composable
 fun ExploreScreen(
     viewModel: ExploreViewModel = hiltViewModel(),
-    onPlaceClick: (Place) -> Unit = {}
+    onPlaceClick: (Place) -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Background
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-        ) {
-            ExploreTopBar()
-
-            when (val state = uiState) {
-                is ExploreUiState.Loading -> ExploreLoadingState()
-                is ExploreUiState.Empty -> ExploreEmptyState(
-                    onRetry = { viewModel.loadPlaces() }
-                )
-                is ExploreUiState.Error -> ExploreEmptyState(
-                    message = state.message,
-                    onRetry = { viewModel.loadPlaces() }
-                )
-                is ExploreUiState.Success -> ExploreSuccessContent(
-                    state = state,
-                    onCategorySelected = viewModel::onCategorySelected,
-                    onSearchQueryChanged = viewModel::onSearchQueryChanged,
-                    onPlaceClick = onPlaceClick
-                )
-            }
-        }
-    }
+    ExploreScreenContent(
+        uiState = uiState,
+        onRetry = viewModel::loadPlaces,
+        onCategorySelected = viewModel::onCategorySelected,
+        onSearchQueryChanged = viewModel::onSearchQueryChanged,
+        onPlaceClick = onPlaceClick,
+        modifier = modifier
+    )
 }
 
+/**
+ * Triển khai phân phối giao diện chính của màn hình Khám phá.
+ *
+ * Tự động chuyển mạch hiển thị giữa trạng thái đang tải (Shimmer loading), trạng thái rỗng,
+ * trạng thái báo lỗi mạng và trạng thái tải dữ liệu thành công chứa danh sách địa điểm.
+ *
+ * @param uiState Đối tượng đại diện cho các trạng thái màn hình ([ExploreUiState]).
+ * @param onRetry Callback nhấn thử lại khi tải dữ liệu gặp sự cố.
+ * @param onCategorySelected Callback nhấn chọn danh mục bộ lọc nhanh.
+ * @param onSearchQueryChanged Callback gõ tìm kiếm từ khóa địa điểm.
+ * @param onPlaceClick Callback xem chi tiết địa điểm.
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ */
 @Composable
-private fun ExploreTopBar() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Background)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+fun ExploreScreenContent(
+    uiState: ExploreUiState,
+    onRetry: () -> Unit,
+    onCategorySelected: (String) -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
+    onPlaceClick: (Place) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        Column {
-            Text(
-                text = "Khám Phá",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary
+        when (uiState) {
+            is ExploreUiState.Loading -> ExploreLoadingState()
+            is ExploreUiState.Empty -> ExploreEmptyState(
+                onRetry = onRetry
             )
-            Text(
-                text = "Tìm kiếm điểm đến Việt Nam",
-                fontSize = 13.sp,
-                color = TextSecondary
+            is ExploreUiState.Error -> ErrorView(
+                message = uiState.message,
+                onRetry = onRetry
             )
-        }
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(PrimaryRed),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.BookmarkBorder,
-                contentDescription = "Saved",
-                tint = Color.White,
-                modifier = Modifier.size(20.dp)
+            is ExploreUiState.Success -> ExploreSuccessContent(
+                state = uiState,
+                onCategorySelected = onCategorySelected,
+                onSearchQueryChanged = onSearchQueryChanged,
+                onPlaceClick = onPlaceClick
             )
         }
     }
 }
 
+/**
+ * Giao diện khi tải dữ liệu thành công (Success State) của màn hình Khám phá.
+ *
+ * Chứa thanh tìm kiếm địa danh, thanh trượt ngang bộ lọc danh mục và danh sách cuộn các địa điểm phù hợp.
+ */
 @Composable
 private fun ExploreSuccessContent(
     state: ExploreUiState.Success,
@@ -135,14 +119,19 @@ private fun ExploreSuccessContent(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
+        // Ô Tìm kiếm (Search Bar)
         item {
             SearchBar(
                 query = state.searchQuery,
                 onQueryChanged = onSearchQueryChanged,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                placeholder = "Tìm kiếm địa điểm...",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }
 
+        // Bộ lọc nhanh danh mục (Category filter row)
         item {
             CategoryFilterRow(
                 categories = categories,
@@ -151,20 +140,23 @@ private fun ExploreSuccessContent(
             )
         }
 
+        // Dòng hiển thị tổng số kết quả
         item {
             Text(
                 text = "${state.filteredPlaces.size} địa điểm",
                 fontSize = 13.sp,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }
 
+        // Kết quả tìm kiếm hoặc trạng thái trống
         if (state.filteredPlaces.isEmpty()) {
             item {
                 SearchEmptyState(query = state.searchQuery)
             }
         } else {
+            // Sử dụng itemsIndexed có tích hợp stable key để tối ưu hóa hiệu năng recomposition
             itemsIndexed(
                 items = state.filteredPlaces,
                 key = { _, place -> place.id }
@@ -181,42 +173,11 @@ private fun ExploreSuccessContent(
     }
 }
 
-@Composable
-private fun SearchBar(
-    query: String,
-    onQueryChanged: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    OutlinedTextField(
-        value = query,
-        onValueChange = onQueryChanged,
-        modifier = modifier.fillMaxWidth(),
-        placeholder = {
-            Text(
-                text = "Tìm kiếm địa điểm...",
-                color = TextSecondary,
-                fontSize = 14.sp
-            )
-        },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Search",
-                tint = TextSecondary,
-                modifier = Modifier.size(20.dp)
-            )
-        },
-        singleLine = true,
-        shape = RoundedCornerShape(16.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = PrimaryRed,
-            unfocusedBorderColor = Color(0xFFE0D5C5),
-            focusedContainerColor = CardBackground,
-            unfocusedContainerColor = CardBackground
-        )
-    )
-}
-
+/**
+ * Thanh cuộn ngang các mục danh mục bộ lọc nhanh.
+ *
+ * Tích hợp stable key cho hiệu năng render danh sách mượt mà nhất.
+ */
 @Composable
 private fun CategoryFilterRow(
     categories: List<String>,
@@ -227,13 +188,17 @@ private fun CategoryFilterRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(categories) { category ->
+        // Tối ưu hóa Recomposition bằng cách cung cấp stable key là tên danh mục duy nhất
+        items(
+            items = categories,
+            key = { it }
+        ) { category ->
             val isSelected = category == selectedCategory
             Surface(
                 onClick = { onCategorySelected(category) },
                 shape = RoundedCornerShape(20.dp),
-                color = if (isSelected) PrimaryRed else CardBackground,
-                border = if (!isSelected) BorderStroke(1.dp, Color(0xFFE0D5C5)) else null,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+                border = if (!isSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant) else null,
                 modifier = Modifier.animateContentSize()
             ) {
                 Text(
@@ -241,162 +206,20 @@ private fun CategoryFilterRow(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     fontSize = 13.sp,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (isSelected) Color.White else TextPrimary
+                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
                 )
             }
         }
     }
 }
 
-@Composable
-fun PlaceCard(
-    place: Place,
-    index: Int,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(16.dp),
-                ambientColor = Color.Black.copy(alpha = 0.08f)
-            ),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = CardBackground)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(90.dp)
-                    .clip(RoundedCornerShape(12.dp))
-            ) {
-                AsyncImage(
-                    model = place.imageUrl,
-                    contentDescription = place.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    Color.Black.copy(alpha = 0.4f)
-                                )
-                            )
-                        )
-                )
-                Text(
-                    text = "$index",
-                    color = Color.White,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(6.dp)
-                        .background(
-                            color = PrimaryRed,
-                            shape = RoundedCornerShape(6.dp)
-                        )
-                        .padding(horizontal = 5.dp, vertical = 2.dp)
-                )
-            }
-
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = place.name,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = null,
-                        tint = StarYellow,
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Text(
-                        text = "${place.rating}*",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = StarYellow
-                    )
-                    Text(text = "·", color = TextSecondary, fontSize = 12.sp)
-                    Text(
-                        text = place.category,
-                        fontSize = 12.sp,
-                        color = TextSecondary
-                    )
-                }
-
-                Text(
-                    text = place.description,
-                    fontSize = 12.sp,
-                    color = TextSecondary,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    lineHeight = 17.sp
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        tint = PrimaryRed,
-                        modifier = Modifier.size(13.dp)
-                    )
-                    Text(
-                        text = place.location,
-                        fontSize = 11.sp,
-                        color = PrimaryRed,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            }
-
-            Icon(
-                imageVector = Icons.Outlined.BookmarkBorder,
-                contentDescription = "Save",
-                tint = TextSecondary,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-    }
-}
-
+/**
+ * Trạng thái đang tải dữ liệu (Loading State) hiển thị hiệu ứng Shimmer mượt mà.
+ */
 @Composable
 private fun ExploreLoadingState() {
-    val shimmerColors = listOf(
-        ShimmerLight,
-        ShimmerDark,
-        ShimmerLight
-    )
+    val culturalColors = LocalCulturalColors.current
+    val shimmerColors = listOf(culturalColors.shimmerLight, culturalColors.shimmerDark, culturalColors.shimmerLight)
     val transition = rememberInfiniteTransition(label = "shimmer")
     val translateAnim by transition.animateFloat(
         initialValue = 0f,
@@ -420,90 +243,49 @@ private fun ExploreLoadingState() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(brush)
-        )
-
+        Box(modifier = Modifier.fillMaxWidth().height(52.dp).clip(RoundedCornerShape(16.dp)).background(brush))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             repeat(4) {
-                Box(
-                    modifier = Modifier
-                        .width(80.dp)
-                        .height(34.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(brush)
-                )
+                Box(modifier = Modifier.width(80.dp).height(34.dp).clip(RoundedCornerShape(20.dp)).background(brush))
             }
         }
-
-        Spacer(modifier = Modifier.height(4.dp))
-
         repeat(4) {
-            ShimmerPlaceCard(brush = brush)
+            Box(modifier = Modifier.fillMaxWidth().height(100.dp).clip(RoundedCornerShape(16.dp)).background(brush))
         }
     }
 }
 
+/**
+ * Trạng thái trống (Empty State) hiển thị khi chưa có bất kỳ địa điểm nào trên hệ thống.
+ */
 @Composable
-private fun ShimmerPlaceCard(brush: Brush) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = CardBackground),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(90.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(brush)
-            )
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.weight(1f)
-            ) {
-                Box(modifier = Modifier.fillMaxWidth(0.7f).height(16.dp).background(brush))
-                Box(modifier = Modifier.fillMaxWidth(0.5f).height(12.dp).background(brush))
-                Box(modifier = Modifier.fillMaxWidth().height(12.dp).background(brush))
-            }
-        }
-    }
-}
-
-@Composable
-private fun ExploreEmptyState(
-    message: String = "Chưa có địa điểm nào",
-    onRetry: () -> Unit
-) {
+private fun ExploreEmptyState(message: String = "Chưa có địa điểm nào", onRetry: () -> Unit) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(text = "🗺️", fontSize = 64.sp)
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = message, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        Text(text = message, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
         Spacer(modifier = Modifier.height(24.dp))
-        Button(onClick = onRetry, colors = ButtonDefaults.buttonColors(containerColor = PrimaryRed)) {
+        Button(onClick = onRetry, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
             Text(text = "Thử lại", color = Color.White)
         }
     }
 }
 
+/**
+ * Trạng thái trống của kết quả tìm kiếm (Search Empty State) hiển thị khi không có địa danh nào khớp từ khóa.
+ */
 @Composable
 private fun SearchEmptyState(query: String) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "🔍", fontSize = 48.sp)
@@ -513,25 +295,32 @@ private fun SearchEmptyState(query: String) {
 
 @Preview(showBackground = true)
 @Composable
-fun ExploreScreenPreview() {
-    ExploreScreen()
+fun ExploreScreenLoadingPreview() {
+    BeVietnamTheme {
+        ExploreScreenContent(
+            uiState = ExploreUiState.Loading,
+            onRetry = {},
+            onCategorySelected = {},
+            onSearchQueryChanged = {},
+            onPlaceClick = {}
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun PlaceCardPreview() {
-    PlaceCard(
-        place = Place(
-            id = "preview",
-            name = "Hội An Phố Cổ",
-            category = "Lãng mạn",
-            description = "Phố cổ Hội An là một trong những điểm đến đẹp nhất Việt Nam.",
-            location = "Hội An, Quảng Nam",
-            imageUrl = "",
-            rating = 4.9f,
-            reviewCount = 2341
-        ),
-        index = 1,
-        onClick = {}
+fun ExploreScreenSuccessPreview() {
+    val mockPlaces = listOf(
+        Place(id = 1, name = "Vịnh Hạ Long", category = "Thiên nhiên", description = "Di sản thiên nhiên thế giới", latitude = 20.9101, longitude = 107.1839, imageUrl = ""),
+        Place(id = 2, name = "Phố cổ Hội An", category = "Lịch sử", description = "Thành phố cổ kính bên sông Hoài", latitude = 15.8801, longitude = 108.3380, imageUrl = "")
     )
+    BeVietnamTheme {
+        ExploreScreenContent(
+            uiState = ExploreUiState.Success(places = mockPlaces, filteredPlaces = mockPlaces),
+            onRetry = {},
+            onCategorySelected = {},
+            onSearchQueryChanged = {},
+            onPlaceClick = {}
+        )
+    }
 }

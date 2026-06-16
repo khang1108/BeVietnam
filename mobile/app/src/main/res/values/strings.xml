@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">BeVietnam</string>
     <string name="app_tagline">Khám phá vẻ đẹp Việt Nam</string>
+    <string name="auth_brand_name">bevietnam</string>
+    <string name="auth_tagline">Du lịch thông minh</string>
     <string name="tab_login">Đăng nhập</string>
     <string name="tab_register">Đăng ký</string>
     <string name="email">Email</string>

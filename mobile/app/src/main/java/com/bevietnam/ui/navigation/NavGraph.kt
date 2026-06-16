@@ -17,12 +17,23 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.bevietnam.ui.screens.auth.AuthScreen
 import com.bevietnam.ui.screens.profile.ProfileScreen
-
 import com.bevietnam.MainViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bevietnam.core.model.User
 import com.bevietnam.ui.components.AppTopBar
+import com.bevietnam.ui.screens.capture.CaptureScreen
 
+/**
+ * Điểm điều hướng chính (Main App Navigation Host) của ứng dụng BeVietnam.
+ *
+ * Nhận `MainViewModel` ở phạm vi toàn cục để theo dõi thông tin tài khoản người dùng hiện tại,
+ * và điều phối luồng giao diện thông qua [AppNavHostContent].
+ *
+ * @param navController Đối tượng quản lý điều hướng chính của ứng dụng ([NavHostController]).
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ * @param mainViewModel ViewModel toàn cục theo dõi thông tin người dùng ([MainViewModel]). Mặc định là [hiltViewModel].
+ */
 @androidx.compose.material3.ExperimentalMaterial3Api
 @Composable
 fun AppNavHost(
@@ -30,18 +41,44 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
+    val currentUser by mainViewModel.currentUser.collectAsStateWithLifecycle()
+
+    AppNavHostContent(
+        navController = navController,
+        currentUser = currentUser,
+        modifier = modifier
+    )
+}
+
+/**
+ * Triển khai giao diện Scaffold và cấu hình biểu đồ điều hướng (NavHost) của BeVietnam.
+ *
+ * Quản lý tự động việc hiển thị/ẩn thanh TopAppBar và BottomNavBar dựa trên tuyến đường (Route) hiện tại,
+ * đồng thời cấu hình Backstack điều hướng an toàn và hiệu quả cho các tab.
+ *
+ * @param navController Đối tượng quản lý điều hướng chính của ứng dụng ([NavHostController]).
+ * @param currentUser Đối tượng thông tin người dùng hiện tại đang đăng nhập ([User]).
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ */
+@androidx.compose.material3.ExperimentalMaterial3Api
+@Composable
+fun AppNavHostContent(
+    navController: NavHostController,
+    currentUser: User?,
+    modifier: Modifier = Modifier
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
+    // Xác định xem màn hình hiện tại có thuộc nhóm Bottom Navigation Bar hay không
     val isBottomBarVisible = currentDestination?.let { dest ->
         Screen.bottomNavItems.any { item -> dest.hasRoute(item.route::class) }
     } ?: false
 
+    // Xác định KClass đại diện cho Route của màn hình đang hiển thị để làm nổi bật tab điều hướng tương ứng
     val currentRouteClass = Screen.bottomNavItems.find { item ->
         currentDestination?.hasRoute(item.route::class) == true
     }?.route?.let { it::class }
-
-    val currentUser by mainViewModel.currentUser.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier,
@@ -50,7 +87,17 @@ fun AppNavHost(
                 AppTopBar(
                     avatarUrl = currentUser?.avatarUrl,
                     onAvatarClick = {
-                        navController.navigate(ProfileRoute(currentUser?.id ?: "")) {
+                        navController.navigate(ProfileRoute(currentUser?.id ?: -1)) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    showCreatePost = true,
+                    onCreatePostClick = {
+                        navController.navigate(CameraRoute) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }
@@ -86,8 +133,6 @@ fun AppNavHost(
             composable<AuthRoute> {
                 AuthScreen(
                     onNavigateToProfile = { userId ->
-                        // Navigate to default tab (Feed) instead of Profile 
-                        // when login is done, but since Feed isn't ready we keep Profile
                         navController.navigate(ProfileRoute(userId)) {
                             popUpTo<AuthRoute> { inclusive = true }
                         }
@@ -102,20 +147,26 @@ fun AppNavHost(
             composable<FeedRoute> { 
                 com.bevietnam.ui.screens.feed.FeedScreen() 
             }
+
+            composable<CameraRoute> {
+                CaptureScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
             
             composable<StorylineRoute> { 
                 com.bevietnam.ui.screens.storyline.StorylineScreen() 
             }
-            
-            composable<CommunityRoute> { 
-                PlaceholderScreen("Cộng đồng") 
-            }
+
+
 
             composable<ProfileRoute> {
                 ProfileScreen(
                     onNavigateToLogin = {
                         navController.navigate(AuthRoute) {
-                            popUpTo(0) // Clear toàn bộ backstack
+                            popUpTo(0)
                         }
                     }
                 )
@@ -124,6 +175,11 @@ fun AppNavHost(
     }
 }
 
+/**
+ * Giao diện màn hình giữ chỗ (Placeholder Screen) hiển thị cho các tính năng đang phát triển.
+ *
+ * @param title Tiêu đề hiển thị của màn hình đang phát triển.
+ */
 @Composable
 fun PlaceholderScreen(title: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

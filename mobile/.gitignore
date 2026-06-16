@@ -1,11 +1,6 @@
-# BeVietnam
-*.iml
-.gradle
-/local.properties
-/.idea
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+# 1. Bỏ qua toàn bộ các folder nằm ở thư mục gốc
+/*/
+
+# 2. Tạo ngoại lệ (giữ lại) cho folder app và gradle
+!/app/
+!/gradle/
