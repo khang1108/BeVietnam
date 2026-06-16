@@ -28,12 +28,18 @@ sealed class ExploreUiState {
      * @property filteredPlaces Danh sách địa điểm sau khi đã lọc theo từ khóa và danh mục.
      * @property selectedCategory Thẻ danh mục đang được lựa chọn để lọc (Mặc định là "Tất cả").
      * @property searchQuery Từ khóa tìm kiếm hiện tại do người dùng nhập.
+     * @property isMapView Trạng thái hiển thị giao diện Bản đồ hay Danh sách.
+     * @property focusedPlaceId ID của địa điểm đang được focus/chọn trên bản đồ.
+     * @property hasLocationPermission Trạng thái cấp quyền vị trí của người dùng.
      */
     data class Success(
         val places: List<Place>,
         val filteredPlaces: List<Place>,
         val selectedCategory: String = "Tất cả",
-        val searchQuery: String = ""
+        val searchQuery: String = "",
+        val isMapView: Boolean = true,
+        val focusedPlaceId: Int? = null,
+        val hasLocationPermission: Boolean = false
     ) : ExploreUiState()
     
     /** Trạng thái danh sách địa điểm trống */
@@ -140,6 +146,50 @@ class ExploreViewModel @Inject constructor(
         val current = _uiState.value as? ExploreUiState.Success ?: return
         updateSuccessState(query = query, filtered = current.filteredPlaces)
         _searchQueryFlow.value = query
+    }
+
+    /**
+     * Chuyển đổi qua lại giữa chế độ xem Bản đồ (Map View) và xem Danh sách (List View).
+     */
+    fun toggleViewMode() {
+        val current = _uiState.value as? ExploreUiState.Success ?: return
+        _uiState.update { currentState ->
+            if (currentState is ExploreUiState.Success) {
+                currentState.copy(isMapView = !currentState.isMapView)
+            } else currentState
+        }
+    }
+
+    /**
+     * Đặt ID của địa điểm đang được chọn hoặc lướt tới trên Carousel để highlight Marker trên bản đồ.
+     *
+     * @param id ID của địa điểm (hoặc null nếu bỏ chọn).
+     */
+    fun onPlaceFocused(id: Int?) {
+        val current = _uiState.value as? ExploreUiState.Success ?: return
+        if (current.focusedPlaceId != id) {
+            _uiState.update { currentState ->
+                if (currentState is ExploreUiState.Success) {
+                    currentState.copy(focusedPlaceId = id)
+                } else currentState
+            }
+        }
+    }
+
+    /**
+     * Cập nhật trạng thái cấp quyền vị trí từ UI.
+     *
+     * @param isGranted Người dùng đã cấp quyền vị trí chưa.
+     */
+    fun updateLocationPermission(isGranted: Boolean) {
+        val current = _uiState.value as? ExploreUiState.Success ?: return
+        if (current.hasLocationPermission != isGranted) {
+            _uiState.update { currentState ->
+                if (currentState is ExploreUiState.Success) {
+                    currentState.copy(hasLocationPermission = isGranted)
+                } else currentState
+            }
+        }
     }
 
     /**

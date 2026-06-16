@@ -34,4 +34,6 @@
     <string name="save">Lưu</string>
     <string name="logout">Đăng xuất</string>
     <string name="app_version">Phiên bản 1.0.0</string>
+    <string name="map_view">Xem Bản đồ</string>
+    <string name="list_view">Xem Danh sách</string>
 </resources>

@@ -4,3 +4,7 @@
 # 2. Tạo ngoại lệ (giữ lại) cho folder app và gradle
 !/app/
 !/gradle/
+
+# Ignore documentation files
+Agent.md
+CONTRIBUTING.md

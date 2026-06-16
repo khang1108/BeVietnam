@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,6 +38,8 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.bevietnam.R
 import com.bevietnam.core.model.Gender
+import com.bevietnam.core.model.User
+import com.bevietnam.ui.theme.BeVietnamTheme
 import com.bevietnam.ui.components.ErrorView
 import com.bevietnam.ui.components.LoadingIndicator
 import com.bevietnam.ui.navigation.BottomNavBar
@@ -431,5 +434,79 @@ private fun ProfileInfoCard(title: String, content: String, icon: ImageVector) {
                 Text(content, fontSize = 14.sp, fontWeight = FontWeight.Medium)
             }
         }
+    }
+}
+
+@Preview(showBackground = true, name = "View Mode")
+@Composable
+fun ProfileScreenViewModePreview() {
+    BeVietnamTheme {
+        ProfileContent(
+            uiState = ProfileUiState(
+                user = User(
+                    id = 1,
+                    name = "Nguyễn Văn A",
+                    email = "nguyenvana@example.com",
+                    avatarUrl = null,
+                    bio = "Yêu du lịch và khám phá văn hóa Việt Nam",
+                    gender = Gender.MALE,
+                    dateOfBirth = "01/01/1990",
+                    location = "Hà Nội, Việt Nam",
+                    joinedDate = "01/01/2023",
+                    level = 5,
+                    points = 1250
+                )
+            ),
+            onNameChange = {},
+            onBioChange = {},
+            onGenderChange = {},
+            onDateOfBirthChange = {},
+            onLocationChange = {},
+            onEditClick = {},
+            onSaveClick = {},
+            onCancelClick = {},
+            onShareClick = {},
+            onLogoutClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Edit Mode")
+@Composable
+fun ProfileScreenEditModePreview() {
+    BeVietnamTheme {
+        ProfileContent(
+            uiState = ProfileUiState(
+                isEditMode = true,
+                user = User(
+                    id = 1,
+                    name = "Nguyễn Văn A",
+                    email = "nguyenvana@example.com",
+                    avatarUrl = null,
+                    bio = "Yêu du lịch và khám phá văn hóa Việt Nam",
+                    gender = Gender.MALE,
+                    dateOfBirth = "01/01/1990",
+                    location = "Hà Nội, Việt Nam",
+                    joinedDate = "01/01/2023",
+                    level = 5,
+                    points = 1250
+                ),
+                editName = "Nguyễn Văn A",
+                editBio = "Yêu du lịch và khám phá văn hóa Việt Nam",
+                editGender = Gender.MALE,
+                editDateOfBirth = "01/01/1990",
+                editLocation = "Hà Nội, Việt Nam"
+            ),
+            onNameChange = {},
+            onBioChange = {},
+            onGenderChange = {},
+            onDateOfBirthChange = {},
+            onLocationChange = {},
+            onEditClick = {},
+            onSaveClick = {},
+            onCancelClick = {},
+            onShareClick = {},
+            onLogoutClick = {}
+        )
     }
 }
