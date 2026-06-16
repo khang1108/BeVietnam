@@ -9,7 +9,7 @@ The agent itself is stateless — all context comes from the workflow state.
 This makes it easy to test with different inputs.
 
 Usage:
-    from src.bevietnam.ai.agents.quest_maker.agent import QuestMaker
+    from services.ai.agents.quest_maker.agent import QuestMaker
 
     maker = QuestMaker()
     task = maker.generate(context={
@@ -22,8 +22,8 @@ import logging
 import uuid
 from typing import Any
 
-from src.bevietnam.ai.common.llm import llm_gateway
-from src.bevietnam.ai.agents.quest_maker.prompts import SYSTEM_PROMPT, build_user_prompt
+from services.ai.common.llm import llm_gateway
+from services.ai.agents.quest_maker.prompts import SYSTEM_PROMPT, build_user_prompt
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,5 @@
-from src.bevietnam.ai.agents.capture_judge.agent import CaptureJudge
-from src.bevietnam.ai.agents.publisher import PublisherAgent
+from services.ai.agents.capture_judge.agent import CaptureJudge
+from services.ai.agents.publisher import PublisherAgent
 
 
 def verify_capture_workflow(context: dict) -> dict:

@@ -49,7 +49,12 @@ data/qdrant/          # local embedded Qdrant storage
 Thumbs.db
 
 # ─── Docs & submissions (academic artifacts) ───────────
-docs/
+docs/*
+!docs/PROJECT_SPEC.md
+!docs/HUE_PILOT_8_DAY_DELIVERY_PLAN.md
+!docs/AI_SERVICE_IMPLEMENTATION_PLAN.md
+!docs/codex/
+!docs/codex/memory
 slides/
 .slides/
 submit/

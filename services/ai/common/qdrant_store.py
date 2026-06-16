@@ -17,9 +17,17 @@ from typing import Any
 
 import httpx
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, PointStruct, VectorParams
+from qdrant_client.models import (
+    Distance,
+    FieldCondition,
+    Filter,
+    MatchValue,
+    PointStruct,
+    VectorParams,
+)
 
-from src.bevietnam.ai.common.config import settings
+from services.ai.common.config import settings
+from services.ai.common.knowledge_schema import KnowledgeChunk
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +83,11 @@ class HFEmbedder:
                 return result
 
             except httpx.HTTPStatusError as exc:
-                logger.error("HF API error %s: %s", exc.response.status_code, exc.response.text[:200])
+                logger.error(
+                    "HF API error %s: %s",
+                    exc.response.status_code,
+                    exc.response.text[:200],
+                )
                 raise
             except Exception as exc:
                 logger.error("HF API call failed: %s", exc)
@@ -110,7 +122,10 @@ class QdrantStore:
                     "rồi thêm vào .env: HF_TOKEN=hf_xxx..."
                 )
             self._embedder = HFEmbedder()
-            logger.info("HF Embedder ready (model: %s via API)", settings.embedding_model_name)
+            logger.info(
+                "HF Embedder ready (model: %s via API)",
+                settings.embedding_model_name,
+            )
         return self._embedder
 
     @property
@@ -136,7 +151,11 @@ class QdrantStore:
                     host=settings.qdrant_host,
                     port=settings.qdrant_port,
                 )
-                logger.info("Connected to local Qdrant at %s:%s", settings.qdrant_host, settings.qdrant_port)
+                logger.info(
+                    "Connected to local Qdrant at %s:%s",
+                    settings.qdrant_host,
+                    settings.qdrant_port,
+                )
         return self._qdrant_client
 
     # ── Public API ────────────────────────────────────────────────────────────
@@ -146,17 +165,19 @@ class QdrantStore:
         query: str,
         limit: int = 5,
         place_filter: str | None = None,
+        place_id_filter: str | None = None,
+        category_filter: str | None = None,
+        language_filter: str | None = None,
     ) -> list[dict[str, Any]]:
         """Tìm kiếm cultural facts liên quan đến query."""
         try:
             query_vector = self.embedder.encode_single(query)
-
-            query_filter = None
-            if place_filter:
-                from qdrant_client.models import FieldCondition, Filter, MatchValue
-                query_filter = Filter(
-                    must=[FieldCondition(key="place_name", match=MatchValue(value=place_filter))]
-                )
+            query_filter = self._build_query_filter(
+                place_name=place_filter,
+                place_id=place_id_filter,
+                category=category_filter,
+                language=language_filter,
+            )
 
             results = self.client.query_points(
                 collection_name=settings.qdrant_collection,
@@ -168,9 +189,19 @@ class QdrantStore:
             return [
                 {
                     "text": p.payload.get("text", ""),
+                    "chunk_id": p.payload.get("chunk_id", ""),
+                    "place_id": p.payload.get("place_id", ""),
                     "place_name": p.payload.get("place_name", ""),
                     "category": p.payload.get("category", ""),
                     "source": p.payload.get("source", ""),
+                    "source_type": p.payload.get("source_type", ""),
+                    "source_title": p.payload.get("source_title", ""),
+                    "source_url": p.payload.get("source_url", ""),
+                    "publisher": p.payload.get("publisher", ""),
+                    "page_or_section": p.payload.get("page_or_section", ""),
+                    "review_status": p.payload.get("review_status", ""),
+                    "language": p.payload.get("language", ""),
+                    "tags": p.payload.get("tags", []),
                     "score": round(p.score, 4),
                 }
                 for p in results.points
@@ -180,13 +211,43 @@ class QdrantStore:
             logger.warning("Qdrant search failed: %s", exc)
             return []
 
+    def _build_query_filter(
+        self,
+        place_name: str | None = None,
+        place_id: str | None = None,
+        category: str | None = None,
+        language: str | None = None,
+    ) -> Filter | None:
+        """Build an optional Qdrant payload filter."""
+        conditions: list[FieldCondition] = []
+        filter_values = {
+            "place_name": place_name,
+            "place_id": place_id,
+            "category": category,
+            "language": language,
+        }
+
+        for key, raw_value in filter_values.items():
+            value = raw_value.strip() if isinstance(raw_value, str) else raw_value
+            if value:
+                conditions.append(
+                    FieldCondition(key=key, match=MatchValue(value=value))
+                )
+
+        if not conditions:
+            return None
+        return Filter(must=conditions)
+
     def ensure_collection(self) -> None:
         """Tạo collection nếu chưa có."""
         collections = [c.name for c in self.client.get_collections().collections]
         if settings.qdrant_collection not in collections:
             self.client.create_collection(
                 collection_name=settings.qdrant_collection,
-                vectors_config=VectorParams(size=settings.embedding_dimension, distance=Distance.COSINE),
+                vectors_config=VectorParams(
+                    size=settings.embedding_dimension,
+                    distance=Distance.COSINE,
+                ),
             )
             logger.info("Created Qdrant collection: %s", settings.qdrant_collection)
         else:
@@ -204,18 +265,17 @@ class QdrantStore:
             batch = texts[i:i + batch_size]
             vecs = self.embedder.encode(batch)
             all_embeddings.extend(vecs)
-            logger.info("  Embedded %d/%d", min(i + batch_size, len(texts)), len(texts))
+            logger.info(
+                "  Embedded %d/%d",
+                min(i + batch_size, len(texts)),
+                len(texts),
+            )
 
         points = [
             PointStruct(
                 id=idx,
                 vector=vec,
-                payload={
-                    "text": doc["text"],
-                    "place_name": doc.get("place_name", ""),
-                    "category": doc.get("category", ""),
-                    "source": doc.get("source", ""),
-                },
+                payload=self._payload_from_document(doc),
             )
             for idx, (doc, vec) in enumerate(zip(documents, all_embeddings))
         ]
@@ -223,6 +283,24 @@ class QdrantStore:
         self.client.upsert(collection_name=settings.qdrant_collection, points=points)
         logger.info("Uploaded %d documents to Qdrant", len(points))
         return len(points)
+
+    def _payload_from_document(self, document: dict[str, Any]) -> dict[str, Any]:
+        """
+        Build a Qdrant payload from a knowledge chunk or legacy fact.
+
+        New curated files should use KnowledgeChunk. The legacy seed file still
+        works so current demo data can be seeded before the full curation pass.
+        """
+        if "chunk_id" in document:
+            return KnowledgeChunk.model_validate(document).qdrant_payload()
+
+        return {
+            "text": document["text"],
+            "place_name": document.get("place_name", ""),
+            "category": document.get("category", ""),
+            "source": document.get("source", ""),
+            "review_status": "needs_review",
+        }
 
 
 qdrant_store = QdrantStore()

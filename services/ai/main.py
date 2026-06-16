@@ -15,7 +15,7 @@ import logging
 
 from fastapi import FastAPI
 
-from src.bevietnam.ai.api.routes import router
+from services.ai.api.routes import router
 
 # ── Logging setup ─────────────────────────────────────────────────────────────
 logging.basicConfig(

@@ -10,12 +10,12 @@ import logging
 import uuid
 from typing import Any
 
-from src.bevietnam.ai.agents.question_pool_maker.prompts import (
+from services.ai.agents.question_pool_maker.prompts import (
     SYSTEM_PROMPT,
     build_user_prompt,
 )
-from src.bevietnam.ai.agents.safety_keeper import SafetyKeeper
-from src.bevietnam.ai.common.llm import llm_gateway
+from services.ai.agents.safety_keeper import SafetyKeeper
+from services.ai.common.llm import llm_gateway
 
 logger = logging.getLogger(__name__)
 

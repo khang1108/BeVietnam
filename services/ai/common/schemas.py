@@ -69,16 +69,35 @@ class ExplainRecommendationRequest(BaseModel):
     """Request body for POST /explain-recommendation."""
 
     user_id: str
-    place: dict
+    place: dict = Field(
+        default_factory=dict,
+        description="Place context: place_id, name, category, lat, lng, optional priority (0–100).",
+    )
     interests: list[str] = []
-    context: dict = {}
+    context: dict = Field(
+        default_factory=dict,
+        description="Normalized backend scores: weather_score, traffic_score, "
+        "distance_score, crowd_score (0–100), and optional missing_factors.",
+    )
+    language: str = Field(default="vi", description="Preferred language: 'vi' or 'en'.")
 
 
-class RecommendationExplanation(BaseModel):
-    """Response for recommendation explanation."""
+class RecommendationResult(BaseModel):
+    """Response payload for recommendation scoring + grounded explanation."""
 
-    explanation: str
+    place_id: str = ""
+    suitability_score: int = 0
+    culture_score: int = 0
+    culture_components: dict = Field(default_factory=dict)
+    bubble_size: str = "small"  # "small" | "medium" | "large"
+    explanation: str = ""
+    cultural_highlight: str = ""
     reason_codes: list[str] = []
+    source_refs: list[dict] = []
+    missing_factors: list[str] = []
+    fallback: bool = False
+    ai_generated: bool = False
+    confidence: float = 0.0
 
 
 # ── Capture Verification ─────────────────────────────────────────────────────
