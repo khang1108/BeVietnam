@@ -18,7 +18,7 @@ interface IUserRepository {
      * @return Một [Flow] phát ra đối tượng [Result] chứa dữ liệu của người dùng ([User]) nếu thành công,
      * hoặc chứa ngoại lệ lỗi nếu có sự cố xảy ra trong quá trình truy xuất.
      */
-    fun getUser(id: Int): Flow<Result<User>>
+    fun getUser(id: String): Flow<Result<User>>
 
     /**
      * Cập nhật thông tin hồ sơ cá nhân của người dùng hiện tại lên hệ thống.

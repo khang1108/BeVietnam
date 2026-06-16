@@ -73,7 +73,7 @@ import com.bevietnam.ui.theme.BeVietnamTheme
  */
 @Composable
 fun AuthScreen(
-    onNavigateToProfile: (Int) -> Unit,
+    onNavigateToProfile: (String) -> Unit,
     viewModel: AuthViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {

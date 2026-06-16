@@ -87,7 +87,7 @@ fun AppNavHostContent(
                 AppTopBar(
                     avatarUrl = currentUser?.avatarUrl,
                     onAvatarClick = {
-                        navController.navigate(ProfileRoute(currentUser?.id ?: -1)) {
+                        navController.navigate(ProfileRoute(currentUser?.id ?: "-1")) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }

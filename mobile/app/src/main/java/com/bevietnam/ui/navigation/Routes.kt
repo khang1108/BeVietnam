@@ -18,7 +18,7 @@ object AuthRoute
  * @property userId Định danh duy nhất của người dùng (User ID) cần hiển thị hồ sơ. Mặc định là -1.
  */
 @Serializable
-data class ProfileRoute(val userId: Int = -1)
+data class ProfileRoute(val userId: String = "-1")
 
 /**
  * Tuyến đường điều hướng đến màn hình Khám phá (Explore Screen).

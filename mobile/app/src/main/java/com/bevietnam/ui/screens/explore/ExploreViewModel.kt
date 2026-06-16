@@ -38,7 +38,7 @@ sealed class ExploreUiState {
         val selectedCategory: String = "Tất cả",
         val searchQuery: String = "",
         val isMapView: Boolean = true,
-        val focusedPlaceId: Int? = null,
+        val focusedPlaceId: String? = null,
         val hasLocationPermission: Boolean = false
     ) : ExploreUiState()
     
@@ -165,7 +165,7 @@ class ExploreViewModel @Inject constructor(
      *
      * @param id ID của địa điểm (hoặc null nếu bỏ chọn).
      */
-    fun onPlaceFocused(id: Int?) {
+    fun onPlaceFocused(id: String?) {
         val current = _uiState.value as? ExploreUiState.Success ?: return
         if (current.focusedPlaceId != id) {
             _uiState.update { currentState ->

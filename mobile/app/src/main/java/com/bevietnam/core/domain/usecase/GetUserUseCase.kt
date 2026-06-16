@@ -22,7 +22,7 @@ class GetUserUseCase @Inject constructor(
      * @param id Định danh duy nhất của người dùng cần lấy thông tin.
      * @return Một [Flow] phát ra kết quả [Result] chứa đối tượng [User], hoặc lỗi ném ra nếu thất bại.
      */
-    operator fun invoke(id: Int): Flow<Result<User>> {
+    operator fun invoke(id: String): Flow<Result<User>> {
         return userRepository.getUser(id)
     }
 }

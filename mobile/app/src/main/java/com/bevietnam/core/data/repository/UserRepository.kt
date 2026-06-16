@@ -12,7 +12,7 @@ class UserRepository @Inject constructor(
     // private val api: BeVietnamApi
 ) : IUserRepository {
 
-    override fun getUser(id: Int): Flow<Result<User>> {
+    override fun getUser(id: String): Flow<Result<User>> {
         TODO("Not yet implemented: connect to GET /api/v1/users/{id}")
     }
 

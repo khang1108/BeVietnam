@@ -111,7 +111,7 @@ fun ExploreScreenContent(
     onSearchQueryChanged: (String) -> Unit,
     onPlaceClick: (Place) -> Unit,
     onToggleViewMode: () -> Unit,
-    onPlaceFocused: (Int?) -> Unit,
+    onPlaceFocused: (String?) -> Unit,
     onPermissionResult: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -153,7 +153,7 @@ private fun ExploreSuccessContent(
     onSearchQueryChanged: (String) -> Unit,
     onPlaceClick: (Place) -> Unit,
     onToggleViewMode: () -> Unit,
-    onPlaceFocused: (Int?) -> Unit,
+    onPlaceFocused: (String?) -> Unit,
     onPermissionResult: (Boolean) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -198,7 +198,7 @@ private fun ExploreMapView(
     onCategorySelected: (String) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     onPlaceClick: (Place) -> Unit,
-    onPlaceFocused: (Int?) -> Unit,
+    onPlaceFocused: (String?) -> Unit,
     onPermissionResult: (Boolean) -> Unit
 ) {
     val daNangLocation = LatLng(16.047079, 108.206230)
@@ -521,8 +521,8 @@ fun ExploreScreenLoadingPreview() {
 @Composable
 fun ExploreScreenSuccessPreview() {
     val mockPlaces = listOf(
-        Place(id = 1, name = "Vịnh Hạ Long", category = "Thiên nhiên", description = "Di sản thiên nhiên thế giới", latitude = 20.9101, longitude = 107.1839, imageUrl = ""),
-        Place(id = 2, name = "Phố cổ Hội An", category = "Lịch sử", description = "Thành phố cổ kính bên sông Hoài", latitude = 15.8801, longitude = 108.3380, imageUrl = "")
+        Place(id = "1", name = "Vịnh Hạ Long", category = "Thiên nhiên", description = "Di sản thiên nhiên thế giới", latitude = 20.9101, longitude = 107.1839, imageUrl = ""),
+        Place(id = "2", name = "Phố cổ Hội An", category = "Lịch sử", description = "Thành phố cổ kính bên sông Hoài", latitude = 15.8801, longitude = 108.3380, imageUrl = "")
     )
     BeVietnamTheme {
         ExploreScreenContent(

@@ -307,7 +307,7 @@ private fun ProfileContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 if (!user.location.isNullOrBlank()) ProfileInfoCard("Vị trí", user.location, Icons.Default.LocationOn)
-                if (!user.joinedDate.isNullOrBlank()) ProfileInfoCard("Ngày tham gia", user.joinedDate, Icons.Default.CalendarToday)
+                if (!user.createdAt.isNullOrBlank()) ProfileInfoCard("Ngày tham gia", user.createdAt, Icons.Default.CalendarToday)
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -444,7 +444,7 @@ fun ProfileScreenViewModePreview() {
         ProfileContent(
             uiState = ProfileUiState(
                 user = User(
-                    id = 1,
+                    id = "1",
                     name = "Nguyễn Văn A",
                     email = "nguyenvana@example.com",
                     avatarUrl = null,
@@ -452,7 +452,7 @@ fun ProfileScreenViewModePreview() {
                     gender = Gender.MALE,
                     dateOfBirth = "01/01/1990",
                     location = "Hà Nội, Việt Nam",
-                    joinedDate = "01/01/2023",
+                    createdAt = "01/01/2023",
                     level = 5,
                     points = 1250
                 )
@@ -479,7 +479,7 @@ fun ProfileScreenEditModePreview() {
             uiState = ProfileUiState(
                 isEditMode = true,
                 user = User(
-                    id = 1,
+                    id = "1",
                     name = "Nguyễn Văn A",
                     email = "nguyenvana@example.com",
                     avatarUrl = null,
@@ -487,7 +487,7 @@ fun ProfileScreenEditModePreview() {
                     gender = Gender.MALE,
                     dateOfBirth = "01/01/1990",
                     location = "Hà Nội, Việt Nam",
-                    joinedDate = "01/01/2023",
+                    createdAt = "01/01/2023",
                     level = 5,
                     points = 1250
                 ),

@@ -67,7 +67,7 @@ sealed interface AuthUiEvent {
      * 
      * @property userId Định danh duy nhất của người dùng vừa đăng nhập.
      */
-    data class NavigateToProfile(val userId: Int) : AuthUiEvent
+    data class NavigateToProfile(val userId: String) : AuthUiEvent
     
     /** 
      * Sự kiện hiển thị thông báo nhanh (Snackbar) lên màn hình.

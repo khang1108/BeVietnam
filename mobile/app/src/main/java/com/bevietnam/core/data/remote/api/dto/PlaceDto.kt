@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PlaceDto(
-    val id: Int,
+    val id: String,
     val name: String,
     val category: String,
     val description: String,

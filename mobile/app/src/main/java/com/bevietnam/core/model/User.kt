@@ -16,7 +16,7 @@ package com.bevietnam.core.model
  * @property points Tổng số điểm tích lũy của người dùng thông qua việc hoàn thành các thử thách văn hóa.
  */
 data class User(
-    val id: Int,
+    val id: String,
     val name: String,
     val email: String,
     val avatarUrl: String?,
@@ -24,7 +24,7 @@ data class User(
     val gender: Gender? = null,
     val dateOfBirth: String? = null,
     val location: String? = null,
-    val joinedDate: String? = null,
+    val createdAt: String? = null,
     val level: Int = 1,
     val points: Int = 0,
 )
