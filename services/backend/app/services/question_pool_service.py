@@ -72,7 +72,7 @@ _FALLBACK_POOL = [
 
 
 def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[5]
+    return Path(__file__).resolve().parents[4]
 
 
 def _resolve_pool_path() -> Path:
