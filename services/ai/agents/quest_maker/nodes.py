@@ -16,12 +16,12 @@ and each step easy to test independently.
 import logging
 import uuid
 
-from src.bevietnam.ai.common.llm import llm_gateway
-from src.bevietnam.ai.agents.culture_scout import CultureScout
-from src.bevietnam.ai.agents.quest_maker.fallback import get_fallback_task
-from src.bevietnam.ai.agents.quest_maker.prompts import SYSTEM_PROMPT, build_user_prompt
-from src.bevietnam.ai.agents.quest_maker.state import QuestMakerState
-from src.bevietnam.ai.agents.safety_keeper import SafetyKeeper
+from services.ai.common.llm import llm_gateway
+from services.ai.agents.culture_scout import CultureScout
+from services.ai.agents.quest_maker.fallback import get_fallback_task
+from services.ai.agents.quest_maker.prompts import SYSTEM_PROMPT, build_user_prompt
+from services.ai.agents.quest_maker.state import QuestMakerState
+from services.ai.agents.safety_keeper import SafetyKeeper
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +73,7 @@ def retrieve_culture(state: QuestMakerState) -> dict:
     # Use place names from nearby or quest state as the query focus
     place_names = [p.get("name", "") for p in nearby if p.get("name")]
     query_parts = place_names + interests
+    primary_place = nearby[0] if nearby else {}
 
     # If we have a current quest, add its context
     current_task = quest_state.get("current_task", {})
@@ -84,7 +85,18 @@ def retrieve_culture(state: QuestMakerState) -> dict:
 
     logger.info("🔍 Culture Scout searching: '%s'", query[:60])
     scout = CultureScout()
-    facts = scout.retrieve(query=query, place_name=place_filter, interests=interests)
+    facts = scout.retrieve(
+        query=query,
+        place_name=place_filter,
+        place_id=str(
+            primary_place.get("place_id")
+            or primary_place.get("id")
+            or ""
+        ),
+        category=str(primary_place.get("category") or ""),
+        language=state.get("language", "vi"),
+        interests=interests,
+    )
 
     logger.info("📚 Culture Scout returned %d facts", len(facts))
     return {"cultural_context": facts}

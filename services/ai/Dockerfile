@@ -9,10 +9,10 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-COPY . ./src/bevietnam/ai
+COPY . ./services/ai
 
 ENV PYTHONPATH=/app
 
 EXPOSE 8000
 
-CMD ["uvicorn", "src.bevietnam.ai.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "services.ai.main:app", "--host", "0.0.0.0", "--port", "8000"]

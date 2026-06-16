@@ -1,0 +1,324 @@
+# Codex Session Memory
+
+Date: 2026-06-16
+
+Project: BeVietnam, a mobile + web tourism application that helps tourists have a better Vietnam trip through culture-aware recommendations, map exploration, and lightweight storyline/geocaching tasks.
+
+## Product Direction
+
+- Main product experience is not a strict hour-by-hour itinerary.
+- Main loop:
+  - Tourist shares/uses current location.
+  - App shows a Facebook-like recommendation feed of nearby cultural places.
+  - Each post explains why the place is good to visit now.
+  - Map renders POIs as dynamic bubbles; larger bubble means better current suitability.
+- Bubble/recommendation factors:
+  - weather,
+  - traffic/travel time,
+  - distance,
+  - estimated crowdedness,
+  - cultural relevance.
+- Secondary experience is a storyline/game:
+  - User moves through places such as Hue or Da Nang.
+  - App shows cultural tasks like check-in, capture, or observation.
+  - Flow is similar to geocaching, with tasks unlocked by visiting cultural locations.
+- Pilot target:
+  - Hue-first usable product.
+  - 8-day completion window, leaving one day before submission.
+  - Small tourist pilot/survey.
+  - Team of 5; teammates mainly handle web/mobile UI, current focus is backend + AI service.
+
+## Key Decisions
+
+- AI service is priority before broader backend work.
+- Backend is considered manageable in a few hours compared with AI/data/service quality.
+- AI role for pilot:
+  - AI contributes score + explanation, but numeric scoring should be bounded and calculated in code.
+  - LLM should not freely invent recommendation scores.
+- Storyline task generation:
+  - Prebuilt reviewed task pool first.
+  - Runtime task selection uses reviewed pool.
+  - Live generation only as fallback.
+- Source policy:
+  - Use official sources + approved books.
+  - Official government/tourism/heritage sources and UNESCO are acceptable.
+  - Book-derived claims must be marked separately in metadata.
+- Platform/database decision:
+  - Managed PostgreSQL is production/pilot product database.
+  - Local DB is development-only.
+  - Firebase Authentication handles user identity.
+  - Firebase Storage stores check-in/capture photos.
+  - Qdrant stores vectorized cultural knowledge chunks.
+  - Backend verifies Firebase ID tokens before protected writes.
+- External APIs:
+  - OpenWeather for weather.
+  - Google APIs for traffic/travel-time context.
+  - Goong for map rendering/API already present in UI.
+  - Qdrant Cloud for vector retrieval.
+  - Gemini via `google-genai` for LLM JSON generation.
+  - Hugging Face Inference API for BAAI/bge-m3 embeddings.
+
+## Docs Exported
+
+- `docs/PROJECT_SPEC.md`
+- `docs/HUE_PILOT_8_DAY_DELIVERY_PLAN.md`
+- `docs/AI_SERVICE_IMPLEMENTATION_PLAN.md`
+- Current requested memory file: `docs/codex/memory`
+
+`.gitignore` was changed so specific Markdown docs under `docs/` are not hidden by the broad `docs/*` ignore rule.
+
+## AI Service Plan
+
+The AI service plan is in `docs/AI_SERVICE_IMPLEMENTATION_PLAN.md`.
+
+Planned AI tasks:
+
+1. Make AI service runnable.
+2. Define knowledge chunk schema.
+3. Rebuild CultureScout retrieval.
+4. Implement AI scoring and grounded explanation.
+5. Generate reviewed question pool.
+6. Improve runtime QuestMaker.
+7. Strengthen SafetyKeeper.
+8. Backend integration checkpoint.
+
+## Implemented Work
+
+### Task 1: Make AI Service Runnable
+
+Implemented:
+
+- Replaced stale `src.bevietnam.ai...` imports with `services.ai...` across AI modules.
+- Updated `services/ai/Dockerfile`:
+  - Copies code into `./services/ai`.
+  - Runs `uvicorn services.ai.main:app --host 0.0.0.0 --port 8000`.
+  - Removed `--reload` from container command.
+- Updated data-pipeline imports at the time from old `src.bevietnam.ai...` to `services.ai...`.
+- Installed AI requirements into existing `services/backend/venv` so smoke checks could run.
+
+Verification passed at the time:
+
+```bash
+PYTHONPATH=. services/backend/venv/bin/python -c "from services.ai.main import app; print(app.title)"
+PYTHONPATH=. services/backend/venv/bin/python -m compileall -q services/ai scripts/data-pipeline
+curl http://127.0.0.1:8011/health
+```
+
+Expected health response:
+
+```json
+{"status":"ok","service":"ai-core","version":"0.2.0"}
+```
+
+Notes:
+
+- `services/backend/venv/bin/uvicorn` has a stale shebang from an older repo path.
+- Use `services/backend/venv/bin/python -m uvicorn ...` instead.
+- Binding local Uvicorn required escalation in sandbox, but app startup succeeded.
+
+### Task 2: Define Knowledge Chunk Schema
+
+Implemented:
+
+- Added `services/ai/common/knowledge_schema.py`.
+- Defines:
+  - `KnowledgeChunk`,
+  - `KnowledgeChunkCollection`,
+  - `SourceRef`,
+  - `SourceType`: `official`, `unesco`, `book`,
+  - `ReviewStatus`: `approved`, `needs_review`, `rejected`.
+- Validation rules:
+  - stable slug IDs,
+  - language limited to `vi` or `en`,
+  - duplicate chunk IDs rejected,
+  - approved official/UNESCO chunks require `source_url`.
+- Updated `services/ai/common/qdrant_store.py` so Qdrant payloads preserve schema fields:
+  - `chunk_id`,
+  - `place_id`,
+  - `source_type`,
+  - `source_title`,
+  - `source_url`,
+  - `publisher`,
+  - `page_or_section`,
+  - `review_status`,
+  - `language`,
+  - `tags`.
+- Added a validator script at the time:
+  - `scripts/data-pipeline/validate_knowledge_chunks.py`.
+
+Important current caveat:
+
+- The working tree currently shows the entire `scripts/` directory as deleted. Do not assume the validator script or data-pipeline scripts are present until this is resolved.
+- This deletion was not intentionally done as part of the memory export. Treat it as an external/user worktree change unless the user asks to restore it.
+
+Verification passed at the time:
+
+```bash
+PYTHONPATH=. services/backend/venv/bin/python -m compileall -q services/ai/common scripts/data-pipeline/validate_knowledge_chunks.py scripts/data-pipeline/seed_qdrant.py
+git diff --check -- services/ai/common/knowledge_schema.py services/ai/common/qdrant_store.py scripts/data-pipeline/validate_knowledge_chunks.py scripts/data-pipeline/seed_qdrant.py
+```
+
+### Task 3: Rebuild CultureScout Retrieval
+
+Implemented:
+
+- `services/ai/agents/culture_scout/agent.py`
+  - `CultureScout.retrieve(...)` now accepts:
+    - `query`,
+    - `place_name`,
+    - `place_id`,
+    - `category`,
+    - `language`,
+    - `interests`,
+    - `limit`.
+  - Filters weak Qdrant results by similarity score.
+  - Rejects results missing source metadata.
+  - Uses hard category filters only for known fact categories:
+    - `architecture`,
+    - `art`,
+    - `festival`,
+    - `food`,
+    - `history`,
+    - `nature`,
+    - `religion`,
+    - `tradition`.
+  - App categories such as `heritage` enrich the query but do not hard-filter results.
+  - Fallback relaxes filters in stages so demo retrieval does not return empty context because of ID/category mismatch.
+- `services/ai/agents/culture_scout/fallback.py`
+  - Fallback facts are now source-backed.
+  - They include:
+    - `chunk_id`,
+    - `place_id`,
+    - `source_type`,
+    - `source_title`,
+    - `source_url`,
+    - `publisher`,
+    - `page_or_section`,
+    - `review_status`,
+    - `language`,
+    - `tags`.
+- `services/ai/common/qdrant_store.py`
+  - Qdrant search now supports payload filters:
+    - `place_name`,
+    - `place_id`,
+    - `category`,
+    - `language`.
+- `services/ai/agents/quest_maker/nodes.py`
+  - QuestMaker now passes POI id/category/language into CultureScout.
+
+Verification passed:
+
+```bash
+PYTHONPATH=. services/backend/venv/bin/python -m compileall -q services/ai/agents/culture_scout services/ai/agents/quest_maker services/ai/common/qdrant_store.py
+PYTHONPATH=. services/backend/venv/bin/python -c "from services.ai.main import app; print(app.title)"
+git diff --check -- services/ai/agents/culture_scout/agent.py services/ai/agents/culture_scout/fallback.py services/ai/common/qdrant_store.py services/ai/agents/quest_maker/nodes.py
+```
+
+Fallback smoke test returned:
+
+```text
+2
+fallback-hue-imperial-001
+official
+True
+```
+
+Live Qdrant/HF was not reachable in the sandbox because DNS resolution failed, but fallback behavior worked.
+
+## Current Working Tree Notes
+
+Current observed working tree included:
+
+- `.gitignore` modified.
+- AI service files modified.
+- `services/ai/common/knowledge_schema.py` untracked.
+- Docs files untracked:
+  - `docs/PROJECT_SPEC.md`,
+  - `docs/HUE_PILOT_8_DAY_DELIVERY_PLAN.md`,
+  - `docs/AI_SERVICE_IMPLEMENTATION_PLAN.md`.
+- `CLAUDE.md` untracked and unrelated.
+- `scripts/data-pipeline/*` showed as deleted and `scripts/` was not present on disk during memory export.
+
+Do not revert user or external changes unless explicitly requested.
+
+## Important Commands
+
+AI import smoke:
+
+```bash
+PYTHONPATH=. services/backend/venv/bin/python -c "from services.ai.main import app; print(app.title)"
+```
+
+AI server smoke:
+
+```bash
+PYTHONPATH=. services/backend/venv/bin/python -m uvicorn services.ai.main:app --host 127.0.0.1 --port 8011
+curl -s http://127.0.0.1:8011/health
+```
+
+CultureScout fallback smoke:
+
+```bash
+PYTHONPATH=. services/backend/venv/bin/python - <<'PY'
+from services.ai.agents.culture_scout import CultureScout
+
+facts = CultureScout().retrieve(
+    query="Kinh thanh Hue lich su",
+    place_name="Kinh thành Huế",
+    place_id="hue-imperial-city",
+    category="heritage",
+    language="vi",
+    interests=["history", "architecture"],
+    limit=3,
+)
+print(len(facts))
+print(facts[0]["chunk_id"])
+print(facts[0]["source_type"])
+print(bool(facts[0]["source_title"]))
+PY
+```
+
+## Next Recommended Task
+
+Next implementation task should be Task 4: AI scoring and grounded recommendation explanation.
+
+Decision-complete direction:
+
+- Replace `TripAdvisorAgent` canned response.
+- AI service should compute:
+  - `culture_score`,
+  - final `suitability_score`,
+  - `bubble_size`,
+  - reason codes,
+  - grounded cultural highlight,
+  - explanation,
+  - source refs.
+- Numeric score must be deterministic Python logic.
+- Gemini can write the explanation text, but if Gemini fails, use a deterministic template explanation with the same score.
+
+Recommended scoring formula from the plan:
+
+```text
+suitability_score =
+  0.20 * weather_score +
+  0.20 * traffic_score +
+  0.15 * distance_score +
+  0.15 * crowd_score +
+  0.30 * culture_score
+```
+
+Culture score:
+
+- Base place priority: 40%.
+- Retrieved fact strength and source quality: 30%.
+- User interest match: 20%.
+- Language/content completeness: 10%.
+
+## Safety Reminders
+
+- Do not commit secrets or print `.env` secret values.
+- Keep AI-generated cultural claims grounded in `source_refs`.
+- Backend owns persistence and protected writes.
+- AI service should not mutate PostgreSQL.
+- Firebase handles auth/storage, not relational product records.
+- Managed PostgreSQL is pilot source of truth for product data.

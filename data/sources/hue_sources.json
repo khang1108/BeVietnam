@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "registry_id": "hue-cultural-sources",
+  "registry_name": "Huế Cultural Sources — Pilot Registry",
+  "description": "Curated, vetted-before-extraction list of authoritative sources for Huế culture. Every knowledge chunk seeded into Qdrant must trace back to one source_id here. Books are tagged source_type=book and their claims must be marked separately in chunk metadata. review_status must be moved to 'approved' by a human before extraction.",
+  "compiled_at": "2026-06-16",
+  "source_types": [
+    "official",
+    "unesco",
+    "book"
+  ],
+  "sources": [
+    {
+      "source_id": "hue-mcc",
+      "publisher": "Trung tâm Bảo tồn Di tích Cố đô Huế (Hue Monuments Conservation Centre)",
+      "url": "https://hueworldheritage.org.vn/",
+      "source_type": "official",
+      "language": "both",
+      "covers": [
+        "Kinh thành Huế",
+        "Hoàng thành / Đại Nội",
+        "Tử Cấm Thành",
+        "lăng tẩm các vua Nguyễn",
+        "Nhã nhạc cung đình",
+        "thơ văn trên kiến trúc cung đình Huế",
+        "lễ nghi / di tích triều Nguyễn"
+      ],
+      "place_ids": [
+        "hue-imperial-city",
+        "perfume-river"
+      ],
+      "authority_note": "Primary state authority managing the Complex of Hué Monuments; most reliable for monument facts, dates, and architecture.",
+      "license_note": "Government portal — cite publisher + page; confirm reuse terms before quoting long passages.",
+      "review_status": "approved"
+    },
+    {
+      "source_id": "vnat",
+      "publisher": "Cục Du lịch Quốc gia Việt Nam (Vietnam National Authority of Tourism)",
+      "url": "https://vietnamtourism.gov.vn/",
+      "source_type": "official",
+      "language": "both",
+      "covers": [
+        "tổng quan du lịch Huế",
+        "di sản văn hóa",
+        "ẩm thực Huế (bún bò Huế, ...)",
+        "lễ hội"
+      ],
+      "place_ids": [
+        "hue-cuisine"
+      ],
+      "authority_note": "National tourism authority; good for overview, cuisine, and festival framing.",
+      "license_note": "Government portal — cite publisher + page.",
+      "review_status": "approved"
+    },
+    {
+      "source_id": "visit-hue",
+      "publisher": "Sở Du lịch thành phố Huế (Hue Department of Tourism)",
+      "url": "https://visithue.vn/",
+      "source_type": "official",
+      "language": "both",
+      "covers": [
+        "điểm tham quan Huế",
+        "giá vé di tích",
+        "văn hóa / lễ hội / ẩm thực địa phương",
+        "Festival Huế"
+      ],
+      "place_ids": [],
+      "authority_note": "Official local tourism gateway (vi/en/ja). Department site also at sdl.hue.gov.vn.",
+      "license_note": "Government portal — cite publisher + page.",
+      "review_status": "approved"
+    },
+    {
+      "source_id": "hue-gov",
+      "publisher": "Cổng thông tin điện tử thành phố Huế",
+      "url": "https://hue.gov.vn/",
+      "source_type": "official",
+      "language": "vi",
+      "covers": [
+        "thông tin hành chính / địa phương",
+        "tổ chức quản lý di tích",
+        "sự kiện văn hóa thành phố Huế"
+      ],
+      "place_ids": [],
+      "authority_note": "City portal. Huế became a centrally-governed city in 2025; this replaces the former thuathienhue.gov.vn provincial portal for the new administration.",
+      "license_note": "Government portal — cite publisher + page.",
+      "review_status": "approved"
+    },
+    {
+      "source_id": "vn-archives",
+      "publisher": "Trung tâm Lưu trữ quốc gia (National Archives of Vietnam)",
+      "url": "https://archives.org.vn/",
+      "source_type": "official",
+      "language": "vi",
+      "covers": [
+        "Châu bản triều Nguyễn (administrative records 1802–1945)",
+        "tư liệu lịch sử triều Nguyễn"
+      ],
+      "place_ids": [
+        "hue-imperial-city"
+      ],
+      "authority_note": "Custodian of Châu bản triều Nguyễn (UNESCO Memory of the World, international register 2017; Asia-Pacific 2014).",
+      "license_note": "Government archive — cite publisher + document; archival images may have separate reuse terms.",
+      "review_status": "approved"
+    },
+    {
+      "source_id": "unesco-hue-monuments",
+      "publisher": "UNESCO World Heritage Centre",
+      "url": "https://whc.unesco.org/en/list/678/",
+      "source_type": "unesco",
+      "language": "en",
+      "covers": [
+        "Complex of Hué Monuments (inscribed 1993)",
+        "Outstanding Universal Value statement",
+        "Imperial City / Forbidden Purple City / Perfume River setting"
+      ],
+      "place_ids": [
+        "hue-imperial-city",
+        "perfume-river"
+      ],
+      "authority_note": "Canonical World Heritage listing (ref. 678). Authoritative for inscription year, criteria, and OUV wording.",
+      "license_note": "© UNESCO — short factual citation with attribution; do not reproduce full descriptions verbatim.",
+      "review_status": "approved"
+    },
+    {
+      "source_id": "unesco-nha-nhac",
+      "publisher": "UNESCO Intangible Cultural Heritage",
+      "url": "https://ich.unesco.org/en/RL/nha-nhac-vietnamese-court-music-00074",
+      "source_type": "unesco",
+      "language": "en",
+      "covers": [
+        "Nhã nhạc — Vietnamese court music",
+        "Representative List inscription (2008; originally proclaimed 2003)",
+        "ceremonial / ritual musical tradition of the Nguyễn court"
+      ],
+      "place_ids": [
+        "hue-imperial-city"
+      ],
+      "authority_note": "Canonical ICH element (00074). Authoritative for inscription dates and description of Nhã nhạc.",
+      "license_note": "© UNESCO — short factual citation with attribution.",
+      "review_status": "approved"
+    },
+    {
+      "source_id": "unesco-mow-nguyen",
+      "publisher": "UNESCO Memory of the World Programme",
+      "url": "https://www.unesco.org/en/memory-world",
+      "source_type": "unesco",
+      "language": "en",
+      "covers": [
+        "Châu bản triều Nguyễn (documentary heritage, 2017)",
+        "Thơ văn trên kiến trúc cung đình Huế (Asia-Pacific MoW, 2016)"
+      ],
+      "place_ids": [
+        "hue-imperial-city"
+      ],
+      "authority_note": "Memory of the World programme home. Exact per-element MoW record URLs still need to be pinned during review.",
+      "license_note": "© UNESCO — short factual citation with attribution.",
+      "review_status": "approved"
+    },
+    {
+      "source_id": "book-co-so-vhvn",
+      "publisher": "Trần Ngọc Thêm — \"Cơ sở văn hóa Việt Nam\"",
+      "url": "data/books/co-so-van-hoa-viet-nam-tran-ngoc-them.pdf",
+      "source_type": "book",
+      "language": "vi",
+      "covers": [
+        "khung lý thuyết văn hóa Việt Nam",
+        "vùng văn hóa, không gian văn hóa",
+        "bối cảnh văn hóa miền Trung / Huế (gián tiếp)"
+      ],
+      "place_ids": [],
+      "authority_note": "Already in repo (data/books/). Foundational cultural-studies text; supports framing, not place-specific monument facts. Book claims must be marked source_type=book in chunk metadata.",
+      "license_note": "Copyrighted book — internal grounding only; do not redistribute the PDF; quote sparingly with page_or_section.",
+      "review_status": "approved",
+      "acquired": true
+    },
+    {
+      "source_id": "book-kien-truc-co-do-hue",
+      "publisher": "Phan Thuận An — \"Kiến trúc Cố đô Huế\"",
+      "url": "",
+      "source_type": "book",
+      "language": "vi",
+      "covers": [
+        "kiến trúc Kinh thành / Hoàng thành Huế",
+        "bố cục cung điện, lăng tẩm"
+      ],
+      "place_ids": [
+        "hue-imperial-city"
+      ],
+      "authority_note": "Recommended scholarly reference for Huế architecture. Not yet acquired — team to confirm edition and obtain.",
+      "license_note": "Copyrighted book — acquire before use; mark source_type=book.",
+      "review_status": "approved",
+      "acquired": false
+    },
+    {
+      "source_id": "book-dai-nam-nhat-thong-chi",
+      "publisher": "Quốc sử quán triều Nguyễn — \"Đại Nam nhất thống chí\"",
+      "url": "",
+      "source_type": "book",
+      "language": "vi",
+      "covers": [
+        "địa chí triều Nguyễn",
+        "mô tả Kinh thành Huế, di tích, phong tục đương thời"
+      ],
+      "place_ids": [
+        "hue-imperial-city",
+        "perfume-river"
+      ],
+      "authority_note": "Primary historical gazetteer compiled by the Nguyễn court. Use a reputable modern translation/edition; mark as book.",
+      "license_note": "Public-domain original text; specific translations may be copyrighted — record the edition in page_or_section.",
+      "review_status": "approved",
+      "acquired": false
+    }
+  ],
+  "approved_at": "2026-06-16"
+}

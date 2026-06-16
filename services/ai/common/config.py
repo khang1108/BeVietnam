@@ -11,7 +11,7 @@ Supports both:
   - Local Qdrant server (QDRANT_HOST + QDRANT_PORT via Docker or binary)
 
 Usage:
-    from src.bevietnam.ai.common.config import settings
+    from services.ai.common.config import settings
     print(settings.gemini_api_key)
 """
 

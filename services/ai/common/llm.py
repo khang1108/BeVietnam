@@ -8,7 +8,7 @@ All LLM calls go through this gateway so we can:
   - handle errors + fallback in one place
 
 Usage:
-    from src.bevietnam.ai.common.llm import llm_gateway
+    from services.ai.common.llm import llm_gateway
 
     result = llm_gateway.generate_json(
         system_prompt="You are a cultural task designer...",
@@ -24,7 +24,7 @@ from typing import Any
 from google import genai
 from google.genai import types
 
-from src.bevietnam.ai.common.config import settings
+from services.ai.common.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -98,5 +98,5 @@ class LLMGateway:
 
 
 # ── Singleton instance ────────────────────────────────────────────────────────
-# Import this in agent modules: from src.bevietnam.ai.common.llm import llm_gateway
+# Import this in agent modules: from services.ai.common.llm import llm_gateway
 llm_gateway = LLMGateway()

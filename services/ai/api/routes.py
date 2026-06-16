@@ -13,20 +13,20 @@ All endpoints follow the same pattern:
 
 from fastapi import APIRouter
 
-from src.bevietnam.ai.agents.capture_judge import verify_capture_workflow
-from src.bevietnam.ai.common.schemas import (
+from services.ai.agents.capture_judge import verify_capture_workflow
+from services.ai.common.schemas import (
     ExplainRecommendationRequest,
     GenerateQuestionPoolRequest,
     GenerateTaskRequest,
     GenerateVlogRequest,
     VerifyCaptureRequest,
 )
-from src.bevietnam.ai.agents.publisher import PublisherAgent
-from src.bevietnam.ai.agents.question_pool_maker import QuestionPoolMaker
-from src.bevietnam.ai.agents.quest_maker import generate_task_workflow
-from src.bevietnam.ai.agents.quest_maker.fallback import get_fallback_chain
-from src.bevietnam.ai.agents.story_weaver import generate_vlog_workflow
-from src.bevietnam.ai.agents.trip_advisor import explain_recommendation_workflow
+from services.ai.agents.publisher import PublisherAgent
+from services.ai.agents.question_pool_maker import QuestionPoolMaker
+from services.ai.agents.quest_maker import generate_task_workflow
+from services.ai.agents.quest_maker.fallback import get_fallback_chain
+from services.ai.agents.story_weaver import generate_vlog_workflow
+from services.ai.agents.trip_advisor import explain_recommendation_workflow
 
 router = APIRouter()
 
@@ -87,7 +87,14 @@ def get_quest_chain(quest_id: str = "quest-hue-imperial") -> dict:
 
 @router.post("/explain-recommendation")
 def explain_recommendation(request: ExplainRecommendationRequest) -> dict:
-    """Explain why a place is recommended (stub for future implementation)."""
+    """
+    Score a place and explain why it is recommended now.
+
+    Trip Advisor combines normalized backend context (weather/traffic/distance/
+    crowd) with grounded cultural facts into a deterministic suitability_score,
+    culture_score, bubble_size, reason_codes, and source_refs. Gemini phrases the
+    explanation; on failure a template explanation with the same scores is used.
+    """
     return explain_recommendation_workflow(request.model_dump())
 
 
