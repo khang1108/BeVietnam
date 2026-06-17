@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,14 +15,17 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.bevietnam.core.model.Place
+import com.bevietnam.ui.theme.BeVietnamTheme
 
 /**
  * Thẻ hiển thị địa điểm du lịch văn hóa (Place Card) của ứng dụng BeVietnam.
@@ -53,7 +57,8 @@ fun PlaceCard(
                 ambientColor = Color.Black.copy(alpha = 0.08f)
             ),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Row(
             modifier = Modifier
@@ -107,12 +112,21 @@ fun PlaceCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                // Danh mục phân loại
-                Text(
-                    text = place.category,
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                // Danh mục phân loại dạng nhãn (Badge)
+                androidx.compose.material3.Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(6.dp)
+                ) {
+                    Text(
+                        text = place.category.uppercase(),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
 
                 // Mô tả ngắn
                 Text(
@@ -124,18 +138,49 @@ fun PlaceCard(
                 )
             }
 
-            IconButton(
-                onClick = { /* Hành động lưu trữ */ },
-                modifier = Modifier.size(48.dp) // Kích thước chuẩn Touch Target 48dp (Accessibility)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.BookmarkBorder,
-                    contentDescription = "Lưu địa điểm này",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
+                val referenceUrl = place.referenceUrl
+                if (!referenceUrl.isNullOrEmpty()) {
+                    val uriHandler = LocalUriHandler.current
+                    IconButton(
+                        onClick = { uriHandler.openUri(referenceUrl) },
+                        modifier = Modifier.size(48.dp) // Kích thước chuẩn Touch Target (Accessibility)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Public,
+                            contentDescription = "Tìm hiểu thêm",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                }
             }
         }
     }
 }
+
+    @Preview(showBackground = true)
+    @Composable
+    private fun PlaceCardPreview() {
+        BeVietnamTheme {
+            Box(modifier = Modifier.padding(16.dp)) {
+                PlaceCard(
+                    place = Place(
+                        id = "place-001",
+                        name = "Văn Miếu - Quốc Tử Giám",
+                        category = "temple",
+                        description = "Quần thể di tích đa dạng và phong phú hàng đầu của thành phố Hà Nội.",
+                        latitude = 21.0275,
+                        longitude = 105.8357,
+                        imageUrl = null,
+                        referenceUrl = "https://vanmieu.gov.vn"
+                    ),
+                    onClick = {}
+                )
+            }
+        }
+    }
 

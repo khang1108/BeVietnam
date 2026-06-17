@@ -36,4 +36,14 @@
     <string name="app_version">Phiên bản 1.0.0</string>
     <string name="map_view">Xem Bản đồ</string>
     <string name="list_view">Xem Danh sách</string>
+
+    <!-- Search Bar -->
+    <string name="search_heritage">Tìm kiếm địa điểm...</string>
+    <string name="search_content_description">Tìm kiếm</string>
+    
+    <!-- Explore Screen -->
+    <string name="places_count">%1$d địa điểm</string>
+    <string name="empty_places">Chưa có địa điểm nào</string>
+    <string name="retry">Thử lại</string>
+    <string name="search_not_found">Không tìm thấy \"%1$s\"</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.bevietnam.core.data.remote.api
 
+import com.bevietnam.core.data.remote.api.dto.FeedResponseDto
 import com.bevietnam.core.data.remote.api.dto.HealthResponseDto
+import com.bevietnam.core.data.remote.api.dto.PlacesResponseDto
 import retrofit2.http.GET
 
 /**
@@ -22,11 +24,11 @@ interface BeVietnamApi {
         @retrofit2.http.Query("category") category: String? = null,
         @retrofit2.http.Query("limit") limit: Int = 10,
         @retrofit2.http.Query("offset") offset: Int = 0
-    ): com.bevietnam.core.data.remote.api.dto.PlacesResponseDto
+    ): PlacesResponseDto
 
     /**
      * Lấy bảng tin gợi ý.
      */
     @GET("feed")
-    suspend fun getFeed(): com.bevietnam.core.data.remote.api.dto.FeedResponseDto
+    suspend fun getFeed(): FeedResponseDto
 }

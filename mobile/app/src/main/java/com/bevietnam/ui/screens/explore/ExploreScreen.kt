@@ -263,18 +263,16 @@ private fun ExploreMapView(
             }
         }
 
-        // Overlay Search and Filters (Glassmorphism effect)
+        // Overlay Search and Filters (Glassmorphism effect is on the components)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.TopCenter)
-                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.85f))
                 .padding(bottom = 12.dp)
         ) {
             SearchBar(
                 query = state.searchQuery,
                 onQueryChanged = onSearchQueryChanged,
-                placeholder = "Tìm kiếm địa điểm...",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -297,16 +295,17 @@ private fun ExploreMapView(
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(
+                itemsIndexed(
                     items = state.filteredPlaces,
-                    key = { it.id }
-                ) { place ->
+                    key = { _, place -> place.id }
+                ) { index, place ->
                     PlaceCard(
                         place = place,
-                        index = 1, // Optional: recalculate index if needed for map view
+                        index = index + 1,
                         onClick = { onPlaceClick(place) },
                         modifier = Modifier
                             .width(280.dp)
+                            .height(130.dp)
                             .padding(vertical = 4.dp)
                     )
                 }
@@ -331,7 +330,6 @@ private fun ExploreListView(
             SearchBar(
                 query = state.searchQuery,
                 onQueryChanged = onSearchQueryChanged,
-                placeholder = "Tìm kiếm địa điểm...",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -350,7 +348,7 @@ private fun ExploreListView(
         // Dòng hiển thị tổng số kết quả
         item {
             Text(
-                text = "${state.filteredPlaces.size} địa điểm",
+                text = stringResource(R.string.places_count, state.filteredPlaces.size),
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -403,17 +401,17 @@ private fun CategoryFilterRow(
             val isSelected = category == selectedCategory
             Surface(
                 onClick = { onCategorySelected(category) },
-                shape = RoundedCornerShape(20.dp),
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-                border = if (!isSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant) else null,
+                shape = RoundedCornerShape(50),
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                border = if (!isSelected) androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant) else null,
                 modifier = Modifier.animateContentSize()
             ) {
                 Text(
                     text = category,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    fontSize = 13.sp,
-                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
+                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -466,7 +464,7 @@ private fun ExploreLoadingState() {
  * Trạng thái trống (Empty State) hiển thị khi chưa có bất kỳ địa điểm nào trên hệ thống.
  */
 @Composable
-private fun ExploreEmptyState(message: String = "Chưa có địa điểm nào", onRetry: () -> Unit) {
+private fun ExploreEmptyState(message: String = stringResource(R.string.empty_places), onRetry: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -479,7 +477,7 @@ private fun ExploreEmptyState(message: String = "Chưa có địa điểm nào",
         Text(text = message, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = onRetry, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
-            Text(text = "Thử lại", color = Color.White)
+            Text(text = stringResource(R.string.retry), color = Color.White)
         }
     }
 }
@@ -496,7 +494,7 @@ private fun SearchEmptyState(query: String) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "🔍", fontSize = 48.sp)
-        Text(text = "Không tìm thấy \"$query\"", fontWeight = FontWeight.SemiBold)
+        Text(text = stringResource(R.string.search_not_found, query), fontWeight = FontWeight.SemiBold)
     }
 }
 
@@ -517,16 +515,38 @@ fun ExploreScreenLoadingPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Map View Mode")
 @Composable
-fun ExploreScreenSuccessPreview() {
+fun ExploreScreenMapViewPreview() {
+    // Trigger preview refresh for new colors
     val mockPlaces = listOf(
-        Place(id = "1", name = "Vịnh Hạ Long", category = "Thiên nhiên", description = "Di sản thiên nhiên thế giới", latitude = 20.9101, longitude = 107.1839, imageUrl = ""),
-        Place(id = "2", name = "Phố cổ Hội An", category = "Lịch sử", description = "Thành phố cổ kính bên sông Hoài", latitude = 15.8801, longitude = 108.3380, imageUrl = "")
+        Place(id = "1", name = "Vịnh Hạ Long", category = "Thiên nhiên", description = "Di sản thiên nhiên thế giới", latitude = 20.9101, longitude = 107.1839, imageUrl = "", referenceUrl = "https://example.com"),
+        Place(id = "2", name = "Phố cổ Hội An", category = "Lịch sử", description = "Thành phố cổ kính bên sông Hoài", latitude = 15.8801, longitude = 108.3380, imageUrl = "", referenceUrl = "https://example.com")
     )
     BeVietnamTheme {
         ExploreScreenContent(
-            uiState = ExploreUiState.Success(places = mockPlaces, filteredPlaces = mockPlaces),
+            uiState = ExploreUiState.Success(places = mockPlaces, filteredPlaces = mockPlaces, isMapView = true),
+            onRetry = {},
+            onCategorySelected = {},
+            onSearchQueryChanged = {},
+            onPlaceClick = {},
+            onToggleViewMode = {},
+            onPlaceFocused = {},
+            onPermissionResult = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "List View Mode")
+@Composable
+fun ExploreScreenListViewPreview() {
+    val mockPlaces = listOf(
+        Place(id = "1", name = "Vịnh Hạ Long", category = "Thiên nhiên", description = "Di sản thiên nhiên thế giới", latitude = 20.9101, longitude = 107.1839, imageUrl = "", referenceUrl = "https://example.com"),
+        Place(id = "2", name = "Phố cổ Hội An", category = "Lịch sử", description = "Thành phố cổ kính bên sông Hoài", latitude = 15.8801, longitude = 108.3380, imageUrl = "", referenceUrl = "https://example.com")
+    )
+    BeVietnamTheme {
+        ExploreScreenContent(
+            uiState = ExploreUiState.Success(places = mockPlaces, filteredPlaces = mockPlaces, isMapView = false),
             onRetry = {},
             onCategorySelected = {},
             onSearchQueryChanged = {},

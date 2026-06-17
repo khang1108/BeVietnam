@@ -2,9 +2,9 @@ package com.bevietnam.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val PrimaryRed = Color(0xFFC0392B)
-val PrimaryRedLight = Color(0xFFE74C3C)
-val Background = Color(0xFFFAF5E4)
+val PrimaryRed = Color(0xFF842C1A)
+val PrimaryRedLight = Color(0xFFA3432F)
+val Background = Color(0xFFFFF8F3)
 val CardBackground = Color(0xFFFFFFFF)
 val TextPrimary = Color(0xFF1A1A1A)
 val TextSecondary = Color(0xFF6B6B6B)
