@@ -52,7 +52,13 @@ class Settings(BaseSettings):
     # ── LLM (Gemini) ─────────────────────────────────────────────────────────
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.0-flash"
-    llm_provider: str = "gemini"  # "gemini" or "mock"
+    llm_provider: str = "gemini"  # "gemini" | "vllm" | "mock"
+
+    # ── LLM (self-hosted vLLM — OpenAI-compatible, replaces quota-dead Gemini) ─
+    # Served by vllm_hosting/ on a Thundercompute L40, exposed via cloudflared.
+    vllm_base_url: str = "https://api.iamphuckhang.dev/v1"
+    vllm_model: str = "qwen2.5-14b-instruct"  # the --served-model-name
+    vllm_api_key: str = ""  # empty = open endpoint
 
     # ── General ───────────────────────────────────────────────────────────────
     log_level: str = "INFO"

@@ -9,11 +9,12 @@ current KnowledgeChunk schema in services/ai/common/knowledge_schema.py):
     keeps its `page_or_section`), then slide ~600-char overlapping windows
     on sentence boundaries within each section.
 
-  Stage 2 — Gemini extraction
-    One JSON call per chunk. Gemini distils a single grounded cultural fact
+  Stage 2 — LLM extraction (default provider: self-hosted vLLM)
+    One JSON call per chunk. The model distils a single grounded cultural fact
     and maps it to a controlled place_id vocabulary (the Huế POIs + the
     national `viet-nam` bucket) and a fixed category set. Anything without
-    clear cultural content is skipped.
+    clear cultural content is skipped. Provider is selectable with --provider
+    (vllm | gemini); per-book source identity comes from the BOOKS registry.
 
 Auto-extracted facts are NOT trusted blindly: every emitted chunk is written
 with `review_status = needs_review` and `source_type = book`, matching the
@@ -21,18 +22,20 @@ project policy that book claims must be marked and human-reviewed before they
 are promoted to `approved` / seeded as authoritative.
 
 Usage (from repo root):
+    # 2 Huế books → one collection (Task 1.3):
     PYTHONPATH=. services/backend/venv/bin/python scripts/data-pipeline/ingest_books.py \
-        --book data/books/book1.md \
-        --out  data/knowledge/vietnam_culture_chunks.json
+        --book data/books/Co-do-hue-xua-va-nay.md \
+               data/books/30-nam-nghien-cuu-van-hoa-dan-gian.md \
+        --out  data/knowledge/hue_book_chunks.json
 
-    # parse/chunk only, no Gemini (offline sanity check):
-    ... ingest_books.py --book data/books/book1.md --dry-run
+    # parse/chunk only, no LLM (offline sanity check):
+    ... ingest_books.py --book data/books/Co-do-hue-xua-va-nay.md --dry-run
 
-    # cap the number of chunks sent to Gemini (quota-friendly):
-    ... ingest_books.py --book data/books/book1.md --limit 20
+    # cap chunks per book sent to the LLM:
+    ... ingest_books.py --book <book.md> --limit 20
 
     # also embed + upsert the drafts into Qdrant:
-    ... ingest_books.py --book data/books/book1.md --seed
+    ... ingest_books.py --book <book.md> --seed
 """
 
 from __future__ import annotations
@@ -43,6 +46,7 @@ import logging
 import re
 import sys
 import unicodedata
+from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
@@ -50,7 +54,7 @@ from services.ai.common.knowledge_schema import (
     KnowledgeChunk,
     KnowledgeChunkCollection,
 )
-from services.ai.common.llm import llm_gateway
+from services.ai.common.llm import llm_gateway, vllm_gateway
 
 logger = logging.getLogger("ingest_books")
 
@@ -78,9 +82,52 @@ CATEGORY_VOCAB = [
     "history", "nature", "religion", "tradition",
 ]
 
-# Source identity for this book (matches data/sources/hue_sources.json → book-co-so-vhvn).
-SOURCE_TITLE = "Cơ sở văn hóa Việt Nam"
-SOURCE_PUBLISHER = 'Trần Ngọc Thêm — "Cơ sở văn hóa Việt Nam"'
+# ── Per-book source identity ──────────────────────────────────────────────────
+# Keyed by file stem. `id_prefix` keeps chunk_ids unique + traceable per book;
+# `scope` is "hue" (POI-bound primary) or "national" (viet-nam supplementary).
+@dataclass(frozen=True)
+class BookSource:
+    source_title: str
+    publisher: str
+    id_prefix: str
+    scope: str  # "hue" | "national"
+
+
+BOOKS: dict[str, BookSource] = {
+    "Co-do-hue-xua-va-nay": BookSource(
+        "Cố Đô Huế Xưa Và Nay",
+        "Hội KHLS Thừa Thiên Huế — NXB Thuận Hóa (2005)",
+        "cdhxvn",
+        "hue",
+    ),
+    "30-nam-nghien-cuu-van-hoa-dan-gian": BookSource(
+        "30 năm nghiên cứu văn hóa dân gian Thừa Thiên Huế (1991–2021)",
+        "Hội Văn nghệ Dân gian Thừa Thiên Huế — NXB Thuận Hóa (2021)",
+        "vhdg",
+        "hue",
+    ),
+    "Co-so-van-hoa-viet-nam": BookSource(
+        "Cơ sở văn hóa Việt Nam",
+        "Trần Ngọc Thêm — NXB Giáo dục",
+        "csvhvn",
+        "national",
+    ),
+    "Van-hoa-am-thuc-viet-nam-tu-ly-luan-va-thuc-tien": BookSource(
+        "Văn hóa ẩm thực Việt Nam nhìn từ lý luận và thực tiễn",
+        "Trần Quốc Vượng, Nguyễn Thị Bảy — NXB Từ điển Bách khoa (2010)",
+        "vhat",
+        "national",
+    ),
+}
+
+
+def resolve_book(path: Path) -> BookSource:
+    """Look up a book's source identity by file stem, with a safe default."""
+    book = BOOKS.get(path.stem)
+    if book is None:
+        logger.warning("No source registry entry for %s — using generic attribution.", path.name)
+        return BookSource(path.stem, path.stem, _slugify(path.stem, 16), "national")
+    return book
 
 CHUNK_CHARS = 600
 CHUNK_STEP = 400
@@ -91,15 +138,29 @@ _SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?…])\s+")
 
 
 # ── Stage 1: parse + chunk ────────────────────────────────────────────────────
+_PAGE_MARKER_RE = re.compile(r"^\{\d+\}[-—]*$")  # OCR page break: {12}-------------
+
+
+_INLINE_HTML_RE = re.compile(r"<[^>]+>")  # <sup>3</sup>, <br>, … OCR/markdown cruft
+
+
 def _is_noise(line: str) -> bool:
-    """Drop OCR image refs / scan artifacts that carry no cultural text."""
+    """Drop OCR image refs / scan artifacts / page markers / TOC rows."""
     stripped = line.strip()
     return (
-        stripped.startswith("![")
-        or stripped.startswith("![](")
+        not stripped
+        or stripped.startswith("![")
+        or stripped.startswith("|")  # markdown table row → TOC/index in these books
         or stripped.lower().startswith("scan to open")
         or bool(re.fullmatch(r"_page_\d+.*", stripped))
+        or bool(_PAGE_MARKER_RE.match(stripped))
+        or bool(re.fullmatch(r"[-—_=|]{3,}", stripped))  # bare separator rules
     )
+
+
+def _clean_inline(text: str) -> str:
+    """Strip inline HTML tags and collapse whitespace within a passage."""
+    return _INLINE_HTML_RE.sub("", text).strip()
 
 
 def split_sections(text: str) -> list[tuple[str, str]]:
@@ -127,7 +188,7 @@ def window_section(body: str) -> list[str]:
             buf.append(sentences[idx])
             size += len(sentences[idx]) + 1
             idx += 1
-        window = " ".join(buf).strip()
+        window = _clean_inline(" ".join(buf))
         if len(window) >= 60:
             windows.append(window)
         # advance by ~CHUNK_STEP worth of characters for overlap
@@ -188,9 +249,11 @@ def extract_chunk(
     passage: str,
     index: int,
     used_ids: set[str],
+    book: BookSource,
+    gateway,
 ) -> KnowledgeChunk | None:
-    """Call Gemini for one passage and build a validated KnowledgeChunk draft."""
-    result = llm_gateway.generate_json(_SYSTEM_PROMPT, _user_prompt(section, passage))
+    """Call the LLM for one passage and build a validated KnowledgeChunk draft."""
+    result = gateway.generate_json(_SYSTEM_PROMPT, _user_prompt(section, passage))
     if not result or result.get("skip"):
         return None
 
@@ -204,7 +267,7 @@ def extract_chunk(
     if len(fact) < 40:
         return None
 
-    base_id = f"book-csvhvn-{place_id}-{_slugify(section, 24)}-{index:03d}"
+    base_id = f"book-{book.id_prefix}-{place_id}-{_slugify(section, 24)}-{index:03d}"
     chunk_id = base_id
     suffix = 1
     while chunk_id in used_ids:
@@ -221,14 +284,14 @@ def extract_chunk(
             language="vi",
             text=fact[:900],
             source_type="book",
-            source_title=SOURCE_TITLE,
-            publisher=SOURCE_PUBLISHER,
+            source_title=book.source_title,
+            publisher=book.publisher,
             page_or_section=section[:160],
             reviewed_at=date.today(),
             review_status="needs_review",
             related_poi_ids=[] if place_id == "viet-nam" else [place_id],
             tags=[str(t).strip().lower() for t in result.get("tags", []) if str(t).strip()],
-            notes="auto-extracted from book1.md via Gemini; pending human review",
+            notes=f"auto-extracted from {book.source_title}; pending human review",
         )
     except Exception as exc:  # pydantic validation failure → skip this passage
         logger.warning("Chunk %s failed validation: %s", chunk_id, exc)
@@ -236,69 +299,91 @@ def extract_chunk(
 
 
 # ── Orchestration ─────────────────────────────────────────────────────────────
+GATEWAYS = {"vllm": vllm_gateway, "gemini": llm_gateway}
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Ingest a book into KnowledgeChunk drafts.")
-    parser.add_argument("--book", required=True, type=Path, help="Path to book .md/.txt")
+    parser = argparse.ArgumentParser(description="Ingest book(s) into KnowledgeChunk drafts.")
+    parser.add_argument("--book", required=True, nargs="+", type=Path, help="Book .md/.txt path(s)")
     parser.add_argument(
         "--out", type=Path,
         default=Path("data/knowledge/vietnam_culture_chunks.json"),
         help="Output KnowledgeChunkCollection JSON",
     )
-    parser.add_argument("--limit", type=int, default=0, help="Cap chunks sent to Gemini (0 = all)")
-    parser.add_argument("--dry-run", action="store_true", help="Parse + chunk only; no Gemini")
+    parser.add_argument("--dataset-id", default="", help="Collection slug (default: derived from --out)")
+    parser.add_argument("--dataset-name", default="", help="Human collection name (default: derived)")
+    parser.add_argument(
+        "--provider", choices=sorted(GATEWAYS), default="vllm",
+        help="LLM provider for extraction (default: vllm)",
+    )
+    parser.add_argument("--limit", type=int, default=0, help="Cap chunks per book sent to LLM (0 = all)")
+    parser.add_argument("--dry-run", action="store_true", help="Parse + chunk only; no LLM calls")
     parser.add_argument("--seed", action="store_true", help="Embed + upsert drafts into Qdrant")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
-    if not args.book.exists():
-        logger.error("Book not found: %s", args.book)
+    missing = [b for b in args.book if not b.exists()]
+    if missing:
+        logger.error("Book(s) not found: %s", ", ".join(str(m) for m in missing))
         return 2
 
-    pairs = build_chunks(args.book.read_text(encoding="utf-8"))
-    logger.info("Parsed %d candidate passages from %s", len(pairs), args.book.name)
-    if args.limit:
-        pairs = pairs[: args.limit]
-        logger.info("Limited to %d passages", len(pairs))
+    # Stage 1 — parse + chunk every book (offline).
+    book_pairs: list[tuple[BookSource, list[tuple[str, str]]]] = []
+    for book_path in args.book:
+        source = resolve_book(book_path)
+        pairs = build_chunks(book_path.read_text(encoding="utf-8"))
+        if args.limit:
+            pairs = pairs[: args.limit]
+        logger.info("Parsed %d passages from %s [%s]", len(pairs), book_path.name, source.scope)
+        book_pairs.append((source, pairs))
 
     if args.dry_run:
-        for section, passage in pairs[:3]:
-            logger.info("  [%s] %s…", section[:40], passage[:90])
-        logger.info("Dry run complete — no Gemini calls made.")
+        for source, pairs in book_pairs:
+            logger.info("── %s ──", source.source_title)
+            for section, passage in pairs[:3]:
+                logger.info("  [%s] %s…", section[:40], passage[:90])
+        total = sum(len(p) for _, p in book_pairs)
+        logger.info("Dry run complete — %d total passages, no LLM calls made.", total)
         return 0
 
+    # Stage 2 — LLM extraction across all books into one collection.
+    gateway = GATEWAYS[args.provider]
     used_ids: set[str] = set()
     chunks: list[KnowledgeChunk] = []
     attempts = empty = 0
-    for i, (section, passage) in enumerate(pairs):
-        attempts += 1
-        chunk = extract_chunk(section, passage, i, used_ids)
-        if chunk is None:
-            empty += 1
-        else:
-            chunks.append(chunk)
+    for source, pairs in book_pairs:
+        for i, (section, passage) in enumerate(pairs):
+            attempts += 1
+            chunk = extract_chunk(section, passage, i, used_ids, source, gateway)
+            if chunk is None:
+                empty += 1
+            else:
+                chunks.append(chunk)
 
-    # Quota / outage guard: if Gemini produced nothing across many attempts the
-    # gateway is almost certainly returning {} (e.g. 429). Do NOT write an empty
-    # dataset — report and fail so the run is not mistaken for success.
+    # Quota / outage guard: if the LLM produced nothing across many attempts the
+    # gateway is almost certainly returning {} (429 quota, or the vLLM endpoint
+    # down — e.g. HTTP 530 from cloudflared). Do NOT write an empty dataset.
     if not chunks:
         logger.error(
-            "Extracted 0 chunks from %d passages. Gemini likely unavailable "
-            "(quota/429) — the LLM gateway swallows errors and returns {}. "
-            "Nothing written. Restore Gemini quota and re-run.",
-            attempts,
+            "Extracted 0 chunks from %d passages via '%s'. The endpoint is likely "
+            "unavailable (the gateway swallows errors and returns {}). Nothing "
+            "written. Bring the provider up and re-run.",
+            attempts, args.provider,
         )
         return 1
     if empty:
         logger.warning("%d/%d passages produced no fact (skipped or failed).", empty, attempts)
 
+    dataset_id = args.dataset_id or _slugify(args.out.stem, 60)
+    dataset_name = args.dataset_name or f"{args.out.stem} — auto-extracted drafts"
     collection = KnowledgeChunkCollection(
         version=1,
-        dataset_id="vietnam-culture-csvhvn",
-        dataset_name="Cơ sở văn hóa Việt Nam — auto-extracted drafts",
+        dataset_id=dataset_id,
+        dataset_name=dataset_name,
         description=(
-            "Auto-extracted national-culture chunks from book1.md (Trần Ngọc Thêm). "
-            "review_status=needs_review until a human approves each chunk."
+            f"Auto-extracted culture chunks from {len(args.book)} book(s) via "
+            f"'{args.provider}'. review_status=needs_review until a human approves each chunk."
         ),
         chunks=chunks,
     )

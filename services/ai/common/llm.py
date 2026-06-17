@@ -97,6 +97,53 @@ class LLMGateway:
             return {}
 
 
-# ── Singleton instance ────────────────────────────────────────────────────────
-# Import this in agent modules: from services.ai.common.llm import llm_gateway
+class VLLMGateway:
+    """
+    Gateway to the self-hosted vLLM endpoint (OpenAI-compatible).
+
+    Same `generate_json(system_prompt, user_prompt)` contract as LLMGateway so
+    callers can swap providers without changing code. Uses httpx directly (the
+    `openai` SDK is not a dependency) and asks for a JSON object via
+    `response_format`. Returns {} on any failure so callers fall back cleanly.
+    """
+
+    def generate_json(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+    ) -> dict[str, Any]:
+        import httpx
+
+        url = settings.vllm_base_url.rstrip("/") + "/chat/completions"
+        headers = {"Content-Type": "application/json"}
+        if settings.vllm_api_key:
+            headers["Authorization"] = f"Bearer {settings.vllm_api_key}"
+        payload = {
+            "model": settings.vllm_model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            "temperature": 0.3,
+            "max_tokens": 600,
+            "response_format": {"type": "json_object"},
+        }
+        try:
+            response = httpx.post(url, json=payload, headers=headers, timeout=90.0)
+            response.raise_for_status()
+            raw_text = response.json()["choices"][0]["message"]["content"].strip()
+            result = json.loads(raw_text)
+            logger.info("vLLM returned valid JSON (%d keys)", len(result))
+            return result
+        except json.JSONDecodeError as exc:
+            logger.warning("vLLM returned invalid JSON: %s", exc)
+            return {}
+        except Exception as exc:
+            logger.warning("vLLM call failed: %s", exc)
+            return {}
+
+
+# ── Singleton instances ───────────────────────────────────────────────────────
+# Import these in agent modules: from services.ai.common.llm import llm_gateway
 llm_gateway = LLMGateway()
+vllm_gateway = VLLMGateway()
