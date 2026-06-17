@@ -20,28 +20,31 @@ explanation generation.
 
 | File | Purpose |
 |------|---------|
-| `setup.sh` | Install vLLM + cloudflared, apply L40 env fixes, launch both services |
-| `serve_vllm.sh` | Launch the vLLM OpenAI server from `.env` |
-| `run_tunnel.sh` | Write cloudflared creds/config and run the `vllm` tunnel |
+| `bootstrap.sh` | **All-in-one, after-clone entrypoint** — installs vLLM + cloudflared, applies L40 fixes, launches both. Committed; holds no secrets |
+| `serve_vllm.sh` | Launch the vLLM OpenAI server from `.env` (restart without reinstalling) |
+| `run_tunnel.sh` | Write cloudflared creds/config and run the `vllm` tunnel (restart tunnel only) |
 | `test_api.sh` | curl smoke test (local or public) |
 | `.env.example` | Config template (placeholders) |
 | `.env` | Real config — **gitignored**, holds HF token + tunnel secret |
 
-## Usage (on the GPU VM)
+## Usage (fresh GPU VM, after cloning the repo)
 
 ```bash
-cd vllm_hosting
-# .env already contains the model, HF token, and the "vllm" tunnel credentials.
-bash setup.sh
+cd BeVietnam/vllm_hosting
+cp .env.example .env     # then fill in HF_TOKEN, CF_ACCOUNT_TAG, CF_TUNNEL_SECRET
+bash bootstrap.sh
 ```
 
-`setup.sh` will:
-1. create `.venv`, install `vllm==0.8.5` (+ `fastapi<0.137`),
-2. apply the L40 fixes (`ldconfig`, `libcuda.so` symlink for Triton JIT, remove
+`bootstrap.sh` will:
+1. on first run, if `.env` is missing it creates one from `.env.example` and stops
+   so you can fill in the secrets (it never embeds any),
+2. create `.venv`, install `vllm==0.8.5` (+ `fastapi<0.137`),
+3. apply the L40 fixes (`ldconfig`, `libcuda.so` symlink for Triton JIT, remove
    flashinfer/tvm-ffi),
-3. install cloudflared,
-4. start vLLM (background, `logs/vllm.log`), wait for `/health`,
-5. start the cloudflared tunnel (background, `logs/cloudflared.log`).
+4. install cloudflared,
+5. start vLLM (background, `logs/vllm.log`), wait for `/health`,
+6. write the cloudflared credential from `.env` into `~/.cloudflared` and start the
+   tunnel (background, `logs/cloudflared.log`).
 
 First run downloads the model (~28 GB) to `~/.cache/huggingface` — watch
 `logs/vllm.log`. Ctrl+C only stops the log tail; the services keep running.
@@ -49,7 +52,7 @@ First run downloads the model (~28 GB) to `~/.cache/huggingface` — watch
 Install/configure without launching:
 
 ```bash
-bash setup.sh --no-launch
+bash bootstrap.sh --no-launch
 bash serve_vllm.sh   # terminal 1
 bash run_tunnel.sh   # terminal 2
 ```
