@@ -20,6 +20,10 @@ export default function HoiAnHouse({ className }: HoiAnHouseProps) {
     "&ui_fullscreen=0" +
     "&ui_stop=0" +
     "&ui_help=0" +
+    "&ui_annotations=0" +
+    "&annotations_visible=0" +
+    "&scrollwheel=0" +
+    "&dnt=1" +
     "&preload=1";
 
   return (
