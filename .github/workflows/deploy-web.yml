@@ -1,0 +1,55 @@
+name: Deploy web to Azure
+
+# Builds the Next.js image in Azure Container Registry and points the
+# App Service (Web App for Containers) at the new tag.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "services/web/**"
+      - ".github/workflows/deploy-web.yml"
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: bevietnam-web
+  ACR_NAME: ${{ vars.ACR_NAME }} # registry name only, e.g. bevietnamacr
+  RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+  WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build and push image in ACR
+        run: |
+          az acr build \
+            --registry "$ACR_NAME" \
+            --image "$IMAGE_NAME:${{ github.sha }}" \
+            --image "$IMAGE_NAME:latest" \
+            --build-arg NEXT_PUBLIC_API_URL="${{ vars.NEXT_PUBLIC_API_URL }}" \
+            --build-arg NEXT_PUBLIC_GOONG_API_KEY="${{ secrets.NEXT_PUBLIC_GOONG_API_KEY }}" \
+            services/web
+
+      - name: Point Web App at the new image
+        run: |
+          az webapp config container set \
+            --name "$WEBAPP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --container-image-name "$ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}"
+
+      - name: Restart Web App
+        run: az webapp restart --name "$WEBAPP_NAME" --resource-group "$RESOURCE_GROUP"
+
+      - name: Deployment summary
+        run: |
+          echo "Deployed $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "App: https://$WEBAPP_NAME.azurewebsites.net" >> "$GITHUB_STEP_SUMMARY"
