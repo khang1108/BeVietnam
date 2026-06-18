@@ -24,3 +24,14 @@ class CaptureRepository:
         self.db.commit()
         self.db.refresh(capture)
         return capture
+    
+    def get_by_user(self, user_id: int) -> list[Capture]:
+        return (
+            self.db.query(Capture)
+            .filter(Capture.user_id == user_id)
+            .order_by(Capture.created_at.desc())
+            .all()
+        )
+
+    def get_by_id(self, capture_id: int) -> Capture | None:
+        return self.db.query(Capture).filter(Capture.id == capture_id).first()
