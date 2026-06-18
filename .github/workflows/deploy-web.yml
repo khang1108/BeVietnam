@@ -13,10 +13,10 @@ on:
 
 env:
   IMAGE_NAME: bevietnam-web
-  ACR_NAME: bevietnamacr2026
-  RESOURCE_GROUP: pkhang
-  WEBAPP_NAME: bevietnam
-  NEXT_PUBLIC_API_URL: https://api.iamphuckhang.dev/api/v1
+  ACR_NAME: ${{ vars.ACR_NAME }}
+  RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+  WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
+  NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
 
 jobs:
   deploy:
