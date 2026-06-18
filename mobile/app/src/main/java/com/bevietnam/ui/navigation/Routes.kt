@@ -28,6 +28,9 @@ data class ProfileRoute(val userId: String = "-1")
 @Serializable
 object ExploreRoute
 
+@Serializable
+data class PlaceDetailRoute(val placeId: String)
+
 /**
  * Tuyến đường điều hướng đến màn hình Cốt truyện & Nhiệm vụ (Storyline Screen).
  *

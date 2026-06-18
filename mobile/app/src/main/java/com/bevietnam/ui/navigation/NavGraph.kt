@@ -23,6 +23,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bevietnam.core.model.User
 import com.bevietnam.ui.components.AppTopBar
 import com.bevietnam.ui.screens.capture.CaptureScreen
+import com.bevietnam.ui.screens.explore.ExploreScreen
+import com.bevietnam.ui.screens.feed.FeedScreen
+import com.bevietnam.ui.screens.storyline.StorylineScreen
+import com.bevietnam.ui.screens.place.PlaceDetailScreen
+import com.bevietnam.ui.screens.place.PlaceDetailViewModel
+import androidx.compose.material3.CircularProgressIndicator
 
 /**
  * Điểm điều hướng chính (Main App Navigation Host) của ứng dụng BeVietnam.
@@ -141,11 +147,31 @@ fun AppNavHostContent(
             }
 
             composable<ExploreRoute> { 
-                com.bevietnam.ui.screens.explore.ExploreScreen() 
+                ExploreScreen(
+                    onPlaceClick = { place ->
+                        navController.navigate(PlaceDetailRoute(place.id))
+                    }
+                ) 
+            }
+            
+            composable<PlaceDetailRoute> {
+                val viewModel: PlaceDetailViewModel = hiltViewModel()
+                val place by viewModel.place.collectAsStateWithLifecycle()
+                
+                place?.let { safePlace ->
+                    PlaceDetailScreen(
+                        place = safePlace,
+                        onBackClick = { navController.popBackStack() }
+                    )
+                } ?: run {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
             
             composable<FeedRoute> { 
-                com.bevietnam.ui.screens.feed.FeedScreen() 
+                FeedScreen() 
             }
 
             composable<CameraRoute> {
@@ -157,7 +183,7 @@ fun AppNavHostContent(
             }
             
             composable<StorylineRoute> { 
-                com.bevietnam.ui.screens.storyline.StorylineScreen() 
+                StorylineScreen() 
             }
 
 
