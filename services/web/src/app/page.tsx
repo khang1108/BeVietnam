@@ -54,13 +54,6 @@ const places: { img: string; cat: Bi; name: Bi; desc: Bi }[] = [
   },
 ];
 
-const team: { name: string; role: Bi; initials: string }[] = [
-  { name: 'Nguyễn Phúc Khang', role: { vi: 'Trưởng nhóm · AI & Dữ liệu', en: 'Lead · AI & Data' }, initials: 'PK' },
-  { name: 'Pumpowhat', role: { vi: 'Giao diện Web', en: 'Web Frontend' }, initials: 'PW' },
-  { name: 'VietThaiNg', role: { vi: 'Ứng dụng & Bản đồ', en: 'Mobile & Maps' }, initials: 'VT' },
-  { name: 'Nhóm Backend', role: { vi: 'Hệ thống & API', en: 'Backend & API' }, initials: 'BE' },
-];
-
 export default function HomePage() {
   const { t, locale } = useI18n();
   const L = (vi: string, en: string) => (locale === 'vi' ? vi : en);
@@ -206,43 +199,6 @@ export default function HomePage() {
               </article>
             );
           })}
-        </div>
-      </section>
-
-      {/* ───────── Team (Zigzag Layout) ───────── */}
-      <section className={styles.team}>
-        <div className={styles.teamContainer}>
-          <header className={styles.teamHead} data-reveal>
-            <span className={styles.kicker}>{L('Nhóm thực hiện', 'The team')}</span>
-            <h2 className={styles.teamTitle}>{L('Nhóm 09 · Dự án văn hoá Việt Nam', 'Group 09 · A Vietnamese culture project')}</h2>
-          </header>
-          
-          <div className={styles.teamZigzag}>
-            {team.map((m, i) => {
-              const isEven = i % 2 === 0;
-              return (
-                <article 
-                  key={m.name} 
-                  className={`${styles.zigzagRow} ${isEven ? styles.rowNormal : styles.rowReverse}`}
-                  data-reveal 
-                  style={revealDelay(i)}
-                >
-                  <div className={styles.avatarBlock}>
-                    <span className={styles.memberIndex}>{(i + 1).toString().padStart(2, '0')}</span>
-                    <span className={styles.zigzagAvatar} aria-hidden="true">
-                      {m.initials}
-                    </span>
-                  </div>
-                  
-                  <div className={styles.detailsBlock}>
-                    <h3 className={styles.memberName}>{m.name}</h3>
-                    <p className={styles.memberRole}>{L(m.role.vi, m.role.en)}</p>
-                    <span className={styles.dividerLine} />
-                  </div>
-                </article>
-              );
-            })}
-          </div>
         </div>
       </section>
 
