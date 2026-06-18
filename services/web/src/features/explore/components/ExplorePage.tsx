@@ -8,6 +8,7 @@ import React, {
     useState,
 } from 'react';
 import type { Map, Marker } from '@goongmaps/goong-js';
+import { MagnifyingGlass, MapTrifold, X, Star, Compass, Crosshair } from '@phosphor-icons/react';
 import styles from '../styles/explore.module.css';
 import { weatherApi, type WeatherCondition as ApiWeatherCondition } from '@/lib/api';
 
@@ -464,7 +465,7 @@ export function ExplorePage() {
             <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
                 <div className={styles.sidebarHeader}>
                     <div className={styles.sidebarBrand}>
-                        <div className={styles.sidebarBrandIcon}>🗺️</div>
+                        <div className={styles.sidebarBrandIcon}><MapTrifold weight="duotone" /></div>
                         <span className={styles.sidebarTitle}>
                             Be<span className={styles.sidebarTitleAccent}>Vietnam</span> Map
                         </span>
@@ -477,7 +478,7 @@ export function ExplorePage() {
                 {/* Search */}
                 <div className={styles.searchContainer}>
                     <div className={styles.searchInputWrapper}>
-                        <span className={styles.searchIcon}>🔍</span>
+                        <span className={styles.searchIcon}><MagnifyingGlass /></span>
                         <input
                             className={styles.searchInput}
                             type="text"
@@ -491,7 +492,7 @@ export function ExplorePage() {
                                 onClick={() => setSearchQuery('')}
                                 aria-label="Xóa tìm kiếm"
                             >
-                                ✕
+                                <X />
                             </button>
                         )}
                     </div>
@@ -537,7 +538,7 @@ export function ExplorePage() {
                                     <div className={styles.placeRegion}>{place.region} · {CATEGORY_LABEL[place.category]}</div>
                                 </div>
                                 <div className={styles.placeRightMeta}>
-                                    <span className={styles.placeRating}>⭐ {place.rating}</span>
+                                    <span className={styles.placeRating}><Star weight="fill" /> {place.rating}</span>
                                     <span className={styles.placeWeatherIcon}>{WEATHER_ICONS[placeWeather]}</span>
                                     {placeHasLiveWeather && (
                                         <span className={styles.placeWeatherLive}>live</span>
@@ -591,7 +592,7 @@ export function ExplorePage() {
                         aria-label="Vị trí của tôi"
                     >
                         <span className={locating ? styles.locateBtnSpinning : ''}>
-                            {locating ? '◎' : '⌖'}
+                            <Crosshair weight="bold" />
                         </span>
                     </button>
                 )}
@@ -599,7 +600,7 @@ export function ExplorePage() {
                 {/* Overlay: API key missing */}
                 {!GOONG_API_KEY && (
                     <div className={styles.mapStatus}>
-                        <div className={styles.mapStatusIcon}>🗺️</div>
+                        <div className={styles.mapStatusIcon}><MapTrifold weight="duotone" /></div>
                         <div className={styles.mapStatusTitle}>Goong Maps chưa được cấu hình</div>
                         <div className={styles.mapStatusDesc}>
                             Thêm Goong API key vào file <code>.env</code> để hiển thị bản đồ tương tác.
@@ -638,7 +639,7 @@ export function ExplorePage() {
                                     onClick={() => setSelectedPlace(null)}
                                     aria-label="Đóng"
                                 >
-                                    ✕
+                                    <X />
                                 </button>
                             </div>
 
@@ -657,7 +658,7 @@ export function ExplorePage() {
                                     </span>
                                 )}
                                 <span className={styles.detailCardRating}>
-                                    ⭐ {selectedPlace.rating}
+                                    <Star weight="fill" /> {selectedPlace.rating}
                                 </span>
                             </div>
 
@@ -665,7 +666,7 @@ export function ExplorePage() {
 
                             <div className={styles.detailCardActions}>
                                 <button className={styles.detailCardBtnPrimary}>
-                                    🧭 Bắt đầu Quest
+                                    <Compass weight="bold" /> Bắt đầu Quest
                                 </button>
                                 <button
                                     className={styles.detailCardBtnSecondary}
