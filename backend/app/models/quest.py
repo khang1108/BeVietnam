@@ -23,7 +23,11 @@ class QuestTask(Base):
 class UserProgress(Base):
     __tablename__ = "user_progress"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), index=True)
+    user_id = Column(String, ForeignKey("users.id"), index=True)
     chain_id = Column(Integer, ForeignKey("quest_chains.id"))
     current_task_id = Column(Integer, ForeignKey("quest_tasks.id"))
     is_completed = Column(Boolean, default=False)
+
+    user = relationship("UserModel", back_populates="progress")
+    chain = relationship("QuestChain")
+    current_task = relationship("QuestTask")

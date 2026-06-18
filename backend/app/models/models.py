@@ -40,6 +40,7 @@ class UserModel(Base):
     created_at = Column(DateTime, default=utcnow)
 
     captures = relationship("CaptureModel", back_populates="user")
+    progress = relationship("UserProgress", back_populates="user", cascade="all, delete-orphan")
 
 class CaptureModel(Base):
     __tablename__ = "captures"

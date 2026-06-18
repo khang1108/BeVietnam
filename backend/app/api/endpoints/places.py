@@ -1,82 +1,81 @@
-from fastapi import APIRouter, Query
+import json
+from pathlib import Path
 from typing import Optional
-from app.schemas import PlacesResponse, PlaceSchema
+
+from fastapi import APIRouter, Query, Depends, HTTPException
+from sqlalchemy import select, func
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.api.dependencies import get_db
+from app.models.models import PlaceModel
+from app.schemas.place import PlaceSchema, PlacesResponse, PlaceCreateRequest, PlaceImportRequest
 
 router = APIRouter()
 
-# ── Mock / seed data ──────────────────────────────────────────────────────────
-_MOCK_PLACES = [
-    PlaceSchema(
-        id="place-001",
-        name="Văn Miếu - Quốc Tử Giám",
-        category="temple",
-        description="Temple of Literature, founded in 1070. Vietnam's first national university.",
-        latitude=21.0275,
-        longitude=105.8357,
-        image_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Van_Mieu.jpg/800px-Van_Mieu.jpg",
-        reference_url="https://vanmieu.gov.vn",
-    ),
-    PlaceSchema(
-        id="place-002",
-        name="Hồ Hoàn Kiếm",
-        category="park",
-        description="Hoàn Kiếm Lake sits at the heart of Hanoi's historic quarter.",
-        latitude=21.0285,
-        longitude=105.8524,
-        image_url="https://upload.wikimedia.org/wikipedia/commons/5/5c/Hoan_Kiem_lake.jpg",
-        reference_url=None,
-    ),
-    PlaceSchema(
-        id="place-003",
-        name="Bảo tàng Lịch sử Quốc gia",
-        category="museum",
-        description="National Museum of Vietnamese History, showcasing artifacts from prehistoric times.",
-        latitude=21.0245,
-        longitude=105.8592,
-        image_url=None,
-        reference_url="https://baotanglichsu.vn",
-    ),
-    PlaceSchema(
-        id="place-004",
-        name="Chùa Một Cột",
-        category="temple",
-        description="One Pillar Pagoda — a historic Buddhist temple built in 1049.",
-        latitude=21.0353,
-        longitude=105.8342,
-        image_url=None,
-        reference_url=None,
-    ),
-    PlaceSchema(
-        id="place-005",
-        name="Phố cổ Hà Nội",
-        category="district",
-        description="Hanoi Old Quarter — 36 ancient guild streets, vibrant street food and culture.",
-        latitude=21.0341,
-        longitude=105.8500,
-        image_url=None,
-        reference_url=None,
-    ),
-]
 
-
-# ── Endpoint ──────────────────────────────────────────────────────────────────
 @router.get("/places", response_model=PlacesResponse, tags=["Places"])
 async def get_places(
     category: Optional[str] = Query(None, description="Filter by category"),
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db),
 ):
     """
     GET /places — Trả về danh sách địa điểm du lịch.
-    Sprint 1: dùng mock data. Sẽ kết nối DB thật sau khi schema sẵn sàng.
-
-    - **category**: lọc theo loại (temple, museum, park, ...)
-    - **limit / offset**: phân trang
     """
-    filtered = _MOCK_PLACES
+    query = select(PlaceModel)
+    count_query = select(func.count()).select_from(PlaceModel)
+
     if category:
-        filtered = [p for p in filtered if p.category == category]
+        query = query.where(PlaceModel.category == category)
+        count_query = count_query.where(PlaceModel.category == category)
 
-    paginated = filtered[offset : offset + limit]
+    query = query.offset(offset).limit(limit)
+    result = await db.execute(query)
+    places = result.scalars().all()
+    total = await db.scalar(count_query)
 
-    return PlacesResponse(total=len(filtered), items=paginated)
+    return PlacesResponse(
+        total=total if total is not None else 0,
+        items=[PlaceSchema.model_validate(place) for place in places],
+    )
+
+
+@router.post("/places/import", tags=["Places"])
+async def import_places(
+    payload: PlaceImportRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    POST /places/import — Load place JSON data from local file or request body.
+    """
+    place_items = payload.items
+    if payload.file_path:
+        file_path = Path(payload.file_path)
+        if not file_path.is_absolute():
+            file_path = Path(__file__).resolve().parents[3] / payload.file_path
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail=f"File not found: {file_path}")
+        try:
+            raw = json.loads(file_path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=f"Unable to parse JSON: {exc}") from exc
+
+        if isinstance(raw, dict):
+            raw = [raw]
+        place_items = [PlaceCreateRequest.model_validate(item) for item in raw]
+
+    if not place_items:
+        raise HTTPException(status_code=400, detail="No place data provided for import")
+
+    records = []
+    for item in place_items:
+        data = item.model_dump()
+        place_id = data.pop("place_id", None)
+        if place_id:
+            data["id"] = place_id
+        records.append(PlaceModel(**data))
+
+    db.add_all(records)
+    await db.commit()
+    return {"inserted": len(records)}

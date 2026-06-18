@@ -6,7 +6,7 @@ Import directly from sub-modules for new code:
     ...
 """
 from app.schemas.base import HealthResponse
-from app.schemas.place import PlaceSchema, PlacesResponse
+from app.schemas.place import PlaceSchema, PlaceImportRequest, PlaceCreateRequest, PlacesResponse
 from app.schemas.feed import FeedItem, FeedResponse
 from app.schemas.storyline import (
     QuestTask,
@@ -28,7 +28,7 @@ from app.schemas.user import (
 
 __all__ = [
     "HealthResponse",
-    "PlaceSchema", "PlacesResponse",
+    "PlaceSchema", "PlaceImportRequest", "PlaceCreateRequest", "PlacesResponse",
     "FeedItem", "FeedResponse",
     "QuestTask", "QuestChainResponse",
     "StorylineTask", "StorylineNextTaskResponse",
