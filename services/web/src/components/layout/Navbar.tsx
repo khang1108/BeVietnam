@@ -10,11 +10,11 @@ import { IconCalendar, IconExplore, IconFeed, IconSparkle, IconStoryline } from 
 import styles from './Navbar.module.css';
 
 const navItems = [
-  { key: 'feed', href: '/', icon: <IconFeed className={styles.navIconSvg} /> },
-  { key: 'explore', href: '/explore', icon: <IconExplore className={styles.navIconSvg} /> },
-  { key: 'storyline', href: '/storyline', icon: <IconStoryline className={styles.navIconSvg} /> },
-  { key: 'events', href: '/events', icon: <IconCalendar className={styles.navIconSvg} /> },
-  { key: 'contribute', href: '/contribute', icon: <IconSparkle className={styles.navIconSvg} /> },
+  { key: 'feed', href: '/' },
+  { key: 'explore', href: '/explore' },
+  { key: 'storyline', href: '/storyline' },
+  { key: 'events', href: '/events' },
+  { key: 'contribute', href: '/contribute' },
 ];
 
 export default function Navbar() {
@@ -73,7 +73,6 @@ export default function Navbar() {
               href={item.href}
               className={`${styles.navLink} ${isActive(item.href) ? styles.navLinkActive : ''}`}
             >
-              <span className={styles.navIcon}>{item.icon}</span>
               {t(`nav.${item.key}`)}
             </Link>
           ))}
@@ -127,7 +126,6 @@ export default function Navbar() {
             className={`${styles.mobileNavLink} ${isActive(item.href) ? styles.mobileNavLinkActive : ''}`}
             onClick={closeMobile}
           >
-            <span className={styles.navIcon}>{item.icon}</span>
             {t(`nav.${item.key}`)}
           </Link>
         ))}
