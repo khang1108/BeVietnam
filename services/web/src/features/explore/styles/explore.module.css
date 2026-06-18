@@ -96,8 +96,8 @@
 }
 
 .searchInputWrapper:focus-within {
-    border-color: rgba(230, 180, 34, 0.4);
-    box-shadow: 0 0 0 3px rgba(230, 180, 34, 0.06);
+    border-color: rgba(198, 154, 63, 0.4);
+    box-shadow: 0 0 0 3px rgba(198, 154, 63, 0.06);
 }
 
 .searchIcon {
@@ -174,14 +174,14 @@
 }
 
 .filterChip:hover {
-    border-color: rgba(230, 180, 34, 0.35);
+    border-color: rgba(198, 154, 63, 0.35);
     color: #d4a017;
-    background: rgba(230, 180, 34, 0.04);
+    background: rgba(198, 154, 63, 0.04);
 }
 
 .filterChipActive {
-    background: rgba(230, 180, 34, 0.1);
-    border-color: rgba(230, 180, 34, 0.45);
+    background: rgba(198, 154, 63, 0.1);
+    border-color: rgba(198, 154, 63, 0.45);
     color: #e6b422;
 }
 
@@ -234,12 +234,12 @@
 }
 
 .placeItemSelected {
-    background: rgba(230, 180, 34, 0.05);
+    background: rgba(198, 154, 63, 0.05);
     border-left-color: #e6b422;
 }
 
 .placeItemSelected .placeIcon {
-    border-color: rgba(230, 180, 34, 0.3);
+    border-color: rgba(198, 154, 63, 0.3);
 }
 
 .placeIcon {
@@ -429,7 +429,7 @@
     font-family: monospace;
     font-size: 0.78rem;
     color: #e6b422;
-    border: 1px solid rgba(230, 180, 34, 0.18);
+    border: 1px solid rgba(198, 154, 63, 0.18);
 }
 
 /* ─── Detail Card (bottom of map) ────────────── */
@@ -530,9 +530,9 @@
 }
 
 .badgeCategory {
-    background: rgba(230, 180, 34, 0.1);
+    background: rgba(198, 154, 63, 0.1);
     color: #e6b422;
-    border: 1px solid rgba(230, 180, 34, 0.2);
+    border: 1px solid rgba(198, 154, 63, 0.2);
 }
 
 .badgeSunny {
@@ -600,7 +600,7 @@
 
 .detailCardBtnPrimary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(230, 180, 34, 0.35);
+    box-shadow: 0 4px 16px rgba(198, 154, 63, 0.35);
 }
 
 .detailCardBtnSecondary {
@@ -738,14 +738,14 @@
 
 .locateBtn:hover {
     background: #1a2234;
-    border-color: rgba(230, 180, 34, 0.45);
+    border-color: rgba(198, 154, 63, 0.45);
     transform: translateY(-1px);
 }
 
 .locateBtnActive {
     color: #fff;
-    background: rgba(230, 180, 34, 0.16);
-    border-color: rgba(230, 180, 34, 0.5);
+    background: rgba(198, 154, 63, 0.16);
+    border-color: rgba(198, 154, 63, 0.5);
 }
 
 .locateBtnSpinning {

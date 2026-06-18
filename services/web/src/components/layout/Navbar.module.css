@@ -56,6 +56,7 @@
 }
 
 .logoText {
+  font-family: var(--font-display);
   font-size: var(--fs-lg);
   font-weight: var(--fw-bold);
   color: var(--text-primary);
@@ -94,7 +95,7 @@
 
 .navLinkActive {
   color: var(--color-primary-500);
-  background: rgba(230, 180, 34, 0.1);
+  background: rgba(198, 154, 63, 0.12);
 }
 
 .navLinkActive::after {
@@ -256,7 +257,7 @@
 }
 
 .mobileNavLinkActive {
-  background: rgba(230, 180, 34, 0.1);
+  background: rgba(198, 154, 63, 0.1);
   color: var(--color-primary-500);
 }
 

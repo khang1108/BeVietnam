@@ -1,73 +1,80 @@
 /* ============================================
-   BeVietnam Design System - CSS Custom Properties
+   BeVietnam Design System — Imperial Huế / Lacquer
+   Lacquer brown-black, imperial gold, son-red seal.
+   Scale names preserved for backward compatibility.
    ============================================ */
 
 :root {
   /* === Color Palette === */
-  /* Primary: Vietnamese Gold */
-  --color-primary-50: #fef9e7;
-  --color-primary-100: #fdf0c4;
-  --color-primary-200: #fbe49d;
-  --color-primary-300: #f9d876;
-  --color-primary-400: #f7cc4f;
-  --color-primary-500: #e6b422;
-  --color-primary-600: #c9991a;
-  --color-primary-700: #a37d15;
-  --color-primary-800: #7d6010;
-  --color-primary-900: #57430b;
+  /* Primary: Imperial Gold (desaturated — gilt, not neon) */
+  --color-primary-50: #f7efdc;
+  --color-primary-100: #efe1bf;
+  --color-primary-200: #e3cd97;
+  --color-primary-300: #d6b873;
+  --color-primary-400: #cba759;
+  --color-primary-500: #c69a3f;  /* imperial gold */
+  --color-primary-600: #a98034;
+  --color-primary-700: #88662a;
+  --color-primary-800: #654c20;
+  --color-primary-900: #443316;
 
-  /* Accent: Vietnamese Red (Son) */
-  --color-accent-50: #fdecea;
-  --color-accent-100: #f9c7c1;
-  --color-accent-200: #f4a198;
-  --color-accent-300: #ef7b6f;
-  --color-accent-400: #ea5546;
-  --color-accent-500: #c9302c;
-  --color-accent-600: #a82824;
-  --color-accent-700: #87201d;
-  --color-accent-800: #661815;
-  --color-accent-900: #45100e;
+  /* Accent: Son Red — lacquer seal (used sparingly) */
+  --color-accent-50: #f6e3e1;
+  --color-accent-100: #e9bdb9;
+  --color-accent-200: #d98e88;
+  --color-accent-300: #c5605a;
+  --color-accent-400: #b03f39;
+  --color-accent-500: #9e2b25;  /* son red */
+  --color-accent-600: #87241f;
+  --color-accent-700: #6c1d19;
+  --color-accent-800: #511613;
+  --color-accent-900: #380f0d;
 
-  /* Emerald: Vietnamese Jade Green */
-  --color-emerald-50: #e8f5f0;
-  --color-emerald-100: #c5e6d8;
-  --color-emerald-200: #9fd7be;
-  --color-emerald-300: #79c7a4;
-  --color-emerald-400: #53b88a;
-  --color-emerald-500: #2d9d6f;
-  --color-emerald-600: #258560;
-  --color-emerald-700: #1d6d50;
-  --color-emerald-800: #155540;
-  --color-emerald-900: #0d3d30;
+  /* Jade — kept for success/rare use only, no longer an accent voice */
+  --color-emerald-500: #3f7a5e;
+  --color-emerald-600: #346650;
+  --color-emerald-700: #285040;
 
-  /* Neutral */
+  /* Lacquer neutrals — warm brown-black family (one gray hue, warm) */
   --color-neutral-0: #ffffff;
-  --color-neutral-50: #f8f9fa;
-  --color-neutral-100: #f1f3f5;
-  --color-neutral-200: #e9ecef;
-  --color-neutral-300: #dee2e6;
-  --color-neutral-400: #ced4da;
-  --color-neutral-500: #adb5bd;
-  --color-neutral-600: #868e96;
-  --color-neutral-700: #495057;
-  --color-neutral-800: #343a40;
-  --color-neutral-900: #212529;
-  --color-neutral-950: #0d1117;
+  --color-neutral-50: #faf5ea;   /* warm cream */
+  --color-neutral-100: #f2ead8;
+  --color-neutral-200: #e6d9bf;
+  --color-neutral-300: #d6c4a3;
+  --color-neutral-400: #b9a888;
+  --color-neutral-500: #8f8068;
+  --color-neutral-600: #645847;
+  --color-neutral-700: #443a2b;
+  --color-neutral-800: #2a2016;
+  --color-neutral-900: #1f1810;
+  --color-neutral-950: #1a120b;  /* lacquer */
+
+  /* Signature aliases */
+  --gold: var(--color-primary-500);
+  --gold-soft: var(--color-primary-300);
+  --seal: var(--color-accent-500);
+  --lacquer: #1a120b;
+  --ink: #1f1810;
+  --paper: #faf5ea;
+
+  /* Gold-leaf grain texture (tileable noise, very low opacity) */
+  --texture-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
 
   /* === Typography === */
+  --font-display: 'Cinzel', 'Playfair Display', Georgia, serif;
   --font-primary: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-  --fs-xs: 0.75rem;      /* 12px */
-  --fs-sm: 0.875rem;     /* 14px */
-  --fs-base: 1rem;       /* 16px */
-  --fs-md: 1.125rem;     /* 18px */
-  --fs-lg: 1.25rem;      /* 20px */
-  --fs-xl: 1.5rem;       /* 24px */
-  --fs-2xl: 2rem;        /* 32px */
-  --fs-3xl: 2.5rem;      /* 40px */
-  --fs-4xl: 3rem;        /* 48px */
-  --fs-5xl: 3.75rem;     /* 60px */
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-md: 1.125rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+  --fs-3xl: 2.5rem;
+  --fs-4xl: 3.25rem;
+  --fs-5xl: 4.5rem;
 
   --fw-light: 300;
   --fw-regular: 400;
@@ -76,48 +83,54 @@
   --fw-bold: 700;
   --fw-extrabold: 800;
 
-  --lh-tight: 1.2;
-  --lh-normal: 1.5;
+  --lh-tight: 1.08;
+  --lh-snug: 1.28;
+  --lh-normal: 1.55;
   --lh-relaxed: 1.75;
 
-  /* === Spacing === */
-  --space-1: 0.25rem;    /* 4px */
-  --space-2: 0.5rem;     /* 8px */
-  --space-3: 0.75rem;    /* 12px */
-  --space-4: 1rem;       /* 16px */
-  --space-5: 1.25rem;    /* 20px */
-  --space-6: 1.5rem;     /* 24px */
-  --space-8: 2rem;       /* 32px */
-  --space-10: 2.5rem;    /* 40px */
-  --space-12: 3rem;      /* 48px */
-  --space-16: 4rem;      /* 64px */
-  --space-20: 5rem;      /* 80px */
-  --space-24: 6rem;      /* 96px */
+  --tracking-tight: -0.02em;
+  --tracking-wide: 0.18em;
 
-  /* === Border Radius === */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
+  /* === Spacing === */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  /* === Border Radius === (tighter, less bubbly) */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
   --radius-full: 9999px;
 
-  /* === Shadows === */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
-  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.15);
-  --shadow-glow: 0 0 20px rgba(230, 180, 34, 0.3);
+  /* === Shadows === (warm-tinted lacquer, single light source from top) */
+  --shadow-xs: 0 1px 2px rgba(26, 18, 11, 0.10);
+  --shadow-sm: 0 2px 6px rgba(26, 18, 11, 0.14);
+  --shadow-md: 0 8px 20px rgba(26, 18, 11, 0.18);
+  --shadow-lg: 0 16px 34px rgba(26, 18, 11, 0.24);
+  --shadow-xl: 0 28px 60px rgba(26, 18, 11, 0.30);
+  --shadow-2xl: 0 40px 80px rgba(26, 18, 11, 0.38);
+  --shadow-glow: 0 0 26px rgba(198, 154, 63, 0.20);
 
   /* === Transitions === */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-spring: 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 520ms cubic-bezier(0.22, 1, 0.36, 1);
 
   /* === Z-index === */
+  --z-base: 1;
   --z-dropdown: 100;
   --z-sticky: 200;
   --z-navbar: 300;
@@ -131,59 +144,64 @@
   --container-lg: 1024px;
   --container-xl: 1200px;
   --container-2xl: 1400px;
-  --navbar-height: 64px;
+  --measure: 64ch;
+  --navbar-height: 72px;
 }
 
-/* === Light Theme (default) === */
+/* === Light Theme — warm rice-paper === */
 [data-theme="light"] {
-  --bg-primary: var(--color-neutral-0);
-  --bg-secondary: var(--color-neutral-50);
-  --bg-tertiary: var(--color-neutral-100);
-  --bg-elevated: var(--color-neutral-0);
-  --bg-overlay: rgba(0, 0, 0, 0.5);
+  --bg-primary: var(--paper);
+  --bg-secondary: #f2ead8;
+  --bg-tertiary: #e9dec4;
+  --bg-elevated: #fdfaf2;
+  --bg-overlay: rgba(26, 18, 11, 0.55);
 
-  --text-primary: var(--color-neutral-900);
-  --text-secondary: var(--color-neutral-700);
-  --text-tertiary: var(--color-neutral-500);
-  --text-inverse: var(--color-neutral-0);
-  --text-link: var(--color-primary-600);
+  --text-primary: var(--ink);
+  --text-secondary: #5a4d3a;
+  --text-tertiary: #897a60;
+  --text-inverse: var(--paper);
+  --text-link: var(--color-primary-700);
 
-  --border-primary: var(--color-neutral-200);
-  --border-secondary: var(--color-neutral-300);
+  --border-primary: #e3d6bd;
+  --border-secondary: #d6c4a3;
+  --hairline: rgba(198, 154, 63, 0.35);
 
-  --surface-card: var(--color-neutral-0);
-  --surface-hover: var(--color-neutral-100);
+  --surface-card: #fdfaf2;
+  --surface-hover: #f2ead8;
 
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-bg: rgba(250, 245, 234, 0.72);
+  --glass-border: rgba(198, 154, 63, 0.28);
+  --grain-opacity: 0.05;
 }
 
-/* === Dark Theme === */
+/* === Dark Theme — imperial lacquer (signature) === */
 [data-theme="dark"] {
-  --bg-primary: var(--color-neutral-950);
-  --bg-secondary: #161b22;
-  --bg-tertiary: #1c2128;
-  --bg-elevated: #21262d;
-  --bg-overlay: rgba(0, 0, 0, 0.7);
+  --bg-primary: var(--lacquer);
+  --bg-secondary: #221710;
+  --bg-tertiary: #2a1d13;
+  --bg-elevated: #2f2016;
+  --bg-overlay: rgba(12, 8, 5, 0.72);
 
-  --text-primary: var(--color-neutral-100);
-  --text-secondary: var(--color-neutral-400);
-  --text-tertiary: var(--color-neutral-500);
-  --text-inverse: var(--color-neutral-900);
+  --text-primary: #efe6d2;
+  --text-secondary: #c9bba2;
+  --text-tertiary: #9a8a72;
+  --text-inverse: var(--ink);
   --text-link: var(--color-primary-400);
 
-  --border-primary: #30363d;
-  --border-secondary: #484f58;
+  --border-primary: #3a2c1c;
+  --border-secondary: #4a3826;
+  --hairline: rgba(198, 154, 63, 0.30);
 
-  --surface-card: #161b22;
-  --surface-hover: #21262d;
+  --surface-card: #241910;
+  --surface-hover: #2f2016;
 
-  --glass-bg: rgba(13, 17, 23, 0.7);
-  --glass-border: rgba(48, 54, 61, 0.5);
+  --glass-bg: rgba(26, 18, 11, 0.62);
+  --glass-border: rgba(198, 154, 63, 0.22);
+  --grain-opacity: 0.07;
 
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.2);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.15);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 34px rgba(0, 0, 0, 0.55);
+  --shadow-xl: 0 28px 60px rgba(0, 0, 0, 0.6);
 }

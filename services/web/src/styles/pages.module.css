@@ -15,8 +15,8 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-1) var(--space-3);
-  background: rgba(230, 180, 34, 0.1);
-  border: 1px solid rgba(230, 180, 34, 0.2);
+  background: rgba(198, 154, 63, 0.1);
+  border: 1px solid rgba(198, 154, 63, 0.2);
   border-radius: var(--radius-full);
   font-size: var(--fs-xs);
   font-weight: var(--fw-semibold);
@@ -113,7 +113,7 @@
 
 .searchBar:focus-within {
   border-color: var(--color-primary-500);
-  box-shadow: 0 0 0 3px rgba(230, 180, 34, 0.1);
+  box-shadow: 0 0 0 3px rgba(198, 154, 63, 0.1);
 }
 
 .searchIcon {
@@ -304,7 +304,7 @@
   justify-content: center;
   min-width: 64px;
   padding: var(--space-3);
-  background: rgba(230, 180, 34, 0.1);
+  background: rgba(198, 154, 63, 0.1);
   border-radius: var(--radius-lg);
   flex-shrink: 0;
 }
@@ -374,20 +374,20 @@
 }
 
 .eventBadgeOngoing {
-  background: rgba(45, 157, 111, 0.12);
-  border-color: rgba(45, 157, 111, 0.24);
+  background: rgba(63, 122, 94, 0.12);
+  border-color: rgba(63, 122, 94, 0.24);
   color: var(--color-emerald-600);
 }
 
 .eventBadgeCompleted {
-  background: rgba(201, 48, 44, 0.1);
-  border-color: rgba(201, 48, 44, 0.22);
+  background: rgba(158, 43, 37, 0.1);
+  border-color: rgba(158, 43, 37, 0.22);
   color: var(--color-accent-600);
 }
 
 .eventBadgeUpcoming {
-  background: rgba(230, 180, 34, 0.14);
-  border-color: rgba(230, 180, 34, 0.28);
+  background: rgba(198, 154, 63, 0.14);
+  border-color: rgba(198, 154, 63, 0.28);
   color: var(--color-primary-700);
 }
 
@@ -536,7 +536,7 @@
 .formInput:focus {
   outline: none;
   border-color: var(--color-primary-500);
-  box-shadow: 0 0 0 3px rgba(230, 180, 34, 0.1);
+  box-shadow: 0 0 0 3px rgba(198, 154, 63, 0.1);
 }
 
 .formTextarea {

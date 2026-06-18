@@ -3,6 +3,7 @@
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import DashboardCardEffect from '@/components/DashboardCardEffect';
+import NgoMonHero from '@/components/NgoMonHero';
 import { useI18n } from '@/i18n';
 import { IconCalendar, IconExplore, IconFlagVn, IconFood, IconGlobe, IconLocation, IconMountain } from '@/components/icons/UiIcons';
 import styles from './page.module.css';
@@ -100,39 +101,44 @@ export default function HomePage() {
       <section className={styles.hero} id="hero-section">
         <div className={styles.heroBg}></div>
         <div className={styles.heroPattern}></div>
-        <div className={styles.heroContent}>
-          <div className={styles.heroTag}>
-            <span className={styles.heroTagIcon} aria-hidden="true">
-              <IconFlagVn />
-            </span>
-            {t('common.tagline')}
+        <div className={styles.heroInner}>
+          <div className={styles.heroContent}>
+            <div className={styles.heroTag}>
+              <span className={styles.heroTagIcon} aria-hidden="true">
+                <IconFlagVn />
+              </span>
+              {t('common.tagline')}
+            </div>
+            <h1 className={styles.heroTitle}>
+              {locale === 'vi' ? (
+                <>Khám phá <span className={styles.heroGradient}>Việt Nam</span><br />Với chiều sâu văn hóa</>
+              ) : (
+                <>Discover <span className={styles.heroGradient}>Vietnam</span><br />With Cultural Depth</>
+              )}
+            </h1>
+            <p className={styles.heroSubtitle}>
+              {locale === 'vi'
+                ? 'Khám phá di sản, ẩm thực và nhịp sống của Việt Nam — bắt đầu từ Cố đô Huế, qua từng câu chuyện kể bằng hình ảnh, bản đồ và hành trình.'
+                : 'Discover the heritage, cuisine, and rhythm of Vietnam — starting in the old capital of Huế, told through images, maps, and journeys.'
+              }
+            </p>
+            <div className={styles.heroCta}>
+              <Link href="/explore" className={styles.btnPrimary}>
+                <span className={styles.ctaIcon} aria-hidden="true">
+                  <IconExplore />
+                </span>
+                {t('nav.explore')}
+              </Link>
+              <Link href="/events" className={styles.btnSecondary}>
+                <span className={styles.ctaIcon} aria-hidden="true">
+                  <IconCalendar />
+                </span>
+                {t('nav.events')}
+              </Link>
+            </div>
           </div>
-          <h1 className={styles.heroTitle}>
-            {locale === 'vi' ? (
-              <>Khám phá <span className={styles.heroGradient}>Việt Nam</span><br />Với chiều sâu văn hóa</>
-            ) : (
-              <>Discover <span className={styles.heroGradient}>Vietnam</span><br />With Cultural Depth</>
-            )}
-          </h1>
-          <p className={styles.heroSubtitle}>
-            {locale === 'vi'
-              ? 'Nền tảng du lịch thông minh tích hợp AI giúp bạn khám phá những địa điểm, ẩm thực và sự kiện tuyệt vời nhất Việt Nam.'
-              : 'AI-powered smart tourism platform helping you discover the best places, cuisine, and events across Vietnam.'
-            }
-          </p>
-          <div className={styles.heroCta}>
-            <Link href="/explore" className={styles.btnPrimary}>
-              <span className={styles.ctaIcon} aria-hidden="true">
-                <IconExplore />
-              </span>
-              {t('nav.explore')}
-            </Link>
-            <Link href="/events" className={styles.btnSecondary}>
-              <span className={styles.ctaIcon} aria-hidden="true">
-                <IconCalendar />
-              </span>
-              {t('nav.events')}
-            </Link>
+          <div className={styles.heroStage}>
+            <NgoMonHero className={styles.heroCanvas} />
           </div>
         </div>
       </section>

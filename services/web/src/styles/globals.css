@@ -2,7 +2,7 @@
    BeVietnam - Global Styles
    ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Cinzel:wght@500;600;700;800&display=swap');
 @import './variables.css';
 @import '@goongmaps/goong-js/dist/goong-js.css';
 
@@ -35,6 +35,19 @@ body {
   overflow-x: hidden;
 }
 
+/* === Gold-leaf grain overlay (whole page, non-interactive) === */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-toast);
+  pointer-events: none;
+  background-image: var(--texture-grain);
+  background-size: 140px 140px;
+  opacity: var(--grain-opacity, 0.06);
+  mix-blend-mode: soft-light;
+}
+
 /* === Links === */
 a {
   color: var(--text-link);
@@ -43,7 +56,7 @@ a {
 }
 
 a:hover {
-  color: var(--color-primary-400);
+  color: var(--gold);
 }
 
 /* === Images === */
@@ -78,10 +91,21 @@ ol {
 }
 
 /* === Typography === */
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3 {
+  font-family: var(--font-display);
   font-weight: var(--fw-bold);
   line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
   color: var(--text-primary);
+  text-wrap: balance;
+}
+
+h4, h5, h6 {
+  font-family: var(--font-primary);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+  color: var(--text-primary);
+  text-wrap: balance;
 }
 
 h1 { font-size: var(--fs-4xl); }
@@ -94,6 +118,28 @@ h6 { font-size: var(--fs-md); }
 p {
   color: var(--text-secondary);
   line-height: var(--lh-relaxed);
+  text-wrap: pretty;
+}
+
+/* Numbers read as data — tabular figures */
+.tnum,
+[data-tnum] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Display / measure helpers */
+.font-display { font-family: var(--font-display); }
+.measure { max-width: var(--measure); }
+
+/* Small-caps label (replaces all-caps headers) */
+.kicker {
+  font-family: var(--font-primary);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-sm);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--gold);
 }
 
 /* === Scrollbar === */
