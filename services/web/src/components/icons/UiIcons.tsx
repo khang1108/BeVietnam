@@ -10,6 +10,15 @@ const baseProps = {
 
 type IconProps = SVGProps<SVGSVGElement>;
 
+export function IconArrowRight(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" {...baseProps} {...props}>
+      <line x1="4" y1="12" x2="20" y2="12" />
+      <path d="M14 6l6 6-6 6" />
+    </svg>
+  );
+}
+
 export function IconFeed(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" {...baseProps} {...props}>
