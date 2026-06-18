@@ -5,13 +5,7 @@ import Link from 'next/link';
 import DashboardCardEffect from '@/components/DashboardCardEffect';
 import NgoMonHero from '@/components/NgoMonHero';
 import { useI18n } from '@/i18n';
-import {
-  IconArrowRight,
-  IconCalendar,
-  IconFlagVn,
-  IconLocation,
-  IconStoryline,
-} from '@/components/icons/UiIcons';
+import { ArrowRight, CalendarBlank, Compass, Path } from '@phosphor-icons/react';
 import styles from './page.module.css';
 
 type Bi = { vi: string; en: string };
@@ -25,7 +19,7 @@ const stats: { value: string; label: Bi }[] = [
 const pillars: { href: string; icon: React.ReactNode; title: Bi; desc: Bi }[] = [
   {
     href: '/explore',
-    icon: <IconLocation />,
+    icon: <Compass weight="regular" />,
     title: { vi: 'Bản đồ khám phá', en: 'Explore the map' },
     desc: {
       vi: 'Tìm địa danh, món ăn và di sản trên bản đồ tương tác, kèm bối cảnh văn hoá cho từng điểm đến.',
@@ -34,7 +28,7 @@ const pillars: { href: string; icon: React.ReactNode; title: Bi; desc: Bi }[] = 
   },
   {
     href: '/storyline',
-    icon: <IconStoryline />,
+    icon: <Path weight="regular" />,
     title: { vi: 'Hành trình văn hoá', en: 'Cultural journeys' },
     desc: {
       vi: 'Theo những chặng dừng được kể lại, check-in tại chỗ và lưu giữ khoảnh khắc của riêng bạn.',
@@ -43,7 +37,7 @@ const pillars: { href: string; icon: React.ReactNode; title: Bi; desc: Bi }[] = 
   },
   {
     href: '/events',
-    icon: <IconCalendar />,
+    icon: <CalendarBlank weight="regular" />,
     title: { vi: 'Sự kiện & lễ hội', en: 'Events & festivals' },
     desc: {
       vi: 'Biết điều gì đang diễn ra quanh bạn — từ lễ hội cung đình đến phiên chợ và đêm nhạc.',
@@ -89,7 +83,7 @@ export default function HomePage() {
             <div className={styles.heroCta}>
               <Link href="/explore" className={styles.btnPrimary}>
                 {t('nav.explore')}
-                <span className={styles.btnArrow} aria-hidden="true"><IconArrowRight /></span>
+                <ArrowRight className={styles.btnIcon} weight="bold" aria-hidden="true" />
               </Link>
               <Link href="/storyline" className={styles.btnGhost}>
                 {L('Bắt đầu hành trình', 'Start a journey')}
@@ -113,7 +107,7 @@ export default function HomePage() {
             <h3>{L('Mỗi chặng dừng là một câu chuyện', 'Every stop, a story')}</h3>
             <span className={styles.storyMore}>
               {L('Tìm hiểu thêm', 'Learn more')}
-              <IconArrowRight />
+              <ArrowRight weight="bold" aria-hidden="true" />
             </span>
           </div>
         </Link>
@@ -162,7 +156,7 @@ export default function HomePage() {
               <span className={styles.pillarIcon} aria-hidden="true">{p.icon}</span>
               <h3 className={styles.pillarTitle}>{L(p.title.vi, p.title.en)}</h3>
               <p className={styles.pillarDesc}>{L(p.desc.vi, p.desc.en)}</p>
-              <span className={styles.pillarMore} aria-hidden="true"><IconArrowRight /></span>
+              <span className={styles.pillarMore} aria-hidden="true"><ArrowRight weight="bold" /></span>
             </Link>
           ))}
         </div>
@@ -189,14 +183,13 @@ export default function HomePage() {
       <section className={styles.ctaBand}>
         <div className={styles.ctaPattern} aria-hidden="true" />
         <div className={styles.ctaInner} data-reveal>
-          <span className={styles.heroTagIcon} aria-hidden="true"><IconFlagVn /></span>
           <h2 className={styles.ctaTitle}>{L('Bắt đầu hành trình của bạn', 'Begin your journey')}</h2>
           <p className={styles.ctaText}>
             {L('Mở bản đồ và để Huế kể cho bạn nghe câu chuyện đầu tiên.', 'Open the map and let Huế tell you the first story.')}
           </p>
           <Link href="/explore" className={styles.btnPrimary}>
             {t('nav.explore')}
-            <span className={styles.btnArrow} aria-hidden="true"><IconArrowRight /></span>
+            <ArrowRight className={styles.btnIcon} weight="bold" aria-hidden="true" />
           </Link>
         </div>
       </section>
