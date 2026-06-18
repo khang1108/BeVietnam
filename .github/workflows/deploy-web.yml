@@ -13,9 +13,10 @@ on:
 
 env:
   IMAGE_NAME: bevietnam-web
-  ACR_NAME: ${{ vars.ACR_NAME }} # registry name only, e.g. bevietnamacr
-  RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
-  WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
+  ACR_NAME: bevietnamacr2026
+  RESOURCE_GROUP: pkhang
+  WEBAPP_NAME: bevietnam
+  NEXT_PUBLIC_API_URL: https://api.iamphuckhang.dev/api/v1
 
 jobs:
   deploy:
@@ -35,7 +36,7 @@ jobs:
             --registry "$ACR_NAME" \
             --image "$IMAGE_NAME:${{ github.sha }}" \
             --image "$IMAGE_NAME:latest" \
-            --build-arg NEXT_PUBLIC_API_URL="${{ vars.NEXT_PUBLIC_API_URL }}" \
+            --build-arg NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL" \
             --build-arg NEXT_PUBLIC_GOONG_API_KEY="${{ secrets.NEXT_PUBLIC_GOONG_API_KEY }}" \
             services/web
 
