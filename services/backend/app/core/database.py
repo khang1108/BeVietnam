@@ -2,7 +2,11 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from sqlalchemy.orm import DeclarativeBase
+
+# Single declarative Base lives in app/models/models.py. Re-export it here so that
+# `from ...core.database import Base` keeps working AND every model shares ONE metadata.
+# Relative import resolves under both `app.*` and `services.backend.app.*` run paths.
+from ..models.models import Base  # noqa: F401  (re-exported)
 
 # 1. Tự động tính toán đường dẫn tuyệt đối đến file .env
 # File này đang ở: backend/app/core/database.py -> Lùi 3 cấp sẽ ra thư mục backend
@@ -33,6 +37,3 @@ AsyncSessionLocal = async_sessionmaker(
     autocommit=False,
     autoflush=False,
 )
-
-class Base(DeclarativeBase):
-    pass

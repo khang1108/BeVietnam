@@ -2,7 +2,7 @@
   "version": 1,
   "pool_id": "hue-pilot-question-pool",
   "pool_name": "Huế pilot storyline tasks",
-  "description": "Two reviewed 3-task Huế storylines for the BeVietnam pilot. Each task is bound to a Huế POI with GPS + radius, carries weather/time tags for context selection, and cites a source-grounded cultural fact from data/knowledge/hue_chunks.json. Vietnamese is primary; English mirror lives in metadata.*_en.",
+  "description": "Huế pilot pool: 2 reviewed storylines + landmark-grounded quest-chains auto-generated from the Huế source books (needs_review). Each task binds a famous landmark with GPS + radius and cites a book passage.",
   "reviewed_at": "2026-06-16",
   "questions": [
     {
@@ -16,12 +16,24 @@
       "latitude": 16.4699,
       "longitude": 107.5796,
       "radius_meters": 600,
-      "categories": ["history", "architecture", "culture"],
+      "categories": [
+        "history",
+        "architecture",
+        "culture"
+      ],
       "difficulty": "easy",
       "required_media": "photo",
       "indoor_outdoor": "outdoor",
-      "weather_tags": ["sunny", "cloudy", "any"],
-      "time_tags": ["morning", "afternoon", "any"],
+      "weather_tags": [
+        "sunny",
+        "cloudy",
+        "any"
+      ],
+      "time_tags": [
+        "morning",
+        "afternoon",
+        "any"
+      ],
       "estimated_duration_minutes": 20,
       "language": "vi",
       "metadata": {
@@ -47,12 +59,24 @@
       "latitude": 16.4697,
       "longitude": 107.5793,
       "radius_meters": 500,
-      "categories": ["history", "architecture", "art"],
+      "categories": [
+        "history",
+        "architecture",
+        "art"
+      ],
       "difficulty": "medium",
       "required_media": "photo",
       "indoor_outdoor": "outdoor",
-      "weather_tags": ["sunny", "cloudy", "any"],
-      "time_tags": ["morning", "afternoon", "any"],
+      "weather_tags": [
+        "sunny",
+        "cloudy",
+        "any"
+      ],
+      "time_tags": [
+        "morning",
+        "afternoon",
+        "any"
+      ],
       "estimated_duration_minutes": 25,
       "language": "vi",
       "metadata": {
@@ -76,14 +100,25 @@
       "source": "Nha Nhac, Vietnamese court music — UNESCO ICH",
       "place_name": "Kinh thành Huế",
       "latitude": 16.4685,
-      "longitude": 107.5790,
+      "longitude": 107.579,
       "radius_meters": 700,
-      "categories": ["history", "art", "tradition"],
+      "categories": [
+        "history",
+        "art",
+        "tradition"
+      ],
       "difficulty": "easy",
       "required_media": "photo",
       "indoor_outdoor": "indoor",
-      "weather_tags": ["rainy", "any"],
-      "time_tags": ["afternoon", "evening", "any"],
+      "weather_tags": [
+        "rainy",
+        "any"
+      ],
+      "time_tags": [
+        "afternoon",
+        "evening",
+        "any"
+      ],
       "estimated_duration_minutes": 15,
       "language": "vi",
       "metadata": {
@@ -106,15 +141,28 @@
       "source_text": "Sông Hương uốn quanh Kinh thành, Hoàng thành và Tử Cấm Thành, tạo nên khung cảnh thiên nhiên đặc trưng của cố đô Huế.",
       "source": "Complex of Hué Monuments — UNESCO World Heritage Centre",
       "place_name": "Sông Hương",
-      "latitude": 16.4690,
-      "longitude": 107.5920,
+      "latitude": 16.469,
+      "longitude": 107.592,
       "radius_meters": 800,
-      "categories": ["nature", "history", "culture"],
+      "categories": [
+        "nature",
+        "history",
+        "culture"
+      ],
       "difficulty": "easy",
       "required_media": "photo",
       "indoor_outdoor": "outdoor",
-      "weather_tags": ["sunny", "cloudy", "any"],
-      "time_tags": ["morning", "afternoon", "evening", "any"],
+      "weather_tags": [
+        "sunny",
+        "cloudy",
+        "any"
+      ],
+      "time_tags": [
+        "morning",
+        "afternoon",
+        "evening",
+        "any"
+      ],
       "estimated_duration_minutes": 15,
       "language": "vi",
       "metadata": {
@@ -140,12 +188,24 @@
       "latitude": 16.4536,
       "longitude": 107.5448,
       "radius_meters": 600,
-      "categories": ["religion", "architecture", "history"],
+      "categories": [
+        "religion",
+        "architecture",
+        "history"
+      ],
       "difficulty": "medium",
       "required_media": "photo",
       "indoor_outdoor": "outdoor",
-      "weather_tags": ["sunny", "cloudy", "any"],
-      "time_tags": ["morning", "afternoon", "any"],
+      "weather_tags": [
+        "sunny",
+        "cloudy",
+        "any"
+      ],
+      "time_tags": [
+        "morning",
+        "afternoon",
+        "any"
+      ],
       "estimated_duration_minutes": 25,
       "language": "vi",
       "metadata": {
@@ -171,12 +231,25 @@
       "latitude": 16.4719,
       "longitude": 107.5849,
       "radius_meters": 1500,
-      "categories": ["food", "tradition", "culture"],
+      "categories": [
+        "food",
+        "tradition",
+        "culture"
+      ],
       "difficulty": "easy",
       "required_media": "photo",
       "indoor_outdoor": "any",
-      "weather_tags": ["rainy", "sunny", "any"],
-      "time_tags": ["morning", "afternoon", "evening", "any"],
+      "weather_tags": [
+        "rainy",
+        "sunny",
+        "any"
+      ],
+      "time_tags": [
+        "morning",
+        "afternoon",
+        "evening",
+        "any"
+      ],
       "estimated_duration_minutes": 30,
       "language": "vi",
       "metadata": {
@@ -189,6 +262,5107 @@
         "title_en": "The bold flavor of bún bò Huế",
         "question_text_en": "Find a bún bò Huế eatery or street vendor around Đông Ba market and photograph the bowl — a signature dish of the region.",
         "cultural_explanation_en": "Bún bò Huế is a signature Huế dish; its broth simmered from beef bones, lemongrass, chili, and shrimp paste gives a bold flavor, reflecting the refinement of the old capital's cuisine."
+      }
+    },
+    {
+      "question_id": "hue-hue-imperial-city-01-phong-thuy-kinh-than",
+      "title": "Phong thủy Kinh thành",
+      "question_text": "Chụp ảnh khu vực phía tây Kinh thành và ghi chú về đặc điểm địa hình liên quan đến phong thủy.",
+      "cultural_explanation": "Phía tây đại diện cho chủ, nơi có khí núi xung sát và hành kim vượng, thể hiện quan niệm về phong thủy.",
+      "source_text": "phía tây kinh thành lại có khí núi xung sát, sông Hương uốn khúc vì thế hành kim rất vượng.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Kinh thành Huế (Đại Nội)",
+      "latitude": 16.4699,
+      "longitude": 107.5796,
+      "radius_meters": 700,
+      "categories": [
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-imperial-city",
+        "quest_title": "Dấu ấn Hoàng cung",
+        "place_id": "hue-imperial-city",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Traces of the Imperial Court",
+        "step_index": 1,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-hue-imperial-city-02-ngo-mon-cong-hoang-c",
+      "title": "Ngọ Môn - Cổng Hoàng Cung",
+      "question_text": "Chụp ảnh cổng Ngọ Môn và ghi chú tên các vọng lâu trên cổng thành.",
+      "cultural_explanation": "Ngọ Môn là cổng chính dẫn vào Hoàng Thành, thể hiện quyền lực và sự uy nghiêm của triều đình.",
+      "source_text": "Ngọ Môn, các vọng lâu trên cổng thành...",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Kinh thành Huế (Đại Nội)",
+      "latitude": 16.4699,
+      "longitude": 107.5796,
+      "radius_meters": 700,
+      "categories": [
+        "architecture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-imperial-city",
+        "quest_title": "Dấu ấn Hoàng cung",
+        "place_id": "hue-imperial-city",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Traces of the Imperial Court",
+        "step_index": 2,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-hue-imperial-city-03-khuon-vien-kinh-than",
+      "title": "Khuôn viên Kinh Thành",
+      "question_text": "Chụp ảnh khu vực Kinh Thành được xây dựng bên ngoài Hoàng Thành.",
+      "cultural_explanation": "Khu vực này phản ánh sự phát triển lịch sử của Huế, đặc biệt là việc xây dựng Kinh Thành sau Hoàng Thành.",
+      "source_text": "Năm 1805, Kinh thành được xây dựng bên ngoài Hoàng thành trong một thế điều chỉnh cho phù hợp với một Hoàng thành đã sẵn có từ trước với chức năng bảo vệ cho Hoàng thành và Cung thành.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Kinh thành Huế (Đại Nội)",
+      "latitude": 16.4699,
+      "longitude": 107.5796,
+      "radius_meters": 700,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-imperial-city",
+        "quest_title": "Dấu ấn Hoàng cung",
+        "place_id": "hue-imperial-city",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Traces of the Imperial Court",
+        "step_index": 3,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-hue-imperial-city-04-thuy-khau-kinh-thanh",
+      "title": "Thủy Khẩu Kinh Thành",
+      "question_text": "Chụp ảnh hoặc ghi chú vị trí Long Hồ và Tiên Nộn",
+      "cultural_explanation": "Long Hồ và Tiên Nộn là nơi bắt đầu và kết thúc của thủy khẩu, phản ánh quan niệm về thiên nhiên và kiến trúc của người xưa",
+      "source_text": "Thủy khẩu lúc bấy giờ là vùng Long Hồ (nơi nhận nước) và Tiên Nộn (nơi thoát nước)",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Kinh thành Huế (Đại Nội)",
+      "latitude": 16.4699,
+      "longitude": 107.5796,
+      "radius_meters": 700,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-imperial-city",
+        "quest_title": "Dấu ấn Hoàng cung",
+        "place_id": "hue-imperial-city",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Traces of the Imperial Court",
+        "step_index": 4,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-hue-imperial-city-05-vao-noi-tim-hieu",
+      "title": "Vào Nội Tìm Hiểu",
+      "question_text": "Chụp ảnh và ghi chú về bất kỳ công trình kiến trúc nào nằm trong khu vực Đại Nội.",
+      "cultural_explanation": "Công trình kiến trúc trong Đại Nội phản ánh sự phồn thịnh và quyền lực của triều đại Nguyễn.",
+      "source_text": "Địa điểm của cuộc gặp gỡ không phải ở đâu xa ngoài phạm vi cung cấm mà ở ngay trong Đại Nội theo cách nói ngày nay.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Kinh thành Huế (Đại Nội)",
+      "latitude": 16.4699,
+      "longitude": 107.5796,
+      "radius_meters": 700,
+      "categories": [
+        "architecture",
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 30,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-imperial-city",
+        "quest_title": "Dấu ấn Hoàng cung",
+        "place_id": "hue-imperial-city",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Traces of the Imperial Court",
+        "step_index": 5,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-hue-imperial-city-06-kham-pha-hoang-thanh",
+      "title": "Khám phá Hoàng thành",
+      "question_text": "Chụp ảnh cửa Chương Đức và ghi chú kích thước của nó.",
+      "cultural_explanation": "Cửa Chương Đức là một phần quan trọng của kiến trúc Hoàng thành, đại diện cho quyền lực và sự uy nghiêm của triều đình.",
+      "source_text": "Hoàng thành ở trong Kinh thành có cả miếu điện, chu vi 614 trượng 1 thước, cao 1 trượng 5 tấc, dày 2 thước 6 tấc, xây gạch. Từ nam đến bắc dài 151 trượng, từ đông sang tây dài 155 trượng 5 thước, có 4 cửa: Ngộ Môn, Hiển Nhơn, Chương Đức, Hòa Bình.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Kinh thành Huế (Đại Nội)",
+      "latitude": 16.4699,
+      "longitude": 107.5796,
+      "radius_meters": 700,
+      "categories": [
+        "architecture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-imperial-city",
+        "quest_title": "Dấu ấn Hoàng cung",
+        "place_id": "hue-imperial-city",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Traces of the Imperial Court",
+        "step_index": 6,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-hue-imperial-city-07-ho-ngu-ha-va-hau-ho",
+      "title": "Hồ Ngự Hà và Hậu Hồ",
+      "question_text": "Chụp ảnh và ghi chú vị trí tương đối giữa Hồ Ngự Hà và Hậu Hồ",
+      "cultural_explanation": "Hiểu biết về cấu trúc và vị trí của các hồ trong Kinh thành Huế giúp du khách nắm bắt được quy hoạch tổng thể của khu vực này",
+      "source_text": "Ngự Hà nằm trong Kinh thành nhưng lại nằm ngoài Hoàng thành, còn Hậu Hồ thì lại tọa lạc bên trong Hoàng thành. Hai địa điểm ấy được ngăn cách nhau bằng một hệ thống kiến trúc thành và hào rất nghiêm ngặt: vòng thành của Hoàng thành.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Kinh thành Huế (Đại Nội)",
+      "latitude": 16.4699,
+      "longitude": 107.5796,
+      "radius_meters": 700,
+      "categories": [
+        "architecture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 15,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-imperial-city",
+        "quest_title": "Dấu ấn Hoàng cung",
+        "place_id": "hue-imperial-city",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Traces of the Imperial Court",
+        "step_index": 7,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-hue-imperial-city-08-ngoi-inh-lang-phu-xu",
+      "title": "Ngôi Đình Làng Phú Xuân",
+      "question_text": "Chụp ảnh hoặc ghi chú vị trí ngôi đình nằm trên đường Thái Phiên",
+      "cultural_explanation": "Ngôi đình này là dấu tích còn sót lại của làng cổ Phú Xuân, một phần lịch sử của Huế",
+      "source_text": "Ngôi đình dấu tích của làng Phú Xuân ở giữa kinh thành Huế ấy, ngày nay nằm trên đường Thái Phiên, phường Tây Lộc",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Kinh thành Huế (Đại Nội)",
+      "latitude": 16.4699,
+      "longitude": 107.5796,
+      "radius_meters": 700,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-imperial-city",
+        "quest_title": "Dấu ấn Hoàng cung",
+        "place_id": "hue-imperial-city",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Traces of the Imperial Court",
+        "step_index": 8,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-hue-imperial-city-09-ho-hoa-binh-lich-su",
+      "title": "Hồ Hòa Bình lịch sử",
+      "question_text": "Chụp ảnh hồ Hòa Bình và ghi chú kích thước của nó.",
+      "cultural_explanation": "Hồ Hòa Bình chứng kiến cuộc gặp lịch sử giữa vua Duy Tân và các tướng lãnh, đánh dấu bước ngoặt quan trọng trong lịch sử Việt Nam.",
+      "source_text": "Với diện tích khoảng 35.000m², đây là hỗ lớn nhất trong phạm vi Hoàng thành.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Kinh thành Huế (Đại Nội)",
+      "latitude": 16.4699,
+      "longitude": 107.5796,
+      "radius_meters": 700,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-imperial-city",
+        "quest_title": "Dấu ấn Hoàng cung",
+        "place_id": "hue-imperial-city",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Traces of the Imperial Court",
+        "step_index": 9,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-hue-imperial-city-10-kham-pha-cua-ngo-mon",
+      "title": "Khám phá cửa Ngọ Môn",
+      "question_text": "Chụp ảnh và ghi chú về hình dáng của cửa Ngọ Môn",
+      "cultural_explanation": "Cửa Ngọ Môn là biểu tượng quyền lực của triều đại, nơi chỉ những người có phận sự mới được phép đi qua",
+      "source_text": "Bất cứ ai vô phận sự mà vào cửa Ngọ Môn, Tử Cấm Thành, cửa Đông Ba, cửa Chương Đức, cửa Hiển Nhơn, Thìn Các Môn và các vườn cấm đều bị phạt 100 trượng.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Kinh thành Huế (Đại Nội)",
+      "latitude": 16.4699,
+      "longitude": 107.5796,
+      "radius_meters": 700,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-imperial-city",
+        "quest_title": "Dấu ấn Hoàng cung",
+        "place_id": "hue-imperial-city",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Traces of the Imperial Court",
+        "step_index": 10,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-thien-mu-pagoda-01-linh-muc-cadiere-nha",
+      "title": "Linh Mục Cadière - Nhà Báo",
+      "question_text": "Ghi chú tên và vai trò của Linh mục Cadière trong việc sáng lập Hội Những người bạn Cổ đô Huế",
+      "cultural_explanation": "Linh mục Cadière đóng vai trò quan trọng trong việc bảo tồn và quảng bá văn hóa Huế",
+      "source_text": "Léopold Cadière là một linh mục người Pháp được cử đến phục vụ tại Việt Nam. Ông làm chủ bút của Tập san \"Những người bạn Cổ đô Huế\" suốt 30 năm (1914 - 1944)",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chùa Thiên Mụ",
+      "latitude": 16.4536,
+      "longitude": 107.5448,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-thien-mu-pagoda",
+        "quest_title": "Tiếng chuông Thiên Mụ",
+        "place_id": "thien-mu-pagoda",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Bell of Thiên Mụ",
+        "step_index": 1,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-thien-mu-pagoda-02-tim-hieu-ve-hoi-nhun",
+      "title": "Tìm hiểu về Hội Những Người Bạn Cố Đô Huế",
+      "question_text": "Ghi chú số tập san đã phát hành của Hội Những Người Bạn Cố Đô Huế",
+      "cultural_explanation": "Hội Những Người Bạn Cố Đô Huế đóng vai trò quan trọng trong việc bảo tồn và quảng bá văn hóa Huế",
+      "source_text": "Phát hành 123 tập san, tổng cộng 16000 trang viết, 3200 phụ bản và 800 hình đen trắng và màu",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chùa Thiên Mụ",
+      "latitude": 16.4536,
+      "longitude": 107.5448,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-thien-mu-pagoda",
+        "quest_title": "Tiếng chuông Thiên Mụ",
+        "place_id": "thien-mu-pagoda",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Bell of Thiên Mụ",
+        "step_index": 2,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-thien-mu-pagoda-03-kham-pha-cuoc-oi-lin",
+      "title": "Khám phá cuộc đời linh mục Cadière",
+      "question_text": "Ghi chú tên và năm tổ chức hội thảo về linh mục Cadière",
+      "cultural_explanation": "Hội thảo này tôn vinh và lưu giữ những đóng góp quan trọng của linh mục Cadière cho văn hóa và lịch sử Huế",
+      "source_text": "Theo bản phản biện tham luận \"Cuộc đời của linh mục Léopold Cadière\" của linh mục Gérard Moussay tại Hội thảo \"Thân thế và sự nghiệp của linh mục Léopold Cadière\" (2010)",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chùa Thiên Mụ",
+      "latitude": 16.4536,
+      "longitude": 107.5448,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-thien-mu-pagoda",
+        "quest_title": "Tiếng chuông Thiên Mụ",
+        "place_id": "thien-mu-pagoda",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Bell of Thiên Mụ",
+        "step_index": 3,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-thien-mu-pagoda-04-tim-hieu-ve-bavh",
+      "title": "Tìm hiểu về BAVH",
+      "question_text": "Tìm hiểu và chụp ảnh cuốn tạp chí 'Bulletin des Amis du Vieux Hué' được trưng bày tại đây.",
+      "cultural_explanation": "Cuốn tạp chí này giữ lại nhiều hình ảnh và sinh hoạt của Huế xưa, đồng thời tôn vinh vai trò của linh mục Léopold Cadière.",
+      "source_text": "Chính Tập san này đã giữ lại nhiều hình ảnh và sinh hoạt của Huế xưa, đồng thời làm nên tên tuổi cho những người chủ trương và cộng tác, mà đứng đầu là vai trò của linh mục Léopold Cadière.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chùa Thiên Mụ",
+      "latitude": 16.4536,
+      "longitude": 107.5448,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "indoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-thien-mu-pagoda",
+        "quest_title": "Tiếng chuông Thiên Mụ",
+        "place_id": "thien-mu-pagoda",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Bell of Thiên Mụ",
+        "step_index": 4,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-thien-mu-pagoda-05-hoi-vien-a-dang",
+      "title": "Hội viên đa dạng",
+      "question_text": "Ghi chú tên một nghề nghiệp của hội viên",
+      "cultural_explanation": "Hiểu được sự đa dạng về nghề nghiệp của những người yêu mến Huế",
+      "source_text": "Đó có thể là một ông giáo sư, một linh mục mẫn cán đến viên đại úy bộ binh, dược sĩ thuộc địa, hành chính dân sự, đại diện thương mại, chủ sự kho bạc, chủ sự sở thủy lợi, lâm nghiệp...",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chùa Thiên Mụ",
+      "latitude": 16.4536,
+      "longitude": 107.5448,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-thien-mu-pagoda",
+        "quest_title": "Tiếng chuông Thiên Mụ",
+        "place_id": "thien-mu-pagoda",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Bell of Thiên Mụ",
+        "step_index": 5,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-thien-mu-pagoda-06-kham-pha-ke-hue",
+      "title": "Khám phá Kẻ Huế",
+      "question_text": "Tìm hiểu và chụp ảnh dòng chữ 'Kẻ Huế' tại chùa Thiên Mụ",
+      "cultural_explanation": "Dòng chữ 'Kẻ Huế' phản ánh lịch sử lâu đời của Huế, nơi được linh mục Alexandre de Rhodes đề cập đến",
+      "source_text": "Kẻ Huế đã được linh mục Alexandre de Rhodes nói đến khi đó xứ Thuận Hóa đã ra đời được 334 năm và vẫn tồn tại dưới dạng Thừa tuyên Thuận Hóa của xứ Đàng Trong.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chùa Thiên Mụ",
+      "latitude": 16.4536,
+      "longitude": 107.5448,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-thien-mu-pagoda",
+        "quest_title": "Tiếng chuông Thiên Mụ",
+        "place_id": "thien-mu-pagoda",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Bell of Thiên Mụ",
+        "step_index": 6,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-thien-mu-pagoda-07-dan-so-hue-xua",
+      "title": "Dân số Huế xưa",
+      "question_text": "Ghi chú về dân số Huế thời điểm đầu thế kỷ XX dựa trên thông tin từ đoạn tư liệu",
+      "cultural_explanation": "Giúp du khách hiểu về sự phát triển dân cư và kinh tế của Huế qua các thời kỳ",
+      "source_text": "Linh mục L.Cadière đã cho rằng dân số của Huế lúc đó không kém thời điểm đầu thế kỷ XX là bao nhiêu",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chùa Thiên Mụ",
+      "latitude": 16.4536,
+      "longitude": 107.5448,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-thien-mu-pagoda",
+        "quest_title": "Tiếng chuông Thiên Mụ",
+        "place_id": "thien-mu-pagoda",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Bell of Thiên Mụ",
+        "step_index": 7,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-thien-mu-pagoda-08-chua-thien-mu-va-son",
+      "title": "Chùa Thiên Mụ và sông Hương",
+      "question_text": "Ghi chú hoặc chụp ảnh hướng nhìn từ chùa Thiên Mụ ra sông Hương",
+      "cultural_explanation": "Hướng nhìn từ chùa Thiên Mụ ra sông Hương biểu thị sự kết hợp giữa kiến trúc và thiên nhiên, phản ánh quan niệm về mối liên hệ giữa con người và tự nhiên trong văn hóa Việt Nam",
+      "source_text": "nơi núi sông đẹp tốt",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chùa Thiên Mụ",
+      "latitude": 16.4536,
+      "longitude": 107.5448,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-thien-mu-pagoda",
+        "quest_title": "Tiếng chuông Thiên Mụ",
+        "place_id": "thien-mu-pagoda",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Bell of Thiên Mụ",
+        "step_index": 8,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-thien-mu-pagoda-09-kham-pha-vu-khi-co",
+      "title": "Khám phá vũ khí cổ",
+      "question_text": "Chụp ảnh hoặc ghi chú về hình dáng và họa tiết của các khẩu súng được mô tả trong đoạn tư liệu",
+      "cultural_explanation": "Những khẩu súng này phản ánh kỹ năng thủ công và nghệ thuật quân sự thời kỳ đó",
+      "source_text": "mỗi trại đều có đặt súng đồng, nặng từ vài trăm cân đến vài nghìn cân, đúc rất tinh xảo, khảm châu sa phỉ thúy, văn vẻ sáng ngời",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chùa Thiên Mụ",
+      "latitude": 16.4536,
+      "longitude": 107.5448,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "sunny",
+        "cloudy",
+        "any"
+      ],
+      "time_tags": [
+        "morning",
+        "afternoon",
+        "evening",
+        "night",
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-thien-mu-pagoda",
+        "quest_title": "Tiếng chuông Thiên Mụ",
+        "place_id": "thien-mu-pagoda",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Bell of Thiên Mụ",
+        "step_index": 9,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-thien-mu-pagoda-10-do-tim-dau-vet-lich",
+      "title": "Dò tìm dấu vết lịch sử",
+      "question_text": "Tìm và chụp ảnh vị trí từng là phủ Phú Xuân theo sách Thực Lực",
+      "cultural_explanation": "Việc di chuyển phủ Phú Xuân phản ánh sự thích nghi của triều đại với điều kiện tự nhiên",
+      "source_text": "Sách Thực lực chép: \"Tháng 12 (Tân Mão - 1711), chúa muốn dời phủ sang bãi phù sa (xã) Bác Vọng\"",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chùa Thiên Mụ",
+      "latitude": 16.4536,
+      "longitude": 107.5448,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-thien-mu-pagoda",
+        "quest_title": "Tiếng chuông Thiên Mụ",
+        "place_id": "thien-mu-pagoda",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Bell of Thiên Mụ",
+        "step_index": 10,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-perfume-river-01-ky-niem-song-huong",
+      "title": "Kỷ niệm sông Hương",
+      "question_text": "Ghi chú tên các di tích lịch sử văn hóa liên quan đến cuộc đời và sự nghiệp cứu nước của Cụ Phan Bội Châu.",
+      "cultural_explanation": "Những di tích này phản ánh lịch sử đấu tranh chống thực dân Pháp của Việt Nam.",
+      "source_text": "Các di tích ấy được phân bố rộng khấp ở mạn Bắc và nam sông Hương, trong và ngoài thành phố, chứa đựng nhiều nội dung và giá trị quan trọng, không ngừng được bảo tồn và phát huy.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Sông Hương",
+      "latitude": 16.469,
+      "longitude": 107.585,
+      "radius_meters": 1500,
+      "categories": [
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 30,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-perfume-river",
+        "quest_title": "Xuôi dòng Hương Giang",
+        "place_id": "perfume-river",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Down the Perfume River",
+        "step_index": 1,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-perfume-river-02-song-huong-chuyen-do",
+      "title": "Sông Hương chuyển dòng",
+      "question_text": "Quan sát và chụp ảnh đoạn sông Hương đang chuyển dòng về phía Nam.",
+      "cultural_explanation": "Hiện tượng này phản ánh sự thay đổi địa lý và lịch sử của khu vực.",
+      "source_text": "đoạn sông Hương ở trước mặt đang di chuyển dần về phía Nam",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Sông Hương",
+      "latitude": 16.469,
+      "longitude": 107.585,
+      "radius_meters": 1500,
+      "categories": [
+        "nature"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 10,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-perfume-river",
+        "quest_title": "Xuôi dòng Hương Giang",
+        "place_id": "perfume-river",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Down the Perfume River",
+        "step_index": 2,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-perfume-river-03-thap-loc-nuoc-giua-t",
+      "title": "Tháp lọc nước giữa thiên nhiên",
+      "question_text": "Chụp ảnh tháp lọc nước và ghi chú về cảm nhận của bạn về sự tương phản giữa công trình hiện đại và thiên nhiên xung quanh.",
+      "cultural_explanation": "Tháp lọc nước là ví dụ điển hình cho sự thay đổi của cảnh quan đô thị Huế, phản ánh quá trình phát triển hiện đại.",
+      "source_text": "Một số công trình kiến trúc mới, cao lớn theo phong cách hiện đại quốc tế đã mọc lên ở hai bên bờ sông Hương, như Tháp lọc nước (Château d'Eau).",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Sông Hương",
+      "latitude": 16.469,
+      "longitude": 107.585,
+      "radius_meters": 1500,
+      "categories": [
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 10,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-perfume-river",
+        "quest_title": "Xuôi dòng Hương Giang",
+        "place_id": "perfume-river",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Down the Perfume River",
+        "step_index": 3,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-perfume-river-04-tham-hiem-song-huong",
+      "title": "Thám hiểm Sông Hương",
+      "question_text": "Chụp ảnh hoặc ghi chú về hình dáng uốn lượn của sông Hương tại ngã ba gặp gỡ với sông Bồ.",
+      "cultural_explanation": "Hình dáng uốn lượn của sông Hương phản ánh sự hài hòa giữa thiên nhiên và con người, đồng thời cũng là biểu tượng cho sự phát triển bền vững của cộng đồng.",
+      "source_text": "Dòng Hương rông và vô han khuất khúc hữu tình.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Sông Hương",
+      "latitude": 16.469,
+      "longitude": 107.585,
+      "radius_meters": 1500,
+      "categories": [
+        "nature"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-perfume-river",
+        "quest_title": "Xuôi dòng Hương Giang",
+        "place_id": "perfume-river",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Down the Perfume River",
+        "step_index": 4,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-perfume-river-05-song-huong-em-em",
+      "title": "Sông Hương êm đềm",
+      "question_text": "Chụp ảnh cảnh sông Hương chảy êm đềm",
+      "cultural_explanation": "Sông Hương là biểu tượng của vẻ đẹp thiên nhiên Huế, mang ý nghĩa văn hóa sâu sắc",
+      "source_text": "Huế có dòng sông êm đềm với Hương Giang, An Cựu, Như Ý, Lợi Nông",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Sông Hương",
+      "latitude": 16.469,
+      "longitude": 107.585,
+      "radius_meters": 1500,
+      "categories": [
+        "nature"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-perfume-river",
+        "quest_title": "Xuôi dòng Hương Giang",
+        "place_id": "perfume-river",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Down the Perfume River",
+        "step_index": 5,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-perfume-river-06-chan-nui-va-song-huo",
+      "title": "Chân núi và Sông Hương",
+      "question_text": "Quan sát và chụp ảnh khu vực gò cao phía nam sông Hương.",
+      "cultural_explanation": "Khu vực này phản ánh sự kết hợp giữa thiên nhiên và kiến trúc lịch sử, đặc biệt liên quan đến việc xây dựng lăng tẩm.",
+      "source_text": "Y ở trên gò cao (élévation) vùng chân núi (piémont), hợp với hai chữ \"Sơn Lăng\".",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Sông Hương",
+      "latitude": 16.469,
+      "longitude": 107.585,
+      "radius_meters": 1500,
+      "categories": [
+        "nature",
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-perfume-river",
+        "quest_title": "Xuôi dòng Hương Giang",
+        "place_id": "perfume-river",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Down the Perfume River",
+        "step_index": 6,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-perfume-river-07-thuong-thuc-ca-hue-t",
+      "title": "Thưởng thức Ca Huế trên sông Hương",
+      "question_text": "Chụp ảnh hoặc ghi chú lại hình ảnh một buổi biểu diễn Ca Huế trên thuyền rồng",
+      "cultural_explanation": "Ca Huế trên sông Hương là một phần quan trọng của văn hóa Huế, phản ánh sự kết hợp hài hòa giữa âm nhạc truyền thống và thiên nhiên",
+      "source_text": "Ca Huế phù hợp với không gian vào buổi chiều tà, hay khi màn đêm buông xuống, nó không thích hợp khi trình diễn vào ban ngày, trước đám đông, quảng trường hay không gian rộng lớn.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Sông Hương",
+      "latitude": 16.469,
+      "longitude": 107.585,
+      "radius_meters": 1500,
+      "categories": [
+        "culture",
+        "art"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "evening",
+        "night"
+      ],
+      "estimated_duration_minutes": 30,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-perfume-river",
+        "quest_title": "Xuôi dòng Hương Giang",
+        "place_id": "perfume-river",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Down the Perfume River",
+        "step_index": 7,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-perfume-river-08-dieu-bay-tren-song-h",
+      "title": "Diều bay trên sông Hương",
+      "question_text": "Chụp ảnh cánh diều bay trên sông Hương vào buổi chiều.",
+      "cultural_explanation": "Cánh diều trên sông Hương phản ánh nét văn hóa giải trí truyền thống của người dân Huế.",
+      "source_text": "Vì thế mà trong những trưa hè cháy bỏng, ngang qua cầu Trường Tiền hay cầu Phú Xuân, người ta thường thấy những cánh diều chao lượn trên bầu trời, in bóng xuống dòng Hương trong xanh.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Sông Hương",
+      "latitude": 16.469,
+      "longitude": 107.585,
+      "radius_meters": 1500,
+      "categories": [
+        "culture",
+        "art"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "sunny",
+        "cloudy",
+        "any"
+      ],
+      "time_tags": [
+        "afternoon",
+        "any"
+      ],
+      "estimated_duration_minutes": 15,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-perfume-river",
+        "quest_title": "Xuôi dòng Hương Giang",
+        "place_id": "perfume-river",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Down the Perfume River",
+        "step_index": 8,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-lang-minh-mang-01-ngo-mon-va-vong-lau",
+      "title": "Ngọ Môn và vọng lâu",
+      "question_text": "Chụp ảnh hoặc ghi chú về Ngọ Môn và vọng lâu trên cổng thành",
+      "cultural_explanation": "Ngọ Môn và vọng lâu là biểu tượng quyền lực của triều đình, thể hiện sự nghiêm túc và trang trọng của hoàng gia",
+      "source_text": "đã tiếp tục xây dựng các công trình do vua cha để lại, đồng thời cho xây dựng một số công trình khác như: Ngọ Môn, các vọng lâu trên cổng thành...",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Minh Mạng",
+      "latitude": 16.4486,
+      "longitude": 107.5536,
+      "radius_meters": 600,
+      "categories": [
+        "architecture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-minh-mang",
+        "quest_title": "Uy nghi Hiếu Lăng",
+        "place_id": "lang-minh-mang",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Majesty of Minh Mạng's Tomb",
+        "step_index": 1,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-minh-mang-02-chiec-nhan-vang-ac-b",
+      "title": "Chiếc Nhẫn Vàng Đặc Biệt",
+      "question_text": "Tìm và chụp ảnh chiếc nhẫn vàng nạm bảo thạch đỏ được trưng bày trong lăng.",
+      "cultural_explanation": "Chiếc nhẫn này biểu thị quyết định ngoại giao quan trọng của vua Minh Mạng.",
+      "source_text": "Mặc dù có khoảng một nửa số đại thần muốn liên kết với Miến Điện để chống Xiêm, Minh Mạng đã suy ngẫm, đắn đo, cân nhắc kỹ lưỡng; cuối cùng ông đã từ chối liên kết với Miến Điện, Minh Mạng đều trả lại hết, chỉ thu nhận một chiếc nhẫn vàng nạm bảo thạch đỏ, rồi hậu thưởng cho sử thần và cho người đưa về nước.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Minh Mạng",
+      "latitude": 16.4486,
+      "longitude": 107.5536,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "indoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-minh-mang",
+        "quest_title": "Uy nghi Hiếu Lăng",
+        "place_id": "lang-minh-mang",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Majesty of Minh Mạng's Tomb",
+        "step_index": 2,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-minh-mang-03-kham-pha-hanh-chinh",
+      "title": "Khám phá hành chính triều Nguyễn",
+      "question_text": "Ghi chú tên của ít nhất một tỉnh được thành lập dưới triều Minh Mạng",
+      "cultural_explanation": "Việc này giúp du khách hiểu rõ hơn về sự phát triển và quản lý lãnh thổ dưới triều Nguyễn",
+      "source_text": "Dưới thời Minh Mạng, các trấn được đổi ra tỉnh (có 31 tỉnh)",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Minh Mạng",
+      "latitude": 16.4486,
+      "longitude": 107.5536,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-minh-mang",
+        "quest_title": "Uy nghi Hiếu Lăng",
+        "place_id": "lang-minh-mang",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Majesty of Minh Mạng's Tomb",
+        "step_index": 3,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-minh-mang-04-minh-mang-va-moi-lo",
+      "title": "Minh Mạng và mối lo ngại",
+      "question_text": "Quan sát và chụp ảnh phần nào mô tả mối lo ngại của Minh Mạng về Pháp trong kiến trúc lăng mộ",
+      "cultural_explanation": "Phần kiến trúc này phản ánh mối quan tâm sâu sắc của Minh Mạng về mối đe dọa từ Pháp đối với chủ quyền quốc gia",
+      "source_text": "nhà vua \"ngày đêm suy nghĩ\" về hiểm họa mà người Pháp có thể gây ra đối với chủ quyền dân tộc",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Minh Mạng",
+      "latitude": 16.4486,
+      "longitude": 107.5536,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-minh-mang",
+        "quest_title": "Uy nghi Hiếu Lăng",
+        "place_id": "lang-minh-mang",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Majesty of Minh Mạng's Tomb",
+        "step_index": 4,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-minh-mang-05-bi-an-bai-hoang-sa",
+      "title": "Bí Ẩn Bãi Hoàng Sa",
+      "question_text": "Tìm và chụp ảnh bia đá khắc bốn chữ \"Vạn lý ba bình\"",
+      "cultural_explanation": "Bia đá này phản ánh quyền chủ quyền của Việt Nam trên quần đảo Hoàng Sa",
+      "source_text": "Bãi Hoàng Sa ngoài biển có cây cối rậm tốt, trong cồn có giếng, phía tây nam có cổ miếu có bia khác bốn chữ: \"Vạn lý ba bình\"",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Minh Mạng",
+      "latitude": 16.4486,
+      "longitude": 107.5536,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 10,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-minh-mang",
+        "quest_title": "Uy nghi Hiếu Lăng",
+        "place_id": "lang-minh-mang",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Majesty of Minh Mạng's Tomb",
+        "step_index": 5,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-minh-mang-06-bia-mo-ma-ba-vua",
+      "title": "Bia mộ Mã Bà Vua",
+      "question_text": "Tìm và chụp ảnh bia mộ của Mã Bà Vua tại Lăng Minh Mạng.",
+      "cultural_explanation": "Bia mộ này phản ánh sự tôn trọng và tưởng nhớ đối với những người phụ nữ có đóng góp lớn lao trong lịch sử.",
+      "source_text": "Bia mộ bà Ngô Thị... ở xứ Gò Lăng cho biết bà mất vào năm Minh Mạng thứ 3 (1822) bia mộ do Ngô Văn Ngữ phụng lập năm Minh Mạng thứ 6 (1825).",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Minh Mạng",
+      "latitude": 16.4486,
+      "longitude": 107.5536,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-minh-mang",
+        "quest_title": "Uy nghi Hiếu Lăng",
+        "place_id": "lang-minh-mang",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Majesty of Minh Mạng's Tomb",
+        "step_index": 6,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-minh-mang-07-kiem-tra-su-sach",
+      "title": "Kiểm Tra Sử Sách",
+      "question_text": "Tìm và chụp bức phù điêu hoặc bảng mô tả liên quan đến việc kiểm tra sử sách của vua Minh Mạng.",
+      "cultural_explanation": "Việc này phản ánh tinh thần cầu thị và trọng sử của triều đại.",
+      "source_text": "Sự việc này, kiểm tra lại ở sử sách Châu bản triều Nguyễn, triều Minh Mạng năm thứ 4 và Đại Nam thực lục đệ nhị kỷ, tập 6 (năm 1822 - 1823) đều không thấy chép về sự kiện vua Minh Mạng đi Quảng Trị vào năm 1823",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Minh Mạng",
+      "latitude": 16.4486,
+      "longitude": 107.5536,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-minh-mang",
+        "quest_title": "Uy nghi Hiếu Lăng",
+        "place_id": "lang-minh-mang",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Majesty of Minh Mạng's Tomb",
+        "step_index": 7,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-minh-mang-08-kham-pha-than-hieu",
+      "title": "Khám phá thần hiệu",
+      "question_text": "Ghi chú tên của ít nhất 3 vị thần được đề cập trong văn bản Đơn xin cấp sắc",
+      "cultural_explanation": "Việc này giúp du khách hiểu hơn về tín ngưỡng và văn hóa tâm linh của người dân Việt xưa",
+      "source_text": "Đại Càn Quốc Gia Nam Hải tứ vị Thánh nương vương (大 乾 國 家 南 海 四 位 聖 娘 王), Đương Cảnh Thành Hoàng đại vương tôn thần (當 境 城 隍 大 王 尊 神), Thiên Y A Na Diễn Phi Chúa Ngọc tôn thần (天 依 阿 那 演 妃 主 玉 尊 神), Nghi Thái giám An Bắc đốc doanh Địch Nghĩa hầu chi thần (儀 太 監 安 北 燥 督 迪 義 侯 之 神), Cai tri phó Tướng Phấn Dũng hầu chi thần (該 知 副 將 奮 勇 侯 之 神)",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Minh Mạng",
+      "latitude": 16.4486,
+      "longitude": 107.5536,
+      "radius_meters": 600,
+      "categories": [
+        "religion"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-minh-mang",
+        "quest_title": "Uy nghi Hiếu Lăng",
+        "place_id": "lang-minh-mang",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Majesty of Minh Mạng's Tomb",
+        "step_index": 8,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-minh-mang-09-bia-a-that-bai-chau",
+      "title": "Bia đá Thát Bái châu",
+      "question_text": "Chụp ảnh bia đá ghi chép về Bãi Rái Cá",
+      "cultural_explanation": "Bia đá này ghi lại quyết định của vua Minh Mạng về việc đặt tên cho bãi đất bồi này, phản ánh sự quan tâm của triều đình tới địa danh.",
+      "source_text": "Đối diện với Bãi Rái Cá là một nhà bia trên triền dốc, trong đó có 2 bia đá gồm bia định danh Thát Bái châu và văn bia ghi chép bài ng御制无法翻译，因为它是中文，且看起来是关于明命陵的描述和任务说明。根据指示，我将提供一个符合要求的JSON对象，仅基于提供的信息，不添加额外内容或解释。以下是根据给定段落创建的任务探索活动的JSON对象示例：{",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Minh Mạng",
+      "latitude": 16.4486,
+      "longitude": 107.5536,
+      "radius_meters": 600,
+      "categories": [
+        "history",
+        "architecture",
+        "religion"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 15,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-minh-mang",
+        "quest_title": "Uy nghi Hiếu Lăng",
+        "place_id": "lang-minh-mang",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Majesty of Minh Mạng's Tomb",
+        "step_index": 9,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-minh-mang-10-tham-bai-chau-bi-an",
+      "title": "Thám Bái châu bí ẩn",
+      "question_text": "Tìm hiểu và chụp ảnh khu vực Thát Bái châu được đề cập trong đoạn văn.",
+      "cultural_explanation": "Khu vực này mang ý nghĩa lịch sử quan trọng vì nó được đặt tên bởi chính vua Minh Mạng.",
+      "source_text": "Thát Bái châu (Bãi Rái Cá Lạy) từ đó đã trở thành một vùng đất bãi bồi đặc biệt thú vị trong tiến trình văn hóa Huế.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Minh Mạng",
+      "latitude": 16.4486,
+      "longitude": 107.5536,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 15,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-minh-mang",
+        "quest_title": "Uy nghi Hiếu Lăng",
+        "place_id": "lang-minh-mang",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Majesty of Minh Mạng's Tomb",
+        "step_index": 10,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-tu-duc-01-bi-kich-cua-tu-uc",
+      "title": "Bi kịch của Tự Đức",
+      "question_text": "Ghi chú về ý nghĩa của câu thơ 'khí dân mãi quốc' trên các bia đá hoặc tường tại lăng.",
+      "cultural_explanation": "Câu thơ phản ánh suy nghĩ sâu sắc và bi kịch của vua Tự Đức về trách nhiệm với đất nước.",
+      "source_text": "Tự Đức đã \"tự phê bình\" rất nghiêm khắc, nhưng thực ra chúng ta không nên dùng chữ \"mãi quốc\" đối với Tự Đức. Đó là bi kịch của họ².",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Tự Đức",
+      "latitude": 16.457,
+      "longitude": 107.553,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-tu-duc",
+        "quest_title": "Thi vị Khiêm Lăng",
+        "place_id": "lang-tu-duc",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Poetry of Tự Đức's Tomb",
+        "step_index": 1,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-tu-duc-02-tim-hieu-ve-toc-pho",
+      "title": "Tìm hiểu về tộc phổ",
+      "question_text": "Ghi chú về thông tin về việc hủy và tái lập tộc phổ tại đây",
+      "cultural_explanation": "Việc hủy và tái lập tộc phổ phản ánh sự biến động xã hội và lịch sử phức tạp của Việt Nam",
+      "source_text": "Hầu hết là những bản tộc phổ tân biên. Cho nên tổ tiên các đời xa xưa chỉ có ghi mà rất ít ngài được ghi",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Tự Đức",
+      "latitude": 16.457,
+      "longitude": 107.553,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-tu-duc",
+        "quest_title": "Thi vị Khiêm Lăng",
+        "place_id": "lang-tu-duc",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Poetry of Tự Đức's Tomb",
+        "step_index": 2,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-tu-duc-03-kham-pha-kien-truc-l",
+      "title": "Khám phá kiến trúc lăng Tự Đức",
+      "question_text": "Quan sát và chụp ảnh một ví dụ về kiến trúc mang đậm bản sắc văn hóa phương Đông truyền thống tại lăng Tự Đức.",
+      "cultural_explanation": "Kiến trúc lăng Tự Đức phản ánh sự kết hợp giữa nghệ thuật và kiến trúc truyền thống phương Đông.",
+      "source_text": "Toàn bộ kiến trúc mà các vị vua đầu triều Nguyễn đã cho xây dựng đều mang đậm bản sắc văn hóa phương Đông truyền thống.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Tự Đức",
+      "latitude": 16.457,
+      "longitude": 107.553,
+      "radius_meters": 600,
+      "categories": [
+        "architecture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-tu-duc",
+        "quest_title": "Thi vị Khiêm Lăng",
+        "place_id": "lang-tu-duc",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Poetry of Tự Đức's Tomb",
+        "step_index": 3,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-tu-duc-04-thi-si-tu-uc",
+      "title": "Thi sĩ Tự Đức",
+      "question_text": "Ghi chú về câu thơ nổi tiếng của vua Tự Đức được khắc trên tường lăng.",
+      "cultural_explanation": "Câu thơ thể hiện tâm trạng buồn bã và suy tư của vua Tự Đức về số phận đất nước.",
+      "source_text": "Tội nghiệp thay cho thi sĩ Tự Đức!",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Tự Đức",
+      "latitude": 16.457,
+      "longitude": 107.553,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-tu-duc",
+        "quest_title": "Thi vị Khiêm Lăng",
+        "place_id": "lang-tu-duc",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Poetry of Tự Đức's Tomb",
+        "step_index": 4,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-tu-duc-05-kham-pha-uy-tin-cua",
+      "title": "Khám phá uy tín của Nguyễn Văn Tường",
+      "question_text": "Ghi chú về vị trí và nội dung của phần mô tả về Nguyễn Văn Tường trên tường hoặc bảng thông tin tại đây.",
+      "cultural_explanation": "Nguyễn Văn Tường đóng vai trò quan trọng trong lịch sử Việt Nam, đặc biệt là trong việc giữ vững chủ quyền lãnh thổ trước áp lực của thực dân Pháp.",
+      "source_text": "Sau thắng lợi này, vua Tự Đức đặc cách phong Nguyễn Văn Tường làm Thượng thư bộ Hình, sung Cơ mật viện đại thần, tước Kỳ vī bá13. Ông",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Tự Đức",
+      "latitude": 16.457,
+      "longitude": 107.553,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-tu-duc",
+        "quest_title": "Thi vị Khiêm Lăng",
+        "place_id": "lang-tu-duc",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Poetry of Tự Đức's Tomb",
+        "step_index": 5,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-tu-duc-06-tham-hiem-cau-chuyen",
+      "title": "Thám hiểm câu chuyện Nguyễn Văn Tường",
+      "question_text": "Tìm hiểu và ghi chú về câu chuyện của Nguyễn Văn Tường trong các bản tấu gửi lên vua Tự Đức.",
+      "cultural_explanation": "Câu chuyện này phản ánh mối quan hệ giữa triều đình và các quan viên thời xưa, cũng như tầm quan trọng của việc thi cử trong xã hội phong kiến Việt Nam.",
+      "source_text": "Nhờ đại tạo tác thành may được dự hàng cống sĩ (năm Tự Đức thứ 3, đội ơn chuẩn cho thi lại, trúng được cử nhân)",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Tự Đức",
+      "latitude": 16.457,
+      "longitude": 107.553,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 15,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-tu-duc",
+        "quest_title": "Thi vị Khiêm Lăng",
+        "place_id": "lang-tu-duc",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Poetry of Tự Đức's Tomb",
+        "step_index": 6,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-tu-duc-07-tam-cung-trong-lang",
+      "title": "Tam cung trong Lăng Tự Đức",
+      "question_text": "Ghi chú tên và vai trò của ba người phụ nữ được gọi là Tam cung",
+      "cultural_explanation": "Hiểu biết về hệ thống Tam cung giúp du khách hiểu rõ hơn về vai trò của phụ nữ trong triều đại Huế",
+      "source_text": "Tam cung là ba vị: Thái hoàng Thái hậu Từ Dũ (mẹ vua Tự Đức), Hoàng Thái hậu Thuận Hiếu vợ Tự Đức, bà Học Phi vợ thứ của Tự Đức (mẹ nuôi vua Kiến Phúc)",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Tự Đức",
+      "latitude": 16.457,
+      "longitude": 107.553,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-tu-duc",
+        "quest_title": "Thi vị Khiêm Lăng",
+        "place_id": "lang-tu-duc",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Poetry of Tự Đức's Tomb",
+        "step_index": 7,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-tu-duc-08-tim-hieu-tam-cung",
+      "title": "Tìm hiểu Tam Cung",
+      "question_text": "Ghi chú tên và vai trò của ít nhất hai trong số ba bà hoàng trong Tam cung.",
+      "cultural_explanation": "Tam cung phản ánh hệ thống gia đình phức tạp và quyền lực của phụ nữ trong triều đại.",
+      "source_text": "Tam cung là ba bà gồm Thái hoàng Thái hậu Từ Dũ - mẹ vua Tự Đức, Trang Ý Hoàng thái hậu - vợ chính vua Tự Đức, Hoàng thái phi hay còn gọi là bà Học phi - vợ thứ vua Tự Đức.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Tự Đức",
+      "latitude": 16.457,
+      "longitude": 107.553,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-tu-duc",
+        "quest_title": "Thi vị Khiêm Lăng",
+        "place_id": "lang-tu-duc",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Poetry of Tự Đức's Tomb",
+        "step_index": 8,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-tu-duc-09-viet-huy-chinh-xac",
+      "title": "Viết Húy Chính Xác",
+      "question_text": "Ghi chú cách viết chữ THÌ 時 theo cách húy của vua Tự Đức",
+      "cultural_explanation": "Hiểu về quy tắc viết tên riêng trong văn hóa quân chủ phong kiến Việt Nam",
+      "source_text": "Chữ THÌ 時 được viết húy bằng cách bỏ trông bộ 日, chỉ viết chữ TỤ 寺 hơi lệch về bên phải, hoặc \"chắc ăn\" hơn, đổi dùng chữ THÌ 榱 đọc THỜI.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Tự Đức",
+      "latitude": 16.457,
+      "longitude": 107.553,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "medium",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-tu-duc",
+        "quest_title": "Thi vị Khiêm Lăng",
+        "place_id": "lang-tu-duc",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Poetry of Tự Đức's Tomb",
+        "step_index": 9,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-tu-duc-10-kham-pha-hoat-ong-kh",
+      "title": "Khám phá hoạt động khai thác khoáng sản",
+      "question_text": "Ghi chú về các loại khoáng sản được đề cập trong đoạn văn.",
+      "cultural_explanation": "Việc vua Tự Đức chỉ thị khai thác than đá và sắt thể hiện sự quan tâm đến phát triển kinh tế đất nước.",
+      "source_text": "tháng 6 năm 1868, vua Tự Đức chỉ thị cho tỉnh Khánh Hòa đào lấy than đá ở núi Điện Cơ; tháng 7 năm đó khai mỏ sắt Phổ Lý ở Thái Nguyên, mỏ than ở núi Hoàn Ngọc ở tỉnh Quảng Yên...",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Tự Đức",
+      "latitude": 16.457,
+      "longitude": 107.553,
+      "radius_meters": 600,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-tu-duc",
+        "quest_title": "Thi vị Khiêm Lăng",
+        "place_id": "lang-tu-duc",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Poetry of Tự Đức's Tomb",
+        "step_index": 10,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-khai-dinh-01-kham-pha-kham-sanh-s",
+      "title": "Khám phá khảm sành sứ",
+      "question_text": "Quan sát và chụp ảnh một ví dụ về khảm sành sứ trong lăng Khải Định.",
+      "cultural_explanation": "Khảm sành sứ là một phần quan trọng của nghệ thuật kiến trúc thời Khải Định, thể hiện sự pha trộn giữa các yếu tố truyền thống và hiện đại.",
+      "source_text": "Hầu như rất ít ý kiến phủ nhận giá trị khảm sành sứ, thủy tinh màu ở nội thất lăng Khải Định.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Khải Định",
+      "latitude": 16.3997,
+      "longitude": 107.587,
+      "radius_meters": 400,
+      "categories": [
+        "architecture",
+        "art"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "indoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-khai-dinh",
+        "quest_title": "Nghệ thuật Ứng Lăng",
+        "place_id": "lang-khai-dinh",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Art of Khải Định's Tomb",
+        "step_index": 1,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-khai-dinh-02-kham-pha-lang-khai-i",
+      "title": "Khám phá Lăng Khải Định",
+      "question_text": "Ghi chú về tên gọi của các lăng khác được đề cập trong đoạn văn này.",
+      "cultural_explanation": "Tên gọi của các lăng thể hiện sự tôn trọng và vị thế của các nhân vật lịch sử.",
+      "source_text": "cụm lăng vua Thiệu Trị gồm Xương Lăng của vua Thiệu Trị, Xương Thọ lăng của hoàng hậu Từ Dụ - Phạm Thị Hằng, Hiếu Đông lăng của Tá Thiên Nhân hoàng hậu Hồ Thị Hoa - mẹ vua Thiệu Trị, Cơ Thánh lăng của Hưng Tổ Nguyễn Phúc Luân, Thát Bái châu, Ứng Lăng của vua Khải Định",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Khải Định",
+      "latitude": 16.3997,
+      "longitude": 107.587,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-khai-dinh",
+        "quest_title": "Nghệ thuật Ứng Lăng",
+        "place_id": "lang-khai-dinh",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Art of Khải Định's Tomb",
+        "step_index": 2,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-khai-dinh-03-kham-pha-kham-sanh-s",
+      "title": "Khám phá khảm sành sứ",
+      "question_text": "Quan sát kỹ và chụp ảnh phần nội thất khảm sành sứ, thủy tinh màu lộng lẫy trong lăng Khải Định.",
+      "cultural_explanation": "Những họa tiết khảm sành sứ thể hiện sự tinh tế và nghệ thuật trang trí độc đáo của triều đại Nguyễn.",
+      "source_text": "hầu hết chúng ta liên tưởng trước hết là lăng Khải Định với toàn bộ nội thất được khảm sứ, thuỷ tinh màu lộng lẫy, hoành tráng.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Khải Định",
+      "latitude": 16.3997,
+      "longitude": 107.587,
+      "radius_meters": 400,
+      "categories": [
+        "architecture",
+        "art"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "indoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-khai-dinh",
+        "quest_title": "Nghệ thuật Ứng Lăng",
+        "place_id": "lang-khai-dinh",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Art of Khải Định's Tomb",
+        "step_index": 3,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-khai-dinh-04-kham-pha-kham-sanh-s",
+      "title": "Khám phá khảm sành sứ",
+      "question_text": "Chụp ảnh hoặc ghi chú về một chi tiết khảm sành sứ độc đáo trong cung Thiên Định.",
+      "cultural_explanation": "Những bức tranh khảm sành sứ thể hiện sự kết hợp giữa các nền văn hóa, phản ánh phong cách sống của vua Khải Định.",
+      "source_text": "Những nghệ nhân, người thợ Việt Nam thời Khải Định đã thể hiện một lối tư duy nghệ thuật đầy thông minh sáng tạo, cùng với sự nhẫn nại cần cù, đôi bàn tay tài hoa của họ tạo nên những bức tranh khảm sành sứ đầy sinh khí, tinh xảo, độc đáo và hết sức hấp dẫn.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Khải Định",
+      "latitude": 16.3997,
+      "longitude": 107.587,
+      "radius_meters": 400,
+      "categories": [
+        "art"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "indoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-khai-dinh",
+        "quest_title": "Nghệ thuật Ứng Lăng",
+        "place_id": "lang-khai-dinh",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Art of Khải Định's Tomb",
+        "step_index": 4,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-khai-dinh-05-sac-phong-che-ai-lan",
+      "title": "Sắc phong Chế đại lang",
+      "question_text": "Chụp ảnh hoặc ghi chú về hai đạo sắc phong của Chế đại lang được đề cập trong đoạn văn.",
+      "cultural_explanation": "Sắc phong là bằng chứng lịch sử quan trọng về sự tôn vinh và công nhận của triều đình đối với những cá nhân có đóng góp lớn lao.",
+      "source_text": "Chúng tôi may mắn tiếp cận được hai đạo sắc phong ban cho ngài Chế đại lang vào năm Khải Định thứ 2 (1917) và Khải Định thứ 9 (1924).",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Khải Định",
+      "latitude": 16.3997,
+      "longitude": 107.587,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-khai-dinh",
+        "quest_title": "Nghệ thuật Ứng Lăng",
+        "place_id": "lang-khai-dinh",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Art of Khải Định's Tomb",
+        "step_index": 5,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-khai-dinh-06-phong-thuy-lang-khai",
+      "title": "Phong thủy lăng Khải Định",
+      "question_text": "Ghi chú về cách các yếu tố tự nhiên như núi, đồi, khe suối được sắp xếp theo nguyên tắc phong thủy",
+      "cultural_explanation": "Hiểu biết về cách sử dụng phong thủy trong kiến trúc hoàng gia Việt Nam",
+      "source_text": "tất cả các núi đồi khe suối của một vùng rộng lớn quanh lăng đều đã được dùng làm các yếu tố phong thủy theo nguyên tắc tiền án, hậu chẩm, hổ phục, rồng chầu, thủy tụ",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Khải Định",
+      "latitude": 16.3997,
+      "longitude": 107.587,
+      "radius_meters": 400,
+      "categories": [
+        "architecture"
+      ],
+      "difficulty": "medium",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 15,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-khai-dinh",
+        "quest_title": "Nghệ thuật Ứng Lăng",
+        "place_id": "lang-khai-dinh",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Art of Khải Định's Tomb",
+        "step_index": 6,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-khai-dinh-07-kham-pha-phong-cach",
+      "title": "Khám phá phong cách châu Âu",
+      "question_text": "Chụp ảnh một ví dụ về hoa văn trang trí mang đậm phong cách châu Âu trên tường lăng.",
+      "cultural_explanation": "Hoa văn trang trí mang đậm phong cách châu Âu thể hiện sự kết hợp giữa nghệ thuật phương Đông và phương Tây, tạo nên nét độc đáo cho kiến trúc thời Nguyễn.",
+      "source_text": "do ảnh hưởng của văn hóa phương Tây đã sử dụng vật liệu mới, các hoa văn trang trí mạng đậm phong cách châu Âu như lăng Khải Định",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Khải Định",
+      "latitude": 16.3997,
+      "longitude": 107.587,
+      "radius_meters": 400,
+      "categories": [
+        "architecture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-khai-dinh",
+        "quest_title": "Nghệ thuật Ứng Lăng",
+        "place_id": "lang-khai-dinh",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Art of Khải Định's Tomb",
+        "step_index": 7,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-khai-dinh-08-thu-vien-co-tan-tho",
+      "title": "Thư viện cổ Tân Thơ Viện",
+      "question_text": "Chụp ảnh hoặc ghi chú về kiến trúc độc đáo của Tân Thơ Viện",
+      "cultural_explanation": "Tân Thơ Viện phản ánh sự kết hợp giữa kiến trúc truyền thống và phương Tây trong thời kỳ cận đại",
+      "source_text": "Tân Thơ Viện là thư viện của Trường Quốc Tử Giám lưu trữ tư liệu chữ Hán, Pháp, Anh... là tòa nhà vốn trước đây là điện Long An, được di dời năm 1908 đời vua Duy Tân.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Khải Định",
+      "latitude": 16.3997,
+      "longitude": 107.587,
+      "radius_meters": 400,
+      "categories": [
+        "architecture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "indoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-khai-dinh",
+        "quest_title": "Nghệ thuật Ứng Lăng",
+        "place_id": "lang-khai-dinh",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Art of Khải Định's Tomb",
+        "step_index": 8,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-khai-dinh-09-bao-tang-khai-inh",
+      "title": "Bảo tàng Khải Định",
+      "question_text": "Ghi chú ngày thành lập bảo tàng theo lịch sử Việt Nam",
+      "cultural_explanation": "Ngày thành lập bảo tàng phản ánh sự kiện lịch sử quan trọng",
+      "source_text": "Ngày 15-11-1924, một Ban quản trị Bảo tàng viện ra đời",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Khải Định",
+      "latitude": 16.3997,
+      "longitude": 107.587,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "indoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-khai-dinh",
+        "quest_title": "Nghệ thuật Ứng Lăng",
+        "place_id": "lang-khai-dinh",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Art of Khải Định's Tomb",
+        "step_index": 9,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-khai-dinh-10-kham-pha-nghe-thuat",
+      "title": "Khám phá nghệ thuật xây dựng lăng Khải Định",
+      "question_text": "Quan sát và chụp ảnh một ví dụ về kỹ thuật xây dựng độc đáo tại lăng Khải Định.",
+      "cultural_explanation": "Nghệ thuật xây dựng lăng Khải Định phản ánh sự kết hợp giữa kiến trúc Việt Nam và phương Tây, thể hiện sự sáng tạo và kỹ năng của các nghệ nhân.",
+      "source_text": "Đặc biệt các nghề thủ công mỹ nghệ tại Thừa Thiên Huế đã góp phần xây dựng được nhiều công trình kiến trúc to nhất từ xưa đến nay chưa có...",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Khải Định",
+      "latitude": 16.3997,
+      "longitude": 107.587,
+      "radius_meters": 400,
+      "categories": [
+        "architecture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-khai-dinh",
+        "quest_title": "Nghệ thuật Ứng Lăng",
+        "place_id": "lang-khai-dinh",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Art of Khải Định's Tomb",
+        "step_index": 10,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-gia-long-01-quan-he-viet-nam-tha",
+      "title": "Quan Hệ Việt Nam - Thái Lan",
+      "question_text": "Ghi chú về biểu tượng hoặc hình ảnh thể hiện mối quan hệ thân thiện giữa Việt Nam và Thái Lan trong thời kỳ Gia Long.",
+      "cultural_explanation": "Biểu tượng hoặc hình ảnh này phản ánh mối quan hệ ngoại giao tốt đẹp giữa hai nước trong lịch sử.",
+      "source_text": "During Gia Long's reign, the relations between Vietnam and Thailand were very friendly",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Gia Long",
+      "latitude": 16.376,
+      "longitude": 107.546,
+      "radius_meters": 800,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-gia-long",
+        "quest_title": "Cội nguồn triều Nguyễn",
+        "place_id": "lang-gia-long",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Roots of the Nguyễn Dynasty",
+        "step_index": 1,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-gia-long-02-ngam-ve-lich-su",
+      "title": "Ngẫm về lịch sử",
+      "question_text": "Ghi chú về câu chuyện về mối lo ngại của Gia Long về Pháp trong quá trình trị vì",
+      "cultural_explanation": "Hiểu được mối lo ngại của Gia Long về sự can thiệp của Pháp vào Việt Nam",
+      "source_text": "nhà vua \"ngày đêm suy nghĩ\" về hiểm họa mà người Pháp có thể gây ra đối với chủ quyền dân tộc",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Gia Long",
+      "latitude": 16.376,
+      "longitude": 107.546,
+      "radius_meters": 800,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-gia-long",
+        "quest_title": "Cội nguồn triều Nguyễn",
+        "place_id": "lang-gia-long",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Roots of the Nguyễn Dynasty",
+        "step_index": 2,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-gia-long-03-thu-gui-vua-xiem",
+      "title": "Thư gửi vua Xiêm",
+      "question_text": "Tìm và chụp bức ảnh của bức thư gửi vua Xiêm năm 1811",
+      "cultural_explanation": "Bức thư này phản ánh mối quan hệ ngoại giao giữa Việt Nam và Xiêm vào cuối thế kỷ XVIII",
+      "source_text": "Năm Tân Mùi 1811, vua Gia Long cho sứ mang thư sang Xiêm trách cứ về hành động nói trên của vua Xiêm.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Gia Long",
+      "latitude": 16.376,
+      "longitude": 107.546,
+      "radius_meters": 800,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-gia-long",
+        "quest_title": "Cội nguồn triều Nguyễn",
+        "place_id": "lang-gia-long",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Roots of the Nguyễn Dynasty",
+        "step_index": 3,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-gia-long-04-lang-gia-long-hieu-v",
+      "title": "Lăng Gia Long - Hiểu về quá trình xây dựng",
+      "question_text": "Quan sát và chụp ảnh phần mô tả về việc xây dựng các công trình kiến trúc thời Gia Long và Minh Mạng.",
+      "cultural_explanation": "Việc xây dựng các công trình này phản ánh sự phát triển của Huế dưới triều đại của hai vị vua này.",
+      "source_text": "Sau khi vua Gia Long mất, vua Minh Mạng lên nối ngôi, đã tiếp tục xây dựng các công trình do vua cha để lại, đồng thời cho xây dựng một số công trình khác như: Ngọ Môn, các vọng lâu trên cổng thành, Hổ Quyền, Võ Miếu, Hiếu lăng (1840)...",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Gia Long",
+      "latitude": 16.376,
+      "longitude": 107.546,
+      "radius_meters": 800,
+      "categories": [
+        "history",
+        "architecture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-gia-long",
+        "quest_title": "Cội nguồn triều Nguyễn",
+        "place_id": "lang-gia-long",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Roots of the Nguyễn Dynasty",
+        "step_index": 4,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-gia-long-05-thiet-ke-che-o-cai-t",
+      "title": "Thiết kế chế độ cai trị",
+      "question_text": "Ghi chú về những khó khăn mà vua Gia Long gặp phải khi thiết lập chế độ cai trị mới.",
+      "cultural_explanation": "Việc này giúp du khách hiểu rõ hơn về thách thức mà vua Gia Long phải đối mặt trong việc xây dựng một triều đại vững mạnh.",
+      "source_text": "cái khó khăn lớn nhất cho vua Gia Long là thiết chế một triều đại như thế nào khi hầu hết yếu nhân \"bước xuống từ lưng ngựa\"",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Gia Long",
+      "latitude": 16.376,
+      "longitude": 107.546,
+      "radius_meters": 800,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-gia-long",
+        "quest_title": "Cội nguồn triều Nguyễn",
+        "place_id": "lang-gia-long",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Roots of the Nguyễn Dynasty",
+        "step_index": 5,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-gia-long-06-ngay-khoi-cong-kinh",
+      "title": "Ngày khởi công Kinh thành",
+      "question_text": "Tìm và chụp ảnh khu vực được mô tả là nơi xây dựng Kinh thành vào năm 1805",
+      "cultural_explanation": "Khu vực này đánh dấu sự bắt đầu của việc xây dựng Kinh thành Huế dưới triều Gia Long",
+      "source_text": "năm Ất sửu, Gia Long thứ 4 (1805), tháng 4 ngày Quý mùi, (nhà vua) cho xây đấp Kinh thành",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Gia Long",
+      "latitude": 16.376,
+      "longitude": 107.546,
+      "radius_meters": 800,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 15,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-gia-long",
+        "quest_title": "Cội nguồn triều Nguyễn",
+        "place_id": "lang-gia-long",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Roots of the Nguyễn Dynasty",
+        "step_index": 6,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-gia-long-07-kham-pha-lang-gia-lo",
+      "title": "Khám phá Lăng Gia Long",
+      "question_text": "Quan sát và chụp ảnh khu vực có nhắc đến khói bụi chiến tranh",
+      "cultural_explanation": "Chi tiết này phản ánh giai đoạn lịch sử đầy biến động của Việt Nam dưới triều đại vua Gia Long",
+      "source_text": "Với chiếc áo nhuốm khói bụi suốt mấy năm chiến tranh, vua Gia Long tin vào đội quân hằng chực vạn của mình.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Gia Long",
+      "latitude": 16.376,
+      "longitude": 107.546,
+      "radius_meters": 800,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-gia-long",
+        "quest_title": "Cội nguồn triều Nguyễn",
+        "place_id": "lang-gia-long",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Roots of the Nguyễn Dynasty",
+        "step_index": 7,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-gia-long-08-chu-nom-trong-van-te",
+      "title": "Chữ Nôm trong văn tế",
+      "question_text": "Ghi chú hoặc chụp ảnh bất kỳ biểu ngữ nào sử dụng chữ Nôm tại lăng.",
+      "cultural_explanation": "Chữ Nôm thể hiện sự phong phú của văn hóa Việt Nam dưới triều đại của vua Gia Long.",
+      "source_text": "Dưới thời Gia Long, văn quốc âm cũng thịnh đạt. Đôi khi, Gia Long cũng dùng chữ Nôm để làm văn tế.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Gia Long",
+      "latitude": 16.376,
+      "longitude": 107.546,
+      "radius_meters": 800,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-gia-long",
+        "quest_title": "Cội nguồn triều Nguyễn",
+        "place_id": "lang-gia-long",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Roots of the Nguyễn Dynasty",
+        "step_index": 8,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-gia-long-09-lich-su-trieu-nguyen",
+      "title": "Lịch sử triều Nguyễn",
+      "question_text": "Ghi chú về năm lên ngôi của vua Gia Long và các vua kế tiếp",
+      "cultural_explanation": "Năm lên ngôi đánh dấu sự bắt đầu của triều đại, phản ánh tầm quan trọng lịch sử",
+      "source_text": "ăm 1802 vua Gia Long lên ngôi hoàng đế, chính thức trở thành ông vua đầu tiên của triều Nguyễn",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Gia Long",
+      "latitude": 16.376,
+      "longitude": 107.546,
+      "radius_meters": 800,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-gia-long",
+        "quest_title": "Cội nguồn triều Nguyễn",
+        "place_id": "lang-gia-long",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Roots of the Nguyễn Dynasty",
+        "step_index": 9,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-lang-gia-long-10-su-bo-xiem",
+      "title": "Sứ bộ Xiêm",
+      "question_text": "Ghi chú về vị trí đặt các biểu tượng hoặc mô hình về các sứ bộ Xiêm đến triều đình Gia Long.",
+      "cultural_explanation": "Biểu tượng này phản ánh mối quan hệ ngoại giao phức tạp và quan trọng giữa Việt Nam và Xiêm thời Gia Long.",
+      "source_text": "Chúng tôi đã thống kê trong thời gian từ 1802 đến 1819, dưới thời trị vì của Gia Long, sứ bộ của Xiêm đã 9 lần đến Việt Nam...",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Lăng Gia Long",
+      "latitude": 16.376,
+      "longitude": 107.546,
+      "radius_meters": 800,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-lang-gia-long",
+        "quest_title": "Cội nguồn triều Nguyễn",
+        "place_id": "lang-gia-long",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Roots of the Nguyễn Dynasty",
+        "step_index": 10,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dan-nam-giao-01-an-nam-giao-kien-tru",
+      "title": "Đàn Nam Giao - Kiến trúc độc đáo",
+      "question_text": "Chụp ảnh hoặc ghi chú về cấu trúc 2 hoặc 3 tầng của đàn Nam Giao.",
+      "cultural_explanation": "Cấu trúc này phản ánh sự tôn trọng và nghi lễ trang nghiêm trong việc tế lễ.",
+      "source_text": "Đàn được xây thành 2 hoặc 3 tầng, chung quanh bó via bằng gạch, đá, bên trên mặt đàn để trống và chỉ thiết lập các nhà che bằng vải mang tính tạm thời trong lúc tế lễ.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Đàn Nam Giao",
+      "latitude": 16.44,
+      "longitude": 107.579,
+      "radius_meters": 400,
+      "categories": [
+        "history",
+        "tradition"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dan-nam-giao",
+        "quest_title": "Lễ tế trời đất",
+        "place_id": "dan-nam-giao",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Rite of Heaven and Earth",
+        "step_index": 1,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dan-nam-giao-02-chua-gan-an-nam-giao",
+      "title": "Chùa gần Đàn Nam Giao",
+      "question_text": "Tìm và chụp ảnh một ngôi chùa gần Đàn Nam Giao",
+      "cultural_explanation": "Ngôi chùa này có liên quan đến câu chuyện lịch sử về vua Duy Tân bị bắt",
+      "source_text": "Có tác giả cho rằng vua bị bắt ở chùa Thuyền Tôn, vì đây là theo lời kể của Hòa thượng Thích Mật Hiển",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Đàn Nam Giao",
+      "latitude": 16.44,
+      "longitude": 107.579,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 15,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dan-nam-giao",
+        "quest_title": "Lễ tế trời đất",
+        "place_id": "dan-nam-giao",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Rite of Heaven and Earth",
+        "step_index": 2,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dan-nam-giao-03-lap-an-te-troi",
+      "title": "Lập đàn tế trời",
+      "question_text": "Chụp ảnh và ghi chú về vị trí bạn nghĩ nơi Nguyễn Huệ đã lập đàn tế trời",
+      "cultural_explanation": "Đây là nơi lịch sử quan trọng, nơi vua Quang Trung đã lập đàn tế trời đất trước khi lên ngôi",
+      "source_text": "Ngày 25 tháng 11 năm Mậu Thân (1788), Nguyễn Huệ lập đàn tế cáo trời đất tại núi Bân, lên ngôi hoàng đế, hiệu Quang Trung.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Đàn Nam Giao",
+      "latitude": 16.44,
+      "longitude": 107.579,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dan-nam-giao",
+        "quest_title": "Lễ tế trời đất",
+        "place_id": "dan-nam-giao",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Rite of Heaven and Earth",
+        "step_index": 3,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dan-nam-giao-04-thien-tu-va-quyen-lu",
+      "title": "Thiên tử và quyền lực",
+      "question_text": "Chụp ảnh khu vực nơi diễn ra lễ tế trời và ghi chú về kiến trúc thể hiện quyền lực của vua",
+      "cultural_explanation": "Kiến trúc của Đàn Nam Giao phản ánh quyền lực tuyệt đối của vua như một 'thiên tử'",
+      "source_text": "Hoàng đế với danh hiệu Thiên tử là vị thánh sống có ngôi vị cao hơn các Thượng đẳng thần có sức quyền biến vô hạn, là người điều hành chính quyền vượt lên trên tất cả thế quyền với một quyền uy tuyệt đối.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Đàn Nam Giao",
+      "latitude": 16.44,
+      "longitude": 107.579,
+      "radius_meters": 400,
+      "categories": [
+        "history",
+        "religion"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 15,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dan-nam-giao",
+        "quest_title": "Lễ tế trời đất",
+        "place_id": "dan-nam-giao",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Rite of Heaven and Earth",
+        "step_index": 4,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dan-nam-giao-05-le-te-troi",
+      "title": "Lễ tế trời",
+      "question_text": "Chụp ảnh khu vực diễn ra nghi lễ tế trời",
+      "cultural_explanation": "Đàn Nam Giao là nơi diễn ra nghi lễ tế trời quan trọng",
+      "source_text": "nhà vua đã nắm vững vai trò Chánh lễ trong các buổi lễ lớn có tính chất về tôn giáo, và nhất là lễ tế trời ở Đàn Nam Giao",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Đàn Nam Giao",
+      "latitude": 16.44,
+      "longitude": 107.579,
+      "radius_meters": 400,
+      "categories": [
+        "religion"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dan-nam-giao",
+        "quest_title": "Lễ tế trời đất",
+        "place_id": "dan-nam-giao",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Rite of Heaven and Earth",
+        "step_index": 5,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dan-nam-giao-06-kham-pha-tham-cay-na",
+      "title": "Khám phá thảm cây Nam Giao",
+      "question_text": "Ghi chú hoặc chụp ảnh một loại cây đặc trưng tại Đàn Nam Giao.",
+      "cultural_explanation": "Thảm cây xanh - hoa theo mùa tại Đàn Nam Giao phản ánh sự kết hợp giữa thiên nhiên và kiến trúc, tạo nên cảnh quan độc đáo.",
+      "source_text": "Toàn bộ 65ha... theo mùa (toàn bộ 65ha).",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Đàn Nam Giao",
+      "latitude": 16.44,
+      "longitude": 107.579,
+      "radius_meters": 400,
+      "categories": [
+        "tradition"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dan-nam-giao",
+        "quest_title": "Lễ tế trời đất",
+        "place_id": "dan-nam-giao",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Rite of Heaven and Earth",
+        "step_index": 6,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dan-nam-giao-07-tim-hieu-an-nam-giao",
+      "title": "Tìm hiểu Đàn Nam Giao",
+      "question_text": "Chụp ảnh và ghi chú về tháp chuông ở Đàn Nam Giao.",
+      "cultural_explanation": "Tháp chuông là một phần quan trọng của kiến trúc truyền thống Việt Nam, thường được sử dụng để đánh chuông vào các dịp lễ hội hoặc nghi lễ.",
+      "source_text": "Phần xây dựng mới bao gồm... Tháp chuông...",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Đàn Nam Giao",
+      "latitude": 16.44,
+      "longitude": 107.579,
+      "radius_meters": 400,
+      "categories": [
+        "tradition"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dan-nam-giao",
+        "quest_title": "Lễ tế trời đất",
+        "place_id": "dan-nam-giao",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Rite of Heaven and Earth",
+        "step_index": 7,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dan-nam-giao-08-an-te-troi",
+      "title": "Đàn Tế Trời",
+      "question_text": "Ghi chú về không gian được dự định dành cho việc mô phỏng đàn tế trời.",
+      "cultural_explanation": "Không gian này phản ánh truyền thống tôn giáo và lịch sử của Việt Nam.",
+      "source_text": "Nếu chưa có tư liệu đầy đủ, chúng ta dành một không gian rộng để mô phỏng lại một không gian tế trời.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Đàn Nam Giao",
+      "latitude": 16.44,
+      "longitude": 107.579,
+      "radius_meters": 400,
+      "categories": [
+        "religion",
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dan-nam-giao",
+        "quest_title": "Lễ tế trời đất",
+        "place_id": "dan-nam-giao",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Rite of Heaven and Earth",
+        "step_index": 8,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dan-nam-giao-09-chua-thien-lam-va-uo",
+      "title": "Chùa Thiên Lâm và Đường Điện Biên Phú",
+      "question_text": "Ghi chú vị trí hiện tại của tháp Khắc Huyền so với đường Điện Biên Phú.",
+      "cultural_explanation": "Tháp Khắc Huyền là di sản kiến trúc phản ánh lịch sử văn hóa Huế.",
+      "source_text": "Vì thế ngày nay tháp Ngài khi sơn Khắc Huyền nằm bên trái đường Điện Biên Phú",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Đàn Nam Giao",
+      "latitude": 16.44,
+      "longitude": 107.579,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dan-nam-giao",
+        "quest_title": "Lễ tế trời đất",
+        "place_id": "dan-nam-giao",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Rite of Heaven and Earth",
+        "step_index": 9,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dan-nam-giao-10-iem-nhin-an-nam-giao",
+      "title": "Điểm nhìn đàn Nam Giao",
+      "question_text": "Chụp ảnh hoặc ghi chú về vị trí đàn Nam Giao từ nghĩa trang Phan Bội Châu.",
+      "cultural_explanation": "Đàn Nam Giao là nơi diễn ra nghi lễ cầu mưa, cầu mùa quan trọng trong lịch sử Việt Nam.",
+      "source_text": "Hai cụ Huỳnh và Võ còn mua một sở đất gần đàn Nam Giao, sau này là nghĩa trang Phan Bội Châu",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Đàn Nam Giao",
+      "latitude": 16.44,
+      "longitude": 107.579,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dan-nam-giao",
+        "quest_title": "Lễ tế trời đất",
+        "place_id": "dan-nam-giao",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Rite of Heaven and Earth",
+        "step_index": 10,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-ho-quyen-01-ho-quyen-bi-an-lich",
+      "title": "Hổ Quyền - Bí Ẩn Lịch Sử",
+      "question_text": "Chụp ảnh và ghi chú vị trí của Hổ Quyền trên bản đồ.",
+      "cultural_explanation": "Hổ Quyền là một di tích lịch sử quan trọng, phản ánh sự phát triển của đô thị Huế qua các thời kỳ.",
+      "source_text": "8. Hổ Quyền (Thủy Biểu, Huế)",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Hổ Quyền",
+      "latitude": 16.453,
+      "longitude": 107.553,
+      "radius_meters": 300,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-ho-quyen",
+        "quest_title": "Đấu trường voi - hổ",
+        "place_id": "ho-quyen",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Elephant-Tiger Arena",
+        "step_index": 1,
+        "total_steps": 2
+      }
+    },
+    {
+      "question_id": "hue-ho-quyen-02-ho-quyen-vong-lau-li",
+      "title": "Hổ Quyền - Vọng Lâu Lịch Sử",
+      "question_text": "Chụp ảnh hoặc ghi chú về vị trí và hình dáng của vọng lâu Hổ Quyền.",
+      "cultural_explanation": "Vọng lâu Hổ Quyền là một phần quan trọng của hệ thống phòng thủ kinh thành Huế, phản ánh sự tinh tế trong kiến trúc quân sự thời phong kiến.",
+      "source_text": "Sau khi vua Gia Long mất, vua Minh Mạng lên nối ngôi, đã tiếp tục xây dựng các công trình do vua cha để lại, đồng thời cho xây dựng một số công trình khác như: ... Hổ Quyền...",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Hổ Quyền",
+      "latitude": 16.453,
+      "longitude": 107.553,
+      "radius_meters": 300,
+      "categories": [
+        "architecture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-ho-quyen",
+        "quest_title": "Đấu trường voi - hổ",
+        "place_id": "ho-quyen",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Elephant-Tiger Arena",
+        "step_index": 2,
+        "total_steps": 2
+      }
+    },
+    {
+      "question_id": "hue-van-mieu-hue-01-kham-pha-vet-tich-li",
+      "title": "Khám phá vết tích lịch sử",
+      "question_text": "Ghi chú hoặc chụp ảnh những dấu vết còn sót lại của các bia đá bị đập phá ở Văn Miếu",
+      "cultural_explanation": "Những dấu vết còn lại phản ánh sự tàn phá của chiến tranh và mất mát văn hóa",
+      "source_text": "Nhân dân làng Văn Chương thấy nhà bia Văn Miếu đã bị đốt phá, còn bia tiến sĩ đề danh thì bị đạp đổ",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Văn Miếu Huế",
+      "latitude": 16.458,
+      "longitude": 107.543,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-van-mieu-hue",
+        "quest_title": "Bia đá Văn Thánh",
+        "place_id": "van-mieu-hue",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Stelae of the Temple of Literature",
+        "step_index": 1,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-van-mieu-hue-02-huong-van-mieu",
+      "title": "Hướng Văn Miếu",
+      "question_text": "Quan sát và xác định hướng chính mà Văn Miếu Huế đang quay mặt về.",
+      "cultural_explanation": "Việc Văn Miếu quay mặt về hướng Nam phản ánh quan điểm Nho giáo về vị trí của thánh nhân.",
+      "source_text": "Về địa thế, theo quan điểm Nho giáo \"thánh nhân Nam diện nhi thính thiên hạ\" nên Văn Miếu được xây dựng quay mặt về hướng Nam.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Văn Miếu Huế",
+      "latitude": 16.458,
+      "longitude": 107.543,
+      "radius_meters": 400,
+      "categories": [
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-van-mieu-hue",
+        "quest_title": "Bia đá Văn Thánh",
+        "place_id": "van-mieu-hue",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Stelae of the Temple of Literature",
+        "step_index": 2,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-van-mieu-hue-03-bia-tien-si",
+      "title": "Bia Tiến Sĩ",
+      "question_text": "Chụp ảnh một tấm bia tiến sĩ tại Văn Miếu.",
+      "cultural_explanation": "Bia tiến sĩ là biểu tượng cho sự tôn trọng tri thức và giáo dục.",
+      "source_text": "Về sau, Văn miếu còn là nơi tôn trí các tấm bia tiến sĩ.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Văn Miếu Huế",
+      "latitude": 16.458,
+      "longitude": 107.543,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-van-mieu-hue",
+        "quest_title": "Bia đá Văn Thánh",
+        "place_id": "van-mieu-hue",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Stelae of the Temple of Literature",
+        "step_index": 3,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-van-mieu-hue-04-kham-pha-bia-tien-si",
+      "title": "Khám phá Bia Tiến Sĩ",
+      "question_text": "Chụp ảnh một tấm bia tiến sĩ và ghi chú tên của ít nhất một vị hiền tài được khắc trên đó.",
+      "cultural_explanation": "Bia tiến sĩ không chỉ là biểu tượng cho sự tôn vinh trí thức mà còn phản ánh trách nhiệm đạo đức của các học giả.",
+      "source_text": "Những người được ghi tên khắc đá ở bia tiến sĩ là những hiền tài của quốc gia, những người đã được triều đình khẳng định vai trò và giá trị.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Văn Miếu Huế",
+      "latitude": 16.458,
+      "longitude": 107.543,
+      "radius_meters": 400,
+      "categories": [
+        "history",
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-van-mieu-hue",
+        "quest_title": "Bia đá Văn Thánh",
+        "place_id": "van-mieu-hue",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Stelae of the Temple of Literature",
+        "step_index": 4,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-van-mieu-hue-05-tim-hieu-ve-rua-vang",
+      "title": "Tìm hiểu về Rùa Vàng",
+      "question_text": "Chụp ảnh hoặc ghi chú về hình ảnh rùa vàng được đặt tại Văn Miếu.",
+      "cultural_explanation": "Rùa vàng là biểu tượng cho sự tôn vinh trí thức và tài năng.",
+      "source_text": "Rồi ông đền làng Văn Chương một con rùa bằng vàng để bán lấy tiền tu sửa khu Văn Miếu.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Văn Miếu Huế",
+      "latitude": 16.458,
+      "longitude": 107.543,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-van-mieu-hue",
+        "quest_title": "Bia đá Văn Thánh",
+        "place_id": "van-mieu-hue",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Stelae of the Temple of Literature",
+        "step_index": 5,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-van-mieu-hue-06-nguyen-khi-quoc-gia",
+      "title": "Nguyên khí quốc gia",
+      "question_text": "Ghi chú câu nói nổi tiếng của Thân Nhân Trung: 'Hiền tài là nguyên khí quốc gia'",
+      "cultural_explanation": "Câu nói này phản ánh tầm quan trọng của việc giáo dục và trọng dụng nhân tài đối với sự phát triển của quốc gia.",
+      "source_text": "Thân Nhân Trung (1418-1499) từng có câu nói nổi tiếng: 'Hiền tài là nguyên khí quốc gia'.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Văn Miếu Huế",
+      "latitude": 16.458,
+      "longitude": 107.543,
+      "radius_meters": 400,
+      "categories": [
+        "history",
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-van-mieu-hue",
+        "quest_title": "Bia đá Văn Thánh",
+        "place_id": "van-mieu-hue",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Stelae of the Temple of Literature",
+        "step_index": 6,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-van-mieu-hue-07-bia-tien-si-van-mieu",
+      "title": "Bia Tiến Sĩ Văn Miếu",
+      "question_text": "Chụp ảnh một tấm bia tiến sĩ và ghi chú năm khắc trên bia",
+      "cultural_explanation": "Bia tiến sĩ phản ánh truyền thống giáo dục và lịch sử văn hóa của Huế",
+      "source_text": "Những tấm bia tiến sĩ cũng không phải đều được lập ngay sau một khoa thi, mà có khi rất lâu về sau.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Văn Miếu Huế",
+      "latitude": 16.458,
+      "longitude": 107.543,
+      "radius_meters": 400,
+      "categories": [
+        "history",
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-van-mieu-hue",
+        "quest_title": "Bia đá Văn Thánh",
+        "place_id": "van-mieu-hue",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Stelae of the Temple of Literature",
+        "step_index": 7,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-van-mieu-hue-08-van-mieu-hue-ruong-c",
+      "title": "Văn Miếu Huế - Ruộng Cúng",
+      "question_text": "Chụp ảnh hoặc ghi chú về khu vực ruộng đất được dùng để cung cấp tài chính cho việc thờ cúng tại Văn Miếu.",
+      "cultural_explanation": "Ruộng đất này đóng vai trò quan trọng trong việc duy trì truyền thống tôn giáo và văn hóa tại Văn Miếu.",
+      "source_text": "Năm đó, Chỉ huy nghỉ hưu... nay được ra lão, nên các viên chức các vệ của bản xã mới lấy một mẫu ruộng ấy cúng vào Văn Thánh miếu, lưu giao cho hương lão canh tác để lo hương hỏa.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Văn Miếu Huế",
+      "latitude": 16.458,
+      "longitude": 107.543,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-van-mieu-hue",
+        "quest_title": "Bia đá Văn Thánh",
+        "place_id": "van-mieu-hue",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Stelae of the Temple of Literature",
+        "step_index": 8,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-van-mieu-hue-09-bia-tien-si-au-tien",
+      "title": "Bia Tiến sĩ đầu tiên",
+      "question_text": "Chụp ảnh tấm bia Tiến sĩ đầu tiên được dựng vào năm 1822.",
+      "cultural_explanation": "Tấm bia này đánh dấu sự bắt đầu của truyền thống dựng bia Tiến sĩ dưới triều Minh Mạng.",
+      "source_text": "Đến năm Minh Mạng thứ ba (1822), bắt đầu mở khoa thi Hội và bia Tiến sĩ cũng bắt đầu được dựng từ đó.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Văn Miếu Huế",
+      "latitude": 16.458,
+      "longitude": 107.543,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-van-mieu-hue",
+        "quest_title": "Bia đá Văn Thánh",
+        "place_id": "van-mieu-hue",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Stelae of the Temple of Literature",
+        "step_index": 9,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-van-mieu-hue-10-rua-a-o-van-mieu",
+      "title": "Rùa Đá Ở Văn Miếu",
+      "question_text": "Chụp ảnh một tấm bia được rùa đá đội và ghi chú về hình dạng của bê đá dưới bia.",
+      "cultural_explanation": "Rùa đá ở Văn Miếu Huế không chỉ là biểu tượng của sự trường tồn mà còn phản ánh nét đẹp kiến trúc độc đáo.",
+      "source_text": "Tất cả bia tiến sĩ ở Văn Miếu Huế đều có rùa đội bia. Rùa thường liền với bệ đá theo kiểu sập gu chân quì, hoặc rùa liền với bê đá hình chữ nhật, hình tròn, cũng có nhiều bia không có bê.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Văn Miếu Huế",
+      "latitude": 16.458,
+      "longitude": 107.543,
+      "radius_meters": 400,
+      "categories": [
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-van-mieu-hue",
+        "quest_title": "Bia đá Văn Thánh",
+        "place_id": "van-mieu-hue",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Stelae of the Temple of Literature",
+        "step_index": 10,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-cau-truong-tien-01-cau-truong-tien-xua",
+      "title": "Cầu Trường Tiền xưa",
+      "question_text": "Chụp ảnh phần chân cầu Trường Tiền và tìm hiểu về khu phố Trường Tiền xưa",
+      "cultural_explanation": "Khu phố Trường Tiền phản ánh lịch sử phát triển của đô thị Huế",
+      "source_text": "Phố Trường Tiền: \"Phố Cửa Đông từ bờ nam cầu Đông Gia chạy ra phía bắc cầu Thanh Long, chạy vào phía nam đến cầu Gia Hội, dãy trại dài phía đông kinh thành và ngoài quách cửa Chánh Đông...\"",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Cầu Trường Tiền",
+      "latitude": 16.469,
+      "longitude": 107.592,
+      "radius_meters": 300,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 15,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cau-truong-tien",
+        "quest_title": "Nhịp cầu Trường Tiền",
+        "place_id": "cau-truong-tien",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Spans of Trường Tiền Bridge",
+        "step_index": 1,
+        "total_steps": 9
+      }
+    },
+    {
+      "question_id": "hue-cau-truong-tien-02-khu-at-toa-su",
+      "title": "Khu đất Tòa Sứ",
+      "question_text": "Chụp ảnh khu đất hình vuông từng là vị trí của Tòa Sứ và ghi chú kích thước mỗi bề của khu đất.",
+      "cultural_explanation": "Khu đất này phản ánh sự yếu thế của triều đình Tự Đức trước áp lực của thực dân Pháp.",
+      "source_text": "Khu đất hình vuông, mỗi bề khoảng 200m, nằm ở gần cầu Trường Tiền được xây dựng sau đó;",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Cầu Trường Tiền",
+      "latitude": 16.469,
+      "longitude": 107.592,
+      "radius_meters": 300,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cau-truong-tien",
+        "quest_title": "Nhịp cầu Trường Tiền",
+        "place_id": "cau-truong-tien",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Spans of Trường Tiền Bridge",
+        "step_index": 2,
+        "total_steps": 9
+      }
+    },
+    {
+      "question_id": "hue-cau-truong-tien-03-han-xich-cau-truong",
+      "title": "Hàn Xích Cầu Trường Tiền",
+      "question_text": "Quan sát kỹ phần hàn xích trên cầu Trường Tiền và chụp ảnh",
+      "cultural_explanation": "Phần hàn xích thể hiện lịch sử và sự cố gắng trùng tu, tôn tạo của thành phố Huế",
+      "source_text": "chiếc cầu Trường Tiền, hàn lên \"nỗi đau trăm năm\" của thành phố Huế!",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Cầu Trường Tiền",
+      "latitude": 16.469,
+      "longitude": 107.592,
+      "radius_meters": 300,
+      "categories": [
+        "architecture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cau-truong-tien",
+        "quest_title": "Nhịp cầu Trường Tiền",
+        "place_id": "cau-truong-tien",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Spans of Trường Tiền Bridge",
+        "step_index": 3,
+        "total_steps": 9
+      }
+    },
+    {
+      "question_id": "hue-cau-truong-tien-04-dieu-bay-cau-truong",
+      "title": "Diều bay cầu Trường Tiền",
+      "question_text": "Chụp ảnh cánh diều bay qua cầu Trường Tiền vào buổi chiều.",
+      "cultural_explanation": "Cánh diều phản ánh nét văn hóa giải trí truyền thống của người dân Huế.",
+      "source_text": "Vì thế mà trong những trưa hè cháy bỏng, ngang qua cầu Trường Tiền hay cầu Phú Xuân, người ta thường thấy những cánh diều chao lượn trên bầu trời, in bóng xuống dòng Hương trong xanh.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Cầu Trường Tiền",
+      "latitude": 16.469,
+      "longitude": 107.592,
+      "radius_meters": 300,
+      "categories": [
+        "art"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "sunny",
+        "cloudy"
+      ],
+      "time_tags": [
+        "afternoon"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cau-truong-tien",
+        "quest_title": "Nhịp cầu Trường Tiền",
+        "place_id": "cau-truong-tien",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Spans of Trường Tiền Bridge",
+        "step_index": 4,
+        "total_steps": 9
+      }
+    },
+    {
+      "question_id": "hue-cau-truong-tien-05-ben-o-truong-tien-xu",
+      "title": "Bến đò Trường Tiền xưa",
+      "question_text": "Chụp ảnh cây cầu Trường Tiền hiện đại và ghi chú về vị trí của nó tương ứng với bến đò Trường Tiền xưa",
+      "cultural_explanation": "Bến đò Trường Tiền là một phần quan trọng của lịch sử giao thông giữa hai bờ sông Hương",
+      "source_text": "và được liên hệ với bờ Bắc thông qua hệ thống những bến đò:... bến đò Trường Tiền,...",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Cầu Trường Tiền",
+      "latitude": 16.469,
+      "longitude": 107.592,
+      "radius_meters": 300,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cau-truong-tien",
+        "quest_title": "Nhịp cầu Trường Tiền",
+        "place_id": "cau-truong-tien",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Spans of Trường Tiền Bridge",
+        "step_index": 5,
+        "total_steps": 9
+      }
+    },
+    {
+      "question_id": "hue-cau-truong-tien-06-cau-truong-tien-lich",
+      "title": "Cầu Trường Tiền - Lịch sử kiến trúc",
+      "question_text": "Chụp ảnh phần chân cầu và ghi chú về vật liệu xây dựng",
+      "cultural_explanation": "Vật liệu xây dựng phản ánh kỹ thuật xây dựng thời Pháp thuộc",
+      "source_text": "cây cầu đầu tiên được xây dựng theo bản vẽ của Gustave Eiffel (1897)",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Cầu Trường Tiền",
+      "latitude": 16.469,
+      "longitude": 107.592,
+      "radius_meters": 300,
+      "categories": [
+        "architecture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cau-truong-tien",
+        "quest_title": "Nhịp cầu Trường Tiền",
+        "place_id": "cau-truong-tien",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Spans of Trường Tiền Bridge",
+        "step_index": 6,
+        "total_steps": 9
+      }
+    },
+    {
+      "question_id": "hue-cau-truong-tien-07-kham-pha-cau-truong",
+      "title": "Khám phá cầu Trường Tiền",
+      "question_text": "Chụp ảnh cầu Trường Tiền từ góc nhìn cho thấy rõ ràng đường quan lộ Route de Tourance.",
+      "cultural_explanation": "Cầu Trường Tiền và đường quan lộ Route de Tourance là biểu tượng của sự phát triển đô thị Huế và kết nối với các vùng miền khác.",
+      "source_text": "Việc xây dựng đường quan lộ Huế - Đà Nẵng (Route de Tourance) và cầu Trường Tiền qua sông Hương nối liền bờ bắc Kinh Thành Huế về phía Nam là một khởi điểm quan trọng cho kế hoạch mở rộng không gian đô thị Huế và kết nối nó vào mạng lưới quy hoạch thống nhất từ Bắc xuống Nam.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Cầu Trường Tiền",
+      "latitude": 16.469,
+      "longitude": 107.592,
+      "radius_meters": 300,
+      "categories": [
+        "architecture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cau-truong-tien",
+        "quest_title": "Nhịp cầu Trường Tiền",
+        "place_id": "cau-truong-tien",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Spans of Trường Tiền Bridge",
+        "step_index": 7,
+        "total_steps": 9
+      }
+    },
+    {
+      "question_id": "hue-cau-truong-tien-08-cho-ven-cau-truong-t",
+      "title": "Chợ ven Cầu Trường Tiền",
+      "question_text": "Ghi chú tên của ít nhất 3 chợ ven Huế được đề cập trong đoạn văn.",
+      "cultural_explanation": "Những chợ này phản ánh sự phát triển kinh tế và văn hóa của Huế qua nhiều thế kỷ.",
+      "source_text": "Đó là các chơ Xước Dũ, Kim Long, An Hòa, An Vân, Nam Phổ, An Cựu, Bến Ngự, chợ Thợ Đúc, Vỹ Dạ, chợ Gia Lạc, Lại Thế...",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Cầu Trường Tiền",
+      "latitude": 16.469,
+      "longitude": 107.592,
+      "radius_meters": 300,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cau-truong-tien",
+        "quest_title": "Nhịp cầu Trường Tiền",
+        "place_id": "cau-truong-tien",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Spans of Trường Tiền Bridge",
+        "step_index": 8,
+        "total_steps": 9
+      }
+    },
+    {
+      "question_id": "hue-cau-truong-tien-09-tim-hieu-ve-lu-huong",
+      "title": "Tìm hiểu về lư hương mất tích",
+      "question_text": "Quan sát kỹ và chụp ảnh phần cầu Trường Tiền nơi được đề cập đã diễn ra việc mua bán lư hương",
+      "cultural_explanation": "Chi tiết này phản ánh tín ngưỡng và sự tôn trọng truyền thống của người dân Huế",
+      "source_text": "Cái lư này mất từ bao giờ, dân cũng không biết rõ. Theo người cuối cùng có thờ bộ lư này kể lại với dân làng, thì ông biết nguyên lai có một chủ đem bán cho nhôm đồng, người buôn nhôm đồng đem bán ở chợ trời khi chợ trời đang còn đông ở múi cầu Tràng Tiền.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Cầu Trường Tiền",
+      "latitude": 16.469,
+      "longitude": 107.592,
+      "radius_meters": 300,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cau-truong-tien",
+        "quest_title": "Nhịp cầu Trường Tiền",
+        "place_id": "cau-truong-tien",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Spans of Trường Tiền Bridge",
+        "step_index": 9,
+        "total_steps": 9
+      }
+    },
+    {
+      "question_id": "hue-cho-dong-ba-01-noi-dien-thuyet-cua",
+      "title": "Nơi diễn thuyết của Phan Bội Châu",
+      "question_text": "Tìm vị trí của Nữ công học hội Pháp Việt Đông Ba và chụp ảnh",
+      "cultural_explanation": "Nơi này có ý nghĩa lịch sử vì từng là nơi Phan Bội Châu diễn thuyết",
+      "source_text": "biến cố 15 năm cuối đời... diễn thuyết tại các trường... Nữ công học hội Pháp Việt Đông Ba",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chợ Đông Ba",
+      "latitude": 16.4719,
+      "longitude": 107.5849,
+      "radius_meters": 400,
+      "categories": [
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cho-dong-ba",
+        "quest_title": "Chợ quê giữa lòng Cố đô",
+        "place_id": "cho-dong-ba",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "A Market in the Heart of the Old Capital",
+        "step_index": 1,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-cho-dong-ba-02-cho-ong-ba-lich-su-q",
+      "title": "Chợ Đông Ba - Lịch sử quản lý",
+      "question_text": "Ghi chú về quy định vào chợ Đông Ba theo Bộ luật Gia Long",
+      "cultural_explanation": "Quy định này phản ánh tầm quan trọng của chợ Đông Ba trong lịch sử Huế",
+      "source_text": "Bất cứ ai vô phận sự mà vào cửa Ngọ Môn, Tử Cấm Thành, cửa Đông Ba...",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chợ Đông Ba",
+      "latitude": 16.4719,
+      "longitude": 107.5849,
+      "radius_meters": 400,
+      "categories": [
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cho-dong-ba",
+        "quest_title": "Chợ quê giữa lòng Cố đô",
+        "place_id": "cho-dong-ba",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "A Market in the Heart of the Old Capital",
+        "step_index": 2,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-cho-dong-ba-03-chung-tich-lich-su",
+      "title": "Chứng tích lịch sử",
+      "question_text": "Ghi chú vị trí của ngôi chợ cũ gần nơi từng xảy ra sự kiện đốt nhà Nguyễn Văn Tường.",
+      "cultural_explanation": "Sự kiện này phản ánh thời kỳ biến động chính trị và xã hội.",
+      "source_text": "ngày 24-7-1885, nhà ở trong kinh thành gần cửa Đông Ba bị đốt",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chợ Đông Ba",
+      "latitude": 16.4719,
+      "longitude": 107.5849,
+      "radius_meters": 400,
+      "categories": [
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 10,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cho-dong-ba",
+        "quest_title": "Chợ quê giữa lòng Cố đô",
+        "place_id": "cho-dong-ba",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "A Market in the Heart of the Old Capital",
+        "step_index": 3,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-cho-dong-ba-04-benh-vien-bi-mat",
+      "title": "Bệnh viện bí mật",
+      "question_text": "Ghi chú vị trí của hai bệnh viện tư gần chợ Đông Ba",
+      "cultural_explanation": "Hai bệnh viện này đã đóng vai trò quan trọng trong cuộc kháng chiến",
+      "source_text": "có một điều kỳ lạ là hai cơ sở của đảng bộ thành phố Huế, một ở gần cửa Đông Ba, một ở gần cửa Thượng Tứ, đều là hai bệnh viện tư của hai bác sĩ có uy tín lớn trong trí thức Huế",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chợ Đông Ba",
+      "latitude": 16.4719,
+      "longitude": 107.5849,
+      "radius_meters": 400,
+      "categories": [
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 10,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cho-dong-ba",
+        "quest_title": "Chợ quê giữa lòng Cố đô",
+        "place_id": "cho-dong-ba",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "A Market in the Heart of the Old Capital",
+        "step_index": 4,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-cho-dong-ba-05-banh-khoai-ong-ba",
+      "title": "Bánh Khoái Đông Ba",
+      "question_text": "Chụp ảnh hoặc ghi chú về cách chế biến bánh khoái tại chợ Đông Ba",
+      "cultural_explanation": "Bánh khoái là một phần quan trọng của văn hóa ẩm thực Huế, phản ánh sự sáng tạo và kỹ năng nấu ăn truyền thống",
+      "source_text": "bánh khoái Đông Ba (nay ở Thượng Tứ)",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chợ Đông Ba",
+      "latitude": 16.4719,
+      "longitude": 107.5849,
+      "radius_meters": 400,
+      "categories": [
+        "food"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cho-dong-ba",
+        "quest_title": "Chợ quê giữa lòng Cố đô",
+        "place_id": "cho-dong-ba",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "A Market in the Heart of the Old Capital",
+        "step_index": 5,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-cho-dong-ba-06-lau-cho-ong-ba",
+      "title": "Lầu chợ Đông Ba",
+      "question_text": "Quan sát và chụp ảnh Lầu chợ Đông Ba, chú ý đến phong cách kiến trúc hiện đại của nó.",
+      "cultural_explanation": "Lầu chợ Đông Ba là ví dụ điển hình về sự kết hợp giữa kiến trúc truyền thống và hiện đại, phản ánh quá trình phát triển của Huế.",
+      "source_text": "Lầu chợ Đông Ba... Các khối bê-tông đồ sộ của những công trình mới ấy không phải là những nét chấm phá của kiến trúc điểm xuyến vào thiên nhiên mà đang lấn át thiên nhiên, làm mất đi vẻ hài hòa thơ mộng của dòng sông.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chợ Đông Ba",
+      "latitude": 16.4719,
+      "longitude": 107.5849,
+      "radius_meters": 400,
+      "categories": [
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cho-dong-ba",
+        "quest_title": "Chợ quê giữa lòng Cố đô",
+        "place_id": "cho-dong-ba",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "A Market in the Heart of the Old Capital",
+        "step_index": 6,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-cho-dong-ba-07-kham-pha-cong-cho",
+      "title": "Khám phá cổng chợ",
+      "question_text": "Chụp ảnh cổng Chánh Động Môn (cửa Đông Ba)",
+      "cultural_explanation": "Cổng Chánh Động Môn là một phần quan trọng của lịch sử và văn hóa chợ Đông Ba",
+      "source_text": "+ Chánh Động Môn (cửa Đông Ba)",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chợ Đông Ba",
+      "latitude": 16.4719,
+      "longitude": 107.5849,
+      "radius_meters": 400,
+      "categories": [
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cho-dong-ba",
+        "quest_title": "Chợ quê giữa lòng Cố đô",
+        "place_id": "cho-dong-ba",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "A Market in the Heart of the Old Capital",
+        "step_index": 7,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-cho-dong-ba-08-cho-ong-ba-va-cua-th",
+      "title": "Chợ Đông Ba và Cửa Thành",
+      "question_text": "Quan sát và chụp ảnh cửa thành phía sau chợ Đông Ba.",
+      "cultural_explanation": "Cửa thành này phản ánh lịch sử và sự kiên cường của Huế qua thời gian.",
+      "source_text": "Hiện trạng cửa thành bị nút đổ, sạt lở, có thể gây nguy hiểm cho người đi lại tuy rằng chúng vẫn là nơi ra vào của nhiều loại phương tiện giao thông, của dân sống trong thành và khách du lịch.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chợ Đông Ba",
+      "latitude": 16.4719,
+      "longitude": 107.5849,
+      "radius_meters": 400,
+      "categories": [
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cho-dong-ba",
+        "quest_title": "Chợ quê giữa lòng Cố đô",
+        "place_id": "cho-dong-ba",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "A Market in the Heart of the Old Capital",
+        "step_index": 8,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-cho-dong-ba-09-dan-van-o-o-cho-ong",
+      "title": "Dân vạn đò ở chợ Đông Ba",
+      "question_text": "Quan sát và chụp ảnh một chiếc thuyền vạn đò đang hoạt động tại chợ Đông Ba",
+      "cultural_explanation": "Chiếc thuyền vạn đò phản ánh lịch sử và văn hóa của người dân Huế",
+      "source_text": "Không chỉ riêng trên sông Hương mà trên khắp các kênh rạch, sông đào như sông Đông Ba, An Cựu, Bạch Yến... ta đều thấy có dân vạn đò sinh sống",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chợ Đông Ba",
+      "latitude": 16.4719,
+      "longitude": 107.5849,
+      "radius_meters": 400,
+      "categories": [
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cho-dong-ba",
+        "quest_title": "Chợ quê giữa lòng Cố đô",
+        "place_id": "cho-dong-ba",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "A Market in the Heart of the Old Capital",
+        "step_index": 9,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-cho-dong-ba-10-cho-ong-ba-trai-tim",
+      "title": "Chợ Đông Ba - trái tim thương mại",
+      "question_text": "Ghi chú về một mặt hàng đặc trưng được bán tại chợ Đông Ba.",
+      "cultural_explanation": "Chợ Đông Ba phản ánh cuộc sống hàng ngày và nền kinh tế của người dân Huế.",
+      "source_text": "hệ quy chiếu dân gian là chợ Đông Ba",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Chợ Đông Ba",
+      "latitude": 16.4719,
+      "longitude": 107.5849,
+      "radius_meters": 400,
+      "categories": [
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-cho-dong-ba",
+        "quest_title": "Chợ quê giữa lòng Cố đô",
+        "place_id": "cho-dong-ba",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "A Market in the Heart of the Old Capital",
+        "step_index": 10,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-hue-cuisine-01-thu-bun-bo-gio-heo",
+      "title": "Thử bún bò giò heo",
+      "question_text": "Chụp hình và ghi chú về hương vị nguyên bản của bún bò giò heo.",
+      "cultural_explanation": "Bún bò giò heo là một biểu tượng ẩm thực đặc trưng của Huế, phản ánh sự đa dạng và phong phú của ẩm thực địa phương.",
+      "source_text": "cái ngon \"nguyên thủy\" của bún bò giò heo Huế có phai nhạt đi",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Ẩm thực Huế",
+      "latitude": 16.4637,
+      "longitude": 107.5909,
+      "radius_meters": 2000,
+      "categories": [
+        "food"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 30,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-cuisine",
+        "quest_title": "Hương vị Cố đô",
+        "place_id": "hue-cuisine",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Flavors of the Old Capital",
+        "step_index": 1,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-hue-cuisine-02-thuong-thuc-am-thuc",
+      "title": "Thưởng thức Ẩm Thực Cung Đình",
+      "question_text": "Chụp ảnh một món ăn cung đình đặc trưng tại Huế",
+      "cultural_explanation": "Món ăn cung đình phản ánh sự tinh tế và sang trọng trong ẩm thực Huế",
+      "source_text": "Việt Nam có khoảng 1.700 món ăn thì xứ Huế có tới 1.300 món gồm: món ăn dân gian, món ăn cung đình và món ăn chay.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Ẩm thực Huế",
+      "latitude": 16.4637,
+      "longitude": 107.5909,
+      "radius_meters": 2000,
+      "categories": [
+        "food",
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-cuisine",
+        "quest_title": "Hương vị Cố đô",
+        "place_id": "hue-cuisine",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Flavors of the Old Capital",
+        "step_index": 2,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-hue-cuisine-03-soi-bun-truyen-thong",
+      "title": "Sợi Bún Truyền Thống",
+      "question_text": "Quan sát và chụp ảnh sợi bún truyền thống trong một tô bún bò tại Huế.",
+      "cultural_explanation": "Sợi bún truyền thống phản ánh sự biến đổi của ẩm thực Huế theo thời gian.",
+      "source_text": "một trong những đổi thay làm mất đi cái riêng trong ký ức của người xưa còn là những chi tiết thuần túy nguyên liệu, đó là sợi bún.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Ẩm thực Huế",
+      "latitude": 16.4637,
+      "longitude": 107.5909,
+      "radius_meters": 2000,
+      "categories": [
+        "food"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-cuisine",
+        "quest_title": "Hương vị Cố đô",
+        "place_id": "hue-cuisine",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Flavors of the Old Capital",
+        "step_index": 3,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-hue-cuisine-04-bun-bo-gio-heo",
+      "title": "Bún Bò Giò Heo",
+      "question_text": "Chụp ảnh hoặc ghi chú về cách gọi 'bún bò giò heo' tại các quán ăn ở Huế.",
+      "cultural_explanation": "Tên gọi này phản ánh lịch sử di chuyển và thích nghi của người dân miền Trung khi phải rời bỏ quê hương.",
+      "source_text": "Sở dĩ, chúng được đổi gọi là bún bò Huế, nhằm để phân biệt với món bún bò giò heo trong Nam.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Ẩm thực Huế",
+      "latitude": 16.4637,
+      "longitude": 107.5909,
+      "radius_meters": 2000,
+      "categories": [
+        "food",
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-cuisine",
+        "quest_title": "Hương vị Cố đô",
+        "place_id": "hue-cuisine",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Flavors of the Old Capital",
+        "step_index": 4,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-hue-cuisine-05-kham-pha-am-thuc-cun",
+      "title": "Khám phá Ẩm Thực Cung Đình",
+      "question_text": "Ghi chú tên ít nhất 3 cơ quan chuyên lo chuyện ẩm thực trong hoàng cung theo đoạn văn",
+      "cultural_explanation": "Những cơ quan này đã đóng vai trò quan trọng trong việc duy trì và phát triển ẩm thực cung đình",
+      "source_text": "Từ sau năm 1945, Việt Nam không còn chế độ quân chủ, những cơ quan chuyên lo chuyện ẩm thực trong hoàng cung như Quang Lộc tự, đội Thượng Thiện, Ty Lý Thiện tan rã",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Ẩm thực Huế",
+      "latitude": 16.4637,
+      "longitude": 107.5909,
+      "radius_meters": 2000,
+      "categories": [
+        "culture",
+        "tradition"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-cuisine",
+        "quest_title": "Hương vị Cố đô",
+        "place_id": "hue-cuisine",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Flavors of the Old Capital",
+        "step_index": 5,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-hue-cuisine-06-kham-pha-nghe-thuat",
+      "title": "Khám phá nghệ thuật ẩm thực cung đình",
+      "question_text": "Chụp ảnh một món ăn truyền thống của Huế và ghi chú về nguyên liệu chính của nó.",
+      "cultural_explanation": "Món ăn truyền thống phản ánh sự kết hợp tinh hoa giữa kinh nghiệm dân gian và tri thức bác học.",
+      "source_text": "Nghệ thuật ẩm thực cung đình, là đỉnh cao của nền ẩm thực Việt.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Ẩm thực Huế",
+      "latitude": 16.4637,
+      "longitude": 107.5909,
+      "radius_meters": 2000,
+      "categories": [
+        "food"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-cuisine",
+        "quest_title": "Hương vị Cố đô",
+        "place_id": "hue-cuisine",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Flavors of the Old Capital",
+        "step_index": 6,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-hue-cuisine-07-thuc-an-hue",
+      "title": "Thức ăn Huế",
+      "question_text": "Chụp ảnh một món ăn truyền thống của Huế",
+      "cultural_explanation": "Món ăn truyền thống phản ánh bản sắc văn hóa độc đáo của Huế",
+      "source_text": "Nghệ thuật ăn uống, thú vui ẩm thực Huế từ cung đình cho đến dân dã đã góp phần quan trọng trong các biểu trưng của lối sống Huế, của tâm hồn Huế.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Ẩm thực Huế",
+      "latitude": 16.4637,
+      "longitude": 107.5909,
+      "radius_meters": 2000,
+      "categories": [
+        "food"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-cuisine",
+        "quest_title": "Hương vị Cố đô",
+        "place_id": "hue-cuisine",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Flavors of the Old Capital",
+        "step_index": 7,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-hue-cuisine-09-kham-pha-am-thuc-hue",
+      "title": "Khám phá Ẩm thực Huế",
+      "question_text": "Chụp ảnh một món ăn truyền thống của Huế và ghi chú về cách trình bày của nó.",
+      "cultural_explanation": "Cách trình bày món ăn thể hiện sự tinh tế và thẩm mỹ trong ẩm thực Huế.",
+      "source_text": "Ẩm thực Huế...trang trí, phong cách dọn ăn...",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế; Cố đô Huế xưa và nay",
+      "place_name": "Ẩm thực Huế",
+      "latitude": 16.4637,
+      "longitude": 107.5909,
+      "radius_meters": 2000,
+      "categories": [
+        "food",
+        "culture"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-hue-cuisine",
+        "quest_title": "Hương vị Cố đô",
+        "place_id": "hue-cuisine",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế",
+          "Cố đô Huế xưa và nay"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "Flavors of the Old Capital",
+        "step_index": 8,
+        "total_steps": 8
+      }
+    },
+    {
+      "question_id": "hue-dien-hon-chen-01-tham-hiem-ien-hon-ch",
+      "title": "Thám hiểm Điện Hòn Chén",
+      "question_text": "Chụp ảnh phần kiến trúc thể hiện sự kết hợp giữa tín ngưỡng Chăm và Việt",
+      "cultural_explanation": "Kiến trúc thể hiện sự giao thoa văn hóa giữa người Chăm và người Việt",
+      "source_text": "Điện Huệ Nam là sự kế thừa tín ngưỡng thờ mẫu của người Chăm và đã được Việt hóa",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế",
+      "place_name": "Điện Hòn Chén",
+      "latitude": 16.417,
+      "longitude": 107.547,
+      "radius_meters": 400,
+      "categories": [
+        "religion",
+        "history"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dien-hon-chen",
+        "quest_title": "Tín ngưỡng Mẫu Hòn Chén",
+        "place_id": "dien-hon-chen",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Mother Goddess of Hòn Chén",
+        "step_index": 1,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dien-hon-chen-02-thanh-mau-thien-y-a",
+      "title": "Thánh Mẫu Thiên Y A Na",
+      "question_text": "Chụp ảnh hoặc ghi chú về hình ảnh của Thánh Mẫu Thiên Y A Na tại Điện Hòn Chén",
+      "cultural_explanation": "Thánh Mẫu Thiên Y A Na là biểu tượng tâm linh quan trọng đối với người dân làng Hải Cát",
+      "source_text": "Bởi sự hiện thân của Thánh Mẫu Thiên Y A Na trên ngọn núi thiêng của làng Hải Cát",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế",
+      "place_name": "Điện Hòn Chén",
+      "latitude": 16.417,
+      "longitude": 107.547,
+      "radius_meters": 400,
+      "categories": [
+        "religion"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dien-hon-chen",
+        "quest_title": "Tín ngưỡng Mẫu Hòn Chén",
+        "place_id": "dien-hon-chen",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Mother Goddess of Hòn Chén",
+        "step_index": 2,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dien-hon-chen-03-le-cao-yet-me",
+      "title": "Lễ Cáo Yết Mẹ",
+      "question_text": "Quan sát và chụp ảnh nghi thức cáo yết Mẹ vào ngày đầu tiên của lễ hội.",
+      "cultural_explanation": "Nghi thức cáo yết Mẹ thể hiện lòng tôn kính và sự tín ngưỡng của người dân đối với Mẹ.",
+      "source_text": "Ngày đầu tiên là thời gian mà bằng án của các phổ từ khắp các nơi tập trung về điện Hòn Chén để làm lễ cáo yết Mẹ.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế",
+      "place_name": "Điện Hòn Chén",
+      "latitude": 16.417,
+      "longitude": 107.547,
+      "radius_meters": 400,
+      "categories": [
+        "religion"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "morning"
+      ],
+      "estimated_duration_minutes": 30,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dien-hon-chen",
+        "quest_title": "Tín ngưỡng Mẫu Hòn Chén",
+        "place_id": "dien-hon-chen",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Mother Goddess of Hòn Chén",
+        "step_index": 3,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dien-hon-chen-04-tho-thanh-mau-thien",
+      "title": "Thờ Thánh Mẫu Thiên Y A Na",
+      "question_text": "Chụp ảnh khu vực thờ Thánh Mẫu Thiên Y A Na",
+      "cultural_explanation": "Thánh Mẫu Thiên Y A Na được tôn kính như một biểu tượng văn hóa tín ngưỡng của người dân Huế",
+      "source_text": "Thánh Mẫu Thiên Y A Na còn được thờ phụng một cách trang trọng ở Điện Hòn Chén",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế",
+      "place_name": "Điện Hòn Chén",
+      "latitude": 16.417,
+      "longitude": 107.547,
+      "radius_meters": 400,
+      "categories": [
+        "religion"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dien-hon-chen",
+        "quest_title": "Tín ngưỡng Mẫu Hòn Chén",
+        "place_id": "dien-hon-chen",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Mother Goddess of Hòn Chén",
+        "step_index": 4,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dien-hon-chen-05-kieu-thanh-mau",
+      "title": "Kiệu Thánh Mẫu",
+      "question_text": "Chụp ảnh hoặc ghi chú về hình ảnh kiệu Thánh Mẫu trong lễ cung nghinh",
+      "cultural_explanation": "Kiệu Thánh Mẫu thể hiện lòng tôn kính và tưởng nhớ đến các vị thần bảo hộ",
+      "source_text": "Đoàn đạo ngự lại theo tuần tự rước kiệu và long án, sắc phong của Mẫu quay trở lại Hòn Chén",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế",
+      "place_name": "Điện Hòn Chén",
+      "latitude": 16.417,
+      "longitude": 107.547,
+      "radius_meters": 400,
+      "categories": [
+        "religion"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dien-hon-chen",
+        "quest_title": "Tín ngưỡng Mẫu Hòn Chén",
+        "place_id": "dien-hon-chen",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Mother Goddess of Hòn Chén",
+        "step_index": 5,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dien-hon-chen-06-tho-thien-y-a-na",
+      "title": "Thờ Thiên Y A Na",
+      "question_text": "Ghi chú về cách thờ Thiên Y A Na trong miếu",
+      "cultural_explanation": "Thiên Y A Na được thờ độc lập hoặc kết hợp với các vị thần khác, phản ánh tín ngưỡng đa dạng của người dân.",
+      "source_text": "Việc thờ Thiên Y A Na tương đối độc lập với các thần linh khác, được thể hiện ở dạng một miếu một thần vị.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế",
+      "place_name": "Điện Hòn Chén",
+      "latitude": 16.417,
+      "longitude": 107.547,
+      "radius_meters": 400,
+      "categories": [
+        "religion"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "any",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dien-hon-chen",
+        "quest_title": "Tín ngưỡng Mẫu Hòn Chén",
+        "place_id": "dien-hon-chen",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Mother Goddess of Hòn Chén",
+        "step_index": 6,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dien-hon-chen-07-hat-hau-van-em",
+      "title": "Hát Hầu Văn Đêm",
+      "question_text": "Ghi lại một đoạn hát Hầu Văn tại điện Hòn Chén vào ban đêm.",
+      "cultural_explanation": "Hát Hầu Văn là một phần quan trọng của văn hóa dân gian Huế, thể hiện qua việc hát suốt đêm trong các dịp lễ hội.",
+      "source_text": "Loại hình này có thể hát nhiều giờ nhưng vẫn phong phú về nội dung, tùy theo tính chất của ngày vía, ngày lễ, nhất là ngày 3 tháng 3 và tháng 7 âm lịch, người ta hát suốt mấy ngày đêm, như ở điện Hòn Chén (điện Huệ Nam).",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế",
+      "place_name": "Điện Hòn Chén",
+      "latitude": 16.417,
+      "longitude": 107.547,
+      "radius_meters": 400,
+      "categories": [
+        "tradition"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "night"
+      ],
+      "estimated_duration_minutes": 60,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dien-hon-chen",
+        "quest_title": "Tín ngưỡng Mẫu Hòn Chén",
+        "place_id": "dien-hon-chen",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Mother Goddess of Hòn Chén",
+        "step_index": 7,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dien-hon-chen-08-kham-pha-ien-hon-che",
+      "title": "Khám phá Điện Hòn Chén",
+      "question_text": "Quan sát và chụp ảnh các chi tiết kiến trúc đặc trưng của Điện Hòn Chén",
+      "cultural_explanation": "Các chi tiết kiến trúc phản ánh sự kết hợp giữa tín ngưỡng và nghệ thuật kiến trúc độc đáo của Huế",
+      "source_text": "Hiện nay ở Huế, những công trình kiến trúc gắn liền với dòng tín ngưỡng này đã trở thành di tích",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế",
+      "place_name": "Điện Hòn Chén",
+      "latitude": 16.417,
+      "longitude": 107.547,
+      "radius_meters": 400,
+      "categories": [
+        "religion"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 15,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dien-hon-chen",
+        "quest_title": "Tín ngưỡng Mẫu Hòn Chén",
+        "place_id": "dien-hon-chen",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Mother Goddess of Hòn Chén",
+        "step_index": 8,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dien-hon-chen-09-tham-gia-oan-ruoc-th",
+      "title": "Tham gia đoàn rước thủy",
+      "question_text": "Chụp ảnh đoàn rước thủy qua sông Hương",
+      "cultural_explanation": "Đoàn rước thủy là phần quan trọng của lễ hội tín ngưỡng thờ Mẫu, thể hiện sự tôn kính và gắn kết cộng đồng",
+      "source_text": "Việc thực hiện ý tưởng này không phải là điều khó khăn, bởi đoàn rước thủy trong lễ hội rước Mẫu điện Huệ Nam, tự thân nó đã tồn tại và được tổ chức rất bài bản hàng năm",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế",
+      "place_name": "Điện Hòn Chén",
+      "latitude": 16.417,
+      "longitude": 107.547,
+      "radius_meters": 400,
+      "categories": [
+        "religion"
+      ],
+      "difficulty": "easy",
+      "required_media": "photo",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 30,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dien-hon-chen",
+        "quest_title": "Tín ngưỡng Mẫu Hòn Chén",
+        "place_id": "dien-hon-chen",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Mother Goddess of Hòn Chén",
+        "step_index": 9,
+        "total_steps": 10
+      }
+    },
+    {
+      "question_id": "hue-dien-hon-chen-10-than-tich-ba-chua-ng",
+      "title": "Thần tích Bà Chúa Ngọc",
+      "question_text": "Ghi chú tên gọi của Bà Chúa Ngọc được thờ phụng ở Điện Hòn Chén.",
+      "cultural_explanation": "Tên gọi này phản ánh niềm tin tôn giáo và văn hóa của người dân.",
+      "source_text": "Thiên Y A Na có mặt trong các thần vị của một số làng, được người nông dân thờ phụng với tên gọi *Thiên Y A Na Diễn Phi Chúa Ngọc*, hay đơn giản hơn là *Bà Chúa Ngọc*.",
+      "source": "30 năm nghiên cứu văn hóa dân gian Huế",
+      "place_name": "Điện Hòn Chén",
+      "latitude": 16.417,
+      "longitude": 107.547,
+      "radius_meters": 400,
+      "categories": [
+        "religion"
+      ],
+      "difficulty": "easy",
+      "required_media": "note",
+      "indoor_outdoor": "outdoor",
+      "weather_tags": [
+        "any"
+      ],
+      "time_tags": [
+        "any"
+      ],
+      "estimated_duration_minutes": 5,
+      "language": "vi",
+      "metadata": {
+        "quest_id": "quest-hue-dien-hon-chen",
+        "quest_title": "Tín ngưỡng Mẫu Hòn Chén",
+        "place_id": "dien-hon-chen",
+        "source_books": [
+          "30 năm nghiên cứu văn hóa dân gian Huế"
+        ],
+        "review_status": "needs_review",
+        "auto_generated": true,
+        "title_en": "The Mother Goddess of Hòn Chén",
+        "step_index": 10,
+        "total_steps": 10
       }
     }
   ]

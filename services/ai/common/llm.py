@@ -111,6 +111,7 @@ class VLLMGateway:
         self,
         system_prompt: str,
         user_prompt: str,
+        max_tokens: int = 600,
     ) -> dict[str, Any]:
         import httpx
 
@@ -125,7 +126,7 @@ class VLLMGateway:
                 {"role": "user", "content": user_prompt},
             ],
             "temperature": 0.3,
-            "max_tokens": 600,
+            "max_tokens": max_tokens,
             "response_format": {"type": "json_object"},
         }
         try:

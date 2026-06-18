@@ -1,0 +1,15 @@
+# Shared lint config for the backend team (used by CI and local `ruff check`).
+target-version = "py312"
+line-length = 100
+
+[lint]
+# Pragmatic starter set: pyflakes (F), pycodestyle (E/W), isort (I), bugbear (B),
+# pyupgrade (UP). Expand as the codebase stabilizes.
+select = ["E", "W", "F", "I", "B", "UP"]
+ignore = [
+  "E501", # line length is handled by the formatter; don't fail builds on it yet
+  "B008", # FastAPI uses function calls in argument defaults (Depends(), Query())
+]
+
+[lint.per-file-ignores]
+"alembic/**" = ["E", "F"] # generated migration code

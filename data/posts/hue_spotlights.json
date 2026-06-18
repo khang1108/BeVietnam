@@ -1,0 +1,613 @@
+{
+  "version": 1,
+  "dataset_id": "hue-landmark-spotlights",
+  "dataset_name": "Huế landmark spotlights",
+  "description": "Condition-tagged spotlight posts for famous Huế landmarks, grounded in the source books (needs_review).",
+  "posts": [
+    {
+      "post_id": "spot-hue-hue-imperial-city",
+      "place_id": "hue-imperial-city",
+      "place_name": "Kinh thành Huế (Đại Nội)",
+      "title": "Kinh thành Huế: Trải nghiệm lịch sử",
+      "body": "Khi đến Huế, hãy dành thời gian khám phá Kinh thành Huế vào buổi sáng để tận hưởng vẻ đẹp tĩnh lặng của nó. Địa điểm này không chỉ là nơi lưu giữ lịch sử mà còn là nơi chứng kiến nhiều sự kiện quan trọng của triều Nguyễn.",
+      "cultural_hook": "Kinh thành Huế được xây dựng dựa trên nguyên tắc phong thủy, với việc bố trí các cung điện, dinh thự theo hướng tây thuộc về chủ, phía đông thuộc về thê thiếp, bạn bè, và phía sau thuộc về tử tôn, môn sinh, trung thần, lương tướng.",
+      "language": "vi",
+      "weather_tags": [],
+      "time_tags": [
+        "morning"
+      ],
+      "season_tags": [],
+      "categories": [
+        "history",
+        "architecture",
+        "culture"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        },
+        {
+          "source_type": "book",
+          "title": "Cố đô Huế xưa và nay",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "history",
+        "architecture",
+        "culture"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    },
+    {
+      "post_id": "spot-hue-thien-mu-pagoda",
+      "place_id": "thien-mu-pagoda",
+      "place_name": "Chùa Thiên Mụ",
+      "title": "Chùa Thiên Mụ - Nơi Linh Hồn Cổ Đô Ngàn Năm",
+      "body": "Nên ghé thăm Chùa Thiên Mụ vào buổi sáng để tận hưởng khung cảnh thiên nhiên tuyệt đẹp và tìm hiểu về lịch sử lâu đời của ngôi chùa này.",
+      "cultural_hook": "Linh mục Léopold Cadière, một trong những người tiên phong trong việc bảo tồn văn hóa Huế, đã đóng góp đáng kể vào việc duy trì và tôn vinh lịch sử của Chùa Thiên Mụ.",
+      "language": "vi",
+      "weather_tags": [
+        "sunny"
+      ],
+      "time_tags": [
+        "morning"
+      ],
+      "season_tags": [],
+      "categories": [
+        "chùa-tiệm",
+        "di-tich-lịch-su",
+        "văn-hóa-huế"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        },
+        {
+          "source_type": "book",
+          "title": "Cố đô Huế xưa và nay",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "religion",
+        "history",
+        "architecture"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    },
+    {
+      "post_id": "spot-hue-perfume-river",
+      "place_id": "perfume-river",
+      "place_name": "Sông Hương",
+      "title": "Khám phá Sông Hương",
+      "body": "Sông Hương là điểm đến văn hóa đáng ghé thăm. ào những năm cuối thế kỷ XIX, nửa đầu thế kỷ XX, Huế là nơi đã từng chứng kiến nhiều hoạt động chống Pháp của nhà chí sĩ yêu nước Phan Bội Châu và ghi dấu biết bao kỷ niệm của \"Ông già Bến Ngự\" trong 15 cuối đời (1925 - 1940). Do vậy, trên thành phố cổ kính bên dòng Hương Giang thơ mộng này có rất nhiều di tích lịch sử văn hóa liên quan đến cuộc đời và sự nghiệp cứu nước của Cụ Phan. Các di tích ấy được phân bố rộng khấp ở mạn Bắc và nam sông Hương, trong và ngoài thành phố, chứa đựng nhiều nội dung và giá trị quan trọng, không ngừng được bảo tồn và phát huy.",
+      "cultural_hook": "ào những năm cuối thế kỷ XIX, nửa đầu thế kỷ XX, Huế là nơi đã từng chứng kiến nhiều hoạt động chống Pháp của nhà chí sĩ yêu nước Phan Bội Châu và ghi dấu biết bao kỷ niệm của \"Ông già Bến Ngự\" trong 15 cuối đời (1925 - 1940). Do vậy, trên thành phố cổ kính bên dòng Hương Giang thơ mộng này có rất nhiều di tích lịch sử văn hóa liên quan đến cuộc đời và sự nghiệp cứu nước của Cụ Phan. Các di tích ấ",
+      "language": "vi",
+      "weather_tags": [],
+      "time_tags": [],
+      "season_tags": [],
+      "categories": [
+        "nature",
+        "culture",
+        "art"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        },
+        {
+          "source_type": "book",
+          "title": "Cố đô Huế xưa và nay",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "nature",
+        "culture",
+        "art"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    },
+    {
+      "post_id": "spot-hue-lang-minh-mang",
+      "place_id": "lang-minh-mang",
+      "place_name": "Lăng Minh Mạng",
+      "title": "Lăng Minh Mạng - Di Sản Lịch Sử",
+      "body": "Nên ghé thăm Lăng Minh Mạng vào buổi sáng để tận hưởng vẻ đẹp tĩnh lặng của nơi đây. Lăng tọa lạc giữa thiên nhiên tươi đẹp, phản ánh rõ nét về triều đại của vua Minh Mạng.",
+      "cultural_hook": "Vua Minh Mạng đã đóng góp đáng kể vào việc mở rộng lãnh thổ và thống nhất hành chính của Việt Nam, đồng thời cũng chú trọng đến việc bảo vệ chủ quyền quốc gia.",
+      "language": "vi",
+      "weather_tags": [
+        "sunny",
+        "cloudy"
+      ],
+      "time_tags": [
+        "morning"
+      ],
+      "season_tags": [],
+      "categories": [
+        "lịch-sử",
+        "di-san",
+        "huế"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        },
+        {
+          "source_type": "book",
+          "title": "Cố đô Huế xưa và nay",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "history",
+        "architecture",
+        "religion"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    },
+    {
+      "post_id": "spot-hue-lang-tu-duc",
+      "place_id": "lang-tu-duc",
+      "place_name": "Lăng Tự Đức",
+      "title": "Bi Kịch Của Một Vị Vua",
+      "body": "Khi đến thăm Lăng Tự Đức, bạn sẽ hiểu rõ hơn về cuộc đời và sự nghiệp của vua Tự Đức, một vị vua vừa tài hoa vừa bi kịch.",
+      "cultural_hook": "Vua Tự Đức đã chịu ơn khi thâu hồi các tỉnh Bắc Kỳ trong một thời gian tưởng đã mất, thể hiện trách nhiệm đối với chủ quyền quốc gia.",
+      "language": "vi",
+      "weather_tags": [],
+      "time_tags": [],
+      "season_tags": [],
+      "categories": [
+        "lịch-sử",
+        "văn-hóa",
+        "di-tích"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        },
+        {
+          "source_type": "book",
+          "title": "Cố đô Huế xưa và nay",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "history",
+        "architecture",
+        "art"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    },
+    {
+      "post_id": "spot-hue-lang-khai-dinh",
+      "place_id": "lang-khai-dinh",
+      "place_name": "Lăng Khải Định",
+      "title": "Lăng Khải Định - Kiệt tác nghệ thuật",
+      "body": "Nên ghé thăm Lăng Khải Định vào buổi sáng để tận mắt chiêm ngưỡng vẻ đẹp độc đáo của nó. Đây là nơi hội tụ giữa nghệ thuật phương Đông và phương Tây, tạo nên một kiệt tác kiến trúc độc đáo.",
+      "cultural_hook": "Lăng Khải Định nổi bật với nội thất khảm sành sứ, thủy tinh màu lộng lẫy, hoành tráng, phản ánh phong cách sống Rococo của vua Khải Định.",
+      "language": "vi",
+      "weather_tags": [
+        "sunny",
+        "cloudy"
+      ],
+      "time_tags": [
+        "morning"
+      ],
+      "season_tags": [],
+      "categories": [
+        "architecture",
+        "history",
+        "art"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        },
+        {
+          "source_type": "book",
+          "title": "Cố đô Huế xưa và nay",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "history",
+        "architecture",
+        "art"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    },
+    {
+      "post_id": "spot-hue-lang-gia-long",
+      "place_id": "lang-gia-long",
+      "place_name": "Lăng Gia Long",
+      "title": "Lăng Gia Long - Lịch Sử Và Hòa Bình",
+      "body": "Khi đến Huế, hãy dành thời gian ghé thăm Lăng Gia Long để hiểu rõ hơn về mối quan hệ thân thiện giữa Việt Nam và Thái Lan dưới triều đại của vua Gia Long.",
+      "cultural_hook": "Dưới thời trị vì của vua Gia Long, quan hệ ngoại giao giữa Việt Nam và Thái Lan trở nên thân thiện và bình đẳng, tạo nên hòa bình và ổn định cho cả khu vực.",
+      "language": "vi",
+      "weather_tags": [],
+      "time_tags": [],
+      "season_tags": [],
+      "categories": [
+        "lịch-sử",
+        "hoà-bình",
+        "văn-hóa"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        },
+        {
+          "source_type": "book",
+          "title": "Cố đô Huế xưa và nay",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "history",
+        "architecture",
+        "nature"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    },
+    {
+      "post_id": "spot-hue-dan-nam-giao",
+      "place_id": "dan-nam-giao",
+      "place_name": "Đàn Nam Giao",
+      "title": "Đàn Nam Giao - Nơi Hội Ngộ Trời Đất",
+      "body": "Nên ghé thăm Đàn Nam Giao vào buổi sáng để tận mắt chứng kiến nơi mà vua Nguyễn từng tế trời, thể hiện quyền lực tối cao của mình.",
+      "cultural_hook": "Hoàng đế với danh hiệu Thiên tử là vị thánh sống có ngôi vị cao hơn các Thượng đẳng thần, điều hành chính quyền vượt lên trên tất cả thế quyền với một quyền uy tuyệt đối.",
+      "language": "vi",
+      "weather_tags": [
+        "sunny"
+      ],
+      "time_tags": [
+        "morning"
+      ],
+      "season_tags": [],
+      "categories": [
+        "history",
+        "religion",
+        "architecture"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        },
+        {
+          "source_type": "book",
+          "title": "Cố đô Huế xưa và nay",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "history",
+        "religion",
+        "tradition"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    },
+    {
+      "post_id": "spot-hue-ho-quyen",
+      "place_id": "ho-quyen",
+      "place_name": "Hổ Quyền",
+      "title": "Hổ Quyền - Kiến Trúc Lịch Sử",
+      "body": "Hổ Quyền là một công trình kiến trúc độc đáo tại Huế, được xây dựng dưới triều Minh Mạng. Nơi đây phản ánh rõ nét phong cách kiến trúc thời Nguyễn.",
+      "cultural_hook": "Hổ Quyền là một trong những di tích quan trọng được UNESCO công nhận là Di sản Thế giới tại Huế.",
+      "language": "vi",
+      "weather_tags": [],
+      "time_tags": [],
+      "season_tags": [],
+      "categories": [
+        "huong-tram",
+        "kien-truc-lich-su",
+        "di-san-the-gioi"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        },
+        {
+          "source_type": "book",
+          "title": "Cố đô Huế xưa và nay",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "history",
+        "architecture",
+        "tradition"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    },
+    {
+      "post_id": "spot-hue-van-mieu-hue",
+      "place_id": "van-mieu-hue",
+      "place_name": "Văn Miếu Huế",
+      "title": "Văn Miếu Huế - Khuôn mặt lịch sử",
+      "body": "Nên ghé thăm Văn Miếu Huế vào buổi sáng để tận mắt chứng kiến lịch sử và văn hóa Việt Nam qua các tấm bia tiến sĩ.",
+      "cultural_hook": "Triều Nguyễn đã dựng 32 tấm bia tiến sĩ tại Văn Miếu Huế, nhằm tôn vinh hiền tài và khuyến khích học vấn.",
+      "language": "vi",
+      "weather_tags": [],
+      "time_tags": [
+        "morning"
+      ],
+      "season_tags": [],
+      "categories": [
+        "văn-hóa",
+        "di-tich",
+        "huế"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        },
+        {
+          "source_type": "book",
+          "title": "Cố đô Huế xưa và nay",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "history",
+        "culture",
+        "tradition"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    },
+    {
+      "post_id": "spot-hue-cau-truong-tien",
+      "place_id": "cau-truong-tien",
+      "place_name": "Cầu Trường Tiền",
+      "title": "Cầu Trường Tiền - Hòn Ngọc Trên Sông",
+      "body": "Nếu bạn ghé thăm Huế, hãy dành thời gian để ngắm nhìn vẻ đẹp cổ kính của Cầu Trường Tiền. Đây là cây cầu nối liền bờ Bắc và Nam của sông Hương, mang đậm dấu ấn lịch sử.",
+      "cultural_hook": "Cầu Trường Tiền, được xây dựng vào năm 1897, là một phần quan trọng trong kế hoạch mở rộng không gian đô thị Huế và kết nối nó vào mạng lưới quy hoạch thống nhất từ Bắc xuống Nam.",
+      "language": "vi",
+      "weather_tags": [
+        "sunny"
+      ],
+      "time_tags": [
+        "midday"
+      ],
+      "season_tags": [
+        "dry"
+      ],
+      "categories": [
+        "history",
+        "architecture",
+        "culture"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        },
+        {
+          "source_type": "book",
+          "title": "Cố đô Huế xưa và nay",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "history",
+        "architecture",
+        "art"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    },
+    {
+      "post_id": "spot-hue-cho-dong-ba",
+      "place_id": "cho-dong-ba",
+      "place_name": "Chợ Đông Ba",
+      "title": "Chợ Đông Ba - Trải nghiệm văn hóa Huế",
+      "body": "Nên ghé chợ Đông Ba vào buổi sáng để tận hưởng không khí sôi động của thị trường truyền thống, thưởng thức các món ăn đặc trưng của Huế.",
+      "cultural_hook": "Chợ Đông Ba từng là nơi trú ẩn bí mật của lực lượng kháng chiến trong suốt 9 năm kháng chiến, chứng tỏ tầm quan trọng của nó đối với cộng đồng.",
+      "language": "vi",
+      "weather_tags": [],
+      "time_tags": [
+        "morning"
+      ],
+      "season_tags": [],
+      "categories": [
+        "huong-chieu",
+        "thuc-an",
+        "van-hoa"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        },
+        {
+          "source_type": "book",
+          "title": "Cố đô Huế xưa và nay",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "food",
+        "culture",
+        "tradition"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    },
+    {
+      "post_id": "spot-hue-hue-cuisine",
+      "place_id": "hue-cuisine",
+      "place_name": "Ẩm thực Huế",
+      "title": "Thưởng thức ẩm thực Huế",
+      "body": "Nên ghé Huế vào mùa khô, từ tháng 2 đến tháng 9, để thưởng thức đầy đủ hương vị của ẩm thực Huế.",
+      "cultural_hook": "Ẩm thực Huế là đỉnh cao của nền ẩm thực Việt, kết hợp tinh hoa dân gian và tri thức bác học, tạo nên những món ăn mang tầm quốc tế.",
+      "language": "vi",
+      "weather_tags": [
+        "sunny"
+      ],
+      "time_tags": [
+        "midday"
+      ],
+      "season_tags": [
+        "dry"
+      ],
+      "categories": [
+        "ẩm-thực",
+        "văn-hóa",
+        "huế"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        },
+        {
+          "source_type": "book",
+          "title": "Cố đô Huế xưa và nay",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "food",
+        "culture",
+        "tradition"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    },
+    {
+      "post_id": "spot-hue-dien-hon-chen",
+      "place_id": "dien-hon-chen",
+      "place_name": "Điện Hòn Chén",
+      "title": "Điểm Thờ Cúng Linh Thiêng Điện Hòn Chén",
+      "body": "Đến Điện Hòn Chén vào mùa thu để tham gia lễ tế linh thiêng, nơi tôn vinh Thánh Mẫu Thiên Y A Na.",
+      "cultural_hook": "Điện Hòn Chén là nơi thờ Thánh Mẫu Thiên Y A Na, một nữ thần linh thiêng được người dân Hải Cát tôn kính như Thành Hoàng làng.",
+      "language": "vi",
+      "weather_tags": [],
+      "time_tags": [],
+      "season_tags": [
+        "dry"
+      ],
+      "categories": [
+        "thần_thánh",
+        "lễ_hội",
+        "tín_ngưỡng"
+      ],
+      "source_refs": [
+        {
+          "source_type": "book",
+          "title": "30 năm nghiên cứu văn hóa dân gian Huế",
+          "publisher": "Nguồn sách (chưa kiểm định)",
+          "url": null,
+          "page_or_section": ""
+        }
+      ],
+      "review_status": "needs_review",
+      "reviewed_at": "2026-06-18",
+      "tags": [
+        "religion",
+        "tradition",
+        "history"
+      ],
+      "notes": "auto-generated from Huế source books; pending human review"
+    }
+  ]
+}

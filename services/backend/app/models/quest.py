@@ -1,7 +1,7 @@
 # models/quest.py
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
-from app.core.database import Base
+from ..core.database import Base
 
 class QuestChain(Base):
     __tablename__ = "quest_chains"

@@ -80,6 +80,10 @@ python -m pip install --no-cache-dir "vllm==${VLLM_VERSION:-0.8.5}"
 # vLLM 0.8.5 breaks with fastapi>=0.137 (prometheus instrumentator routing).
 echo "[bootstrap] pinning fastapi<0.137 for vLLM 0.8.5 compatibility"
 python -m pip install --no-cache-dir "fastapi<0.137"
+# vLLM 0.8.5 calls tokenizer.all_special_tokens_extended, removed in transformers
+# >=4.53 → "Qwen2Tokenizer has no attribute all_special_tokens_extended". Pin back.
+echo "[bootstrap] pinning transformers==4.51.3 for vLLM 0.8.5 compatibility"
+python -m pip install --no-cache-dir "transformers==4.51.3"
 python -m pip install --no-cache-dir "huggingface_hub[cli]"
 
 # ── 3. L40 / Thundercompute environment fixes ─────────────────────────────────

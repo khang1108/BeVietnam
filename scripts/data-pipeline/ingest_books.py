@@ -64,6 +64,7 @@ logger = logging.getLogger("ingest_books")
 # about that specific place/topic. Keep in sync with data/knowledge/hue_chunks.json.
 PLACE_VOCAB: dict[str, str] = {
     "viet-nam": "Việt Nam",
+    "thua-thien-hue": "Thừa Thiên Huế",
     "hue-imperial-city": "Kinh thành Huế",
     "thien-mu-pagoda": "Chùa Thiên Mụ",
     "perfume-river": "Sông Hương",
@@ -90,7 +91,8 @@ class BookSource:
     source_title: str
     publisher: str
     id_prefix: str
-    scope: str  # "hue" | "national"
+    scope: str          # "hue" | "national"
+    default_place: str  # bucket for province/non-POI facts in this book
 
 
 BOOKS: dict[str, BookSource] = {
@@ -99,24 +101,28 @@ BOOKS: dict[str, BookSource] = {
         "Hội KHLS Thừa Thiên Huế — NXB Thuận Hóa (2005)",
         "cdhxvn",
         "hue",
+        "thua-thien-hue",
     ),
     "30-nam-nghien-cuu-van-hoa-dan-gian": BookSource(
         "30 năm nghiên cứu văn hóa dân gian Thừa Thiên Huế (1991–2021)",
         "Hội Văn nghệ Dân gian Thừa Thiên Huế — NXB Thuận Hóa (2021)",
         "vhdg",
         "hue",
+        "thua-thien-hue",
     ),
     "Co-so-van-hoa-viet-nam": BookSource(
         "Cơ sở văn hóa Việt Nam",
         "Trần Ngọc Thêm — NXB Giáo dục",
         "csvhvn",
         "national",
+        "viet-nam",
     ),
     "Van-hoa-am-thuc-viet-nam-tu-ly-luan-va-thuc-tien": BookSource(
         "Văn hóa ẩm thực Việt Nam nhìn từ lý luận và thực tiễn",
         "Trần Quốc Vượng, Nguyễn Thị Bảy — NXB Từ điển Bách khoa (2010)",
         "vhat",
         "national",
+        "viet-nam",
     ),
 }
 
@@ -126,7 +132,7 @@ def resolve_book(path: Path) -> BookSource:
     book = BOOKS.get(path.stem)
     if book is None:
         logger.warning("No source registry entry for %s — using generic attribution.", path.name)
-        return BookSource(path.stem, path.stem, _slugify(path.stem, 16), "national")
+        return BookSource(path.stem, path.stem, _slugify(path.stem, 16), "national", "viet-nam")
     return book
 
 CHUNK_CHARS = 600
@@ -218,7 +224,7 @@ _SYSTEM_PROMPT = (
 )
 
 
-def _user_prompt(section: str, passage: str) -> str:
+def _user_prompt(section: str, passage: str, default_place: str) -> str:
     places = "\n".join(f"  {slug} = {name}" for slug, name in PLACE_VOCAB.items())
     return (
         f"Mục sách: {section}\n"
@@ -231,8 +237,9 @@ def _user_prompt(section: str, passage: str) -> str:
         '  "category": "<một trong: ' + ", ".join(CATEGORY_VOCAB) + '>",\n'
         '  "tags": ["<2-4 từ khóa slug>"]\n'
         "}\n"
-        "Danh sách place_id hợp lệ (mặc định viet-nam; chỉ chọn POI Huế khi đoạn "
-        "nói cụ thể về nơi/chủ đề đó):\n" + places + "\n"
+        f"Danh sách place_id hợp lệ (mặc định {default_place}; chọn một POI Huế cụ thể "
+        "khi đoạn nói rõ về nơi/chủ đề đó; dùng thua-thien-hue cho sự thật cấp tỉnh "
+        "Huế không gắn POI cụ thể):\n" + places + "\n"
         "Nếu đoạn không có nội dung văn hóa rõ ràng, trả về: {\"skip\": true}"
     )
 
@@ -253,13 +260,15 @@ def extract_chunk(
     gateway,
 ) -> KnowledgeChunk | None:
     """Call the LLM for one passage and build a validated KnowledgeChunk draft."""
-    result = gateway.generate_json(_SYSTEM_PROMPT, _user_prompt(section, passage))
+    result = gateway.generate_json(
+        _SYSTEM_PROMPT, _user_prompt(section, passage, book.default_place)
+    )
     if not result or result.get("skip"):
         return None
 
-    place_id = str(result.get("place_id", "viet-nam")).strip().lower()
+    place_id = str(result.get("place_id", book.default_place)).strip().lower()
     if place_id not in PLACE_VOCAB:
-        place_id = "viet-nam"
+        place_id = book.default_place
     category = str(result.get("category", "")).strip().lower()
     if category not in CATEGORY_VOCAB:
         category = "tradition"
@@ -289,7 +298,7 @@ def extract_chunk(
             page_or_section=section[:160],
             reviewed_at=date.today(),
             review_status="needs_review",
-            related_poi_ids=[] if place_id == "viet-nam" else [place_id],
+            related_poi_ids=[] if place_id in {"viet-nam", "thua-thien-hue"} else [place_id],
             tags=[str(t).strip().lower() for t in result.get("tags", []) if str(t).strip()],
             notes=f"auto-extracted from {book.source_title}; pending human review",
         )
