@@ -5,7 +5,7 @@ import Link from 'next/link';
 import DashboardCardEffect from '@/components/DashboardCardEffect';
 import NgoMonHero from '@/components/NgoMonHero';
 import { useI18n } from '@/i18n';
-import { ArrowRight, CalendarBlank, Compass, Path } from '@phosphor-icons/react';
+import { ArrowRight } from '@phosphor-icons/react';
 import styles from './page.module.css';
 
 type Bi = { vi: string; en: string };
@@ -16,37 +16,32 @@ const stats: { value: string; label: Bi }[] = [
   { value: '2', label: { vi: 'Ngôn ngữ', en: 'Languages' } },
 ];
 
-const pillars: { href: string; icon: React.ReactNode; title: Bi; desc: Bi }[] = [
+// Honest source attribution — text, not invented brand logos.
+const sources: string[] = [
+  'Trung tâm Bảo tồn Di tích Cố đô Huế',
+  'UNESCO',
+  'Cổng TTĐT Thừa Thiên Huế',
+  'Tư liệu sách văn hoá',
+];
+
+const places: { img: string; cat: Bi; name: Bi }[] = [
   {
-    href: '/explore',
-    icon: <Compass weight="regular" />,
-    title: { vi: 'Bản đồ khám phá', en: 'Explore the map' },
-    desc: {
-      vi: 'Tìm địa danh, món ăn và di sản trên bản đồ tương tác, kèm bối cảnh văn hoá cho từng điểm đến.',
-      en: 'Find places, food, and heritage on an interactive map, each with its cultural context.',
-    },
+    img: '/images/hero-hue-citadel.png',
+    cat: { vi: 'Thừa Thiên Huế', en: 'Thừa Thiên Huế' },
+    name: { vi: 'Đại Nội Huế', en: 'Huế Imperial City' },
   },
   {
-    href: '/storyline',
-    icon: <Path weight="regular" />,
-    title: { vi: 'Hành trình văn hoá', en: 'Cultural journeys' },
-    desc: {
-      vi: 'Theo những chặng dừng được kể lại, check-in tại chỗ và lưu giữ khoảnh khắc của riêng bạn.',
-      en: 'Follow narrated stops, check in on site, and keep your own moments along the way.',
-    },
+    img: '/images/hoian-lanterns.png',
+    cat: { vi: 'Quảng Nam', en: 'Quảng Nam' },
+    name: { vi: 'Phố cổ Hội An', en: 'Hội An Ancient Town' },
   },
   {
-    href: '/events',
-    icon: <CalendarBlank weight="regular" />,
-    title: { vi: 'Sự kiện & lễ hội', en: 'Events & festivals' },
-    desc: {
-      vi: 'Biết điều gì đang diễn ra quanh bạn — từ lễ hội cung đình đến phiên chợ và đêm nhạc.',
-      en: 'Know what is happening around you — from royal festivals to markets and music nights.',
-    },
+    img: '/images/one-pillar-pagoda.png',
+    cat: { vi: 'Hà Nội', en: 'Hà Nội' },
+    name: { vi: 'Chùa Một Cột', en: 'One Pillar Pagoda' },
   },
 ];
 
-// Group 09 — replace handles/initials with full names and photos when ready.
 const team: { name: string; role: Bi; initials: string }[] = [
   { name: 'Nguyễn Phúc Khang', role: { vi: 'Trưởng nhóm · AI & Dữ liệu', en: 'Lead · AI & Data' }, initials: 'PK' },
   { name: 'Pumpowhat', role: { vi: 'Giao diện Web', en: 'Web Frontend' }, initials: 'PW' },
@@ -65,33 +60,45 @@ export default function HomePage() {
       <section className={styles.hero}>
         <div className={styles.heroBg} aria-hidden="true" />
         <div className={styles.heroScrim} aria-hidden="true" />
-
-        <h1 className={styles.heroTitle}>
-          {L('Khám phá', 'Explore')}{' '}
-          <span className={styles.heroEm}>{L('Di sản Việt', "Vietnam's Heritage")}</span>
-        </h1>
-
-        <div className={styles.heroBody}>
-          <div className={styles.heroLede}>
-            <span className={styles.connector} aria-hidden="true" />
-            <p>
-              {L(
-                'Khám phá những địa danh vượt ngoài lối mòn du lịch — qua từng câu chuyện, bản đồ và hành trình được tuyển chọn kỹ lưỡng từ di sản Huế.',
-                'Discover places beyond the tourist path — through stories, maps, and journeys carefully drawn from the heritage of Huế.',
-              )}
-            </p>
-            <div className={styles.heroCta}>
-              <Link href="/explore" className={styles.btnPrimary}>
-                {t('nav.explore')}
-                <ArrowRight className={styles.btnIcon} weight="bold" aria-hidden="true" />
-              </Link>
-              <Link href="/storyline" className={styles.btnGhost}>
-                {L('Bắt đầu hành trình', 'Start a journey')}
-              </Link>
-            </div>
+        <div className={styles.heroContent}>
+          <span className={styles.tag}>{L('Di sản · Văn hoá Việt Nam', 'Heritage · Vietnamese Culture')}</span>
+          <h1 className={styles.heroTitle}>
+            {L('Khám phá vẻ đẹp', 'Discover the beauty')}{' '}
+            <span className={styles.heroEm}>{L('văn hoá Việt', 'of Vietnam')}</span>{' '}
+            {L('qua từng câu chuyện', 'one story at a time')}
+          </h1>
+          <p className={styles.heroSub}>
+            {L('Bắt đầu từ Cố đô Huế, qua bản đồ, hành trình và tư liệu được tuyển chọn.',
+              'Beginning in the old capital of Huế, through curated maps, journeys, and material.')}
+          </p>
+          <div className={styles.heroCta}>
+            <Link href="/explore" className={styles.btnPrimary}>
+              {t('nav.explore')}
+              <ArrowRight className={styles.btnIcon} weight="bold" aria-hidden="true" />
+            </Link>
+            <Link href="/storyline" className={styles.btnGhost}>{L('Bắt đầu hành trình', 'Start a journey')}</Link>
           </div>
+        </div>
+        <div className={styles.heroCut} aria-hidden="true" />
+      </section>
 
-          <dl className={styles.heroStats}>
+      {/* ───────── Who we are ───────── */}
+      <section className={styles.who}>
+        <div className={styles.collage} data-reveal="fade-right">
+          <span className={`${styles.photo} ${styles.photo1}`} aria-hidden="true" />
+          <span className={`${styles.photo} ${styles.photo2}`} aria-hidden="true" />
+          <span className={`${styles.photo} ${styles.photo3}`} aria-hidden="true" />
+        </div>
+        <div className={styles.whoText} data-reveal="fade-left">
+          <span className={styles.kicker}>{L('Về chúng tôi', 'Who we are')}</span>
+          <h2 className={styles.whoTitle}>
+            {L('Nhịp cầu đưa văn hoá Việt đến gần bạn hơn', 'A bridge that brings Vietnamese culture closer')}
+          </h2>
+          <p className={styles.whoBody}>
+            {L('BeVietnam ra đời từ một mong muốn giản dị: giữ cho những câu chuyện văn hoá không bị lãng quên. Mỗi cổng thành, ngôi chùa và món ăn đều mang một lớp ký ức, và chúng tôi kể lại chúng một cách trung thực.',
+              'BeVietnam began with a simple wish: to keep cultural stories from being forgotten. Every gate, pagoda, and dish carries a layer of memory, and we retell them faithfully.')}
+          </p>
+          <dl className={styles.statRow}>
             {stats.map((s) => (
               <div key={s.value} className={styles.stat}>
                 <dt className={styles.statValue}>{s.value}</dt>
@@ -100,63 +107,55 @@ export default function HomePage() {
             ))}
           </dl>
         </div>
-
-        <Link href="/storyline" className={styles.storyCard} data-reveal="fade-right">
-          <div className={styles.storyImg} aria-hidden="true" />
-          <div className={styles.storyText}>
-            <h3>{L('Mỗi chặng dừng là một câu chuyện', 'Every stop, a story')}</h3>
-            <span className={styles.storyMore}>
-              {L('Tìm hiểu thêm', 'Learn more')}
-              <ArrowRight weight="bold" aria-hidden="true" />
-            </span>
-          </div>
-        </Link>
       </section>
 
-      {/* ───────── Motivation + gate ───────── */}
-      <section className={styles.about}>
-        <div className={styles.aboutText} data-reveal>
-          <span className={styles.kicker}>{L('Vì sao BeVietnam', 'Why BeVietnam')}</span>
-          <h2 className={styles.aboutTitle}>
-            {L('Giữ cho những câu chuyện không bị lãng quên', 'Keeping the stories from being forgotten')}
-          </h2>
-          <p>
-            {L(
-              'BeVietnam ra đời từ một mong muốn giản dị: đưa chiều sâu văn hoá Việt Nam đến gần người trẻ và du khách hơn. Chúng tôi bắt đầu từ Cố đô Huế — nơi mỗi cổng thành, ngôi chùa và món ăn đều mang một lớp ký ức.',
-              'BeVietnam began with a simple wish: to bring the depth of Vietnamese culture closer to young people and travellers. We start in the old capital of Huế — where every gate, pagoda, and dish carries a layer of memory.',
-            )}
-          </p>
-          <p>
-            {L(
-              'Bằng bản đồ, hành trình và tư liệu được tuyển chọn từ sách và nguồn chính thống, mỗi địa điểm trên BeVietnam đều được kể lại một cách trung thực và sống động.',
-              'Through maps, journeys, and material curated from books and official sources, every place on BeVietnam is retold faithfully and vividly.',
-            )}
-          </p>
-        </div>
-        <div className={styles.gateStage} data-reveal="fade-left">
+      {/* ───────── Sources strip ───────── */}
+      <section className={styles.sources} aria-label={L('Nguồn tư liệu', 'Sources')}>
+        <span className={styles.sourcesLabel}>{L('Tư liệu từ', 'Sourced from')}</span>
+        <ul className={styles.sourcesList}>
+          {sources.map((s) => (
+            <li key={s} className={styles.sourceItem}>{s}</li>
+          ))}
+        </ul>
+      </section>
+
+      {/* ───────── Gate band (Three.js) ───────── */}
+      <section className={styles.band}>
+        <div className={styles.bandPattern} aria-hidden="true" />
+        <div className={styles.gateStage} data-reveal>
           <NgoMonHero className={styles.gateCanvas} />
-          <span className={styles.gateCaption}>
-            {L('Ngọ Môn — cổng chính Hoàng thành Huế', 'Ngọ Môn — the main gate of the Huế Citadel')}
-          </span>
+        </div>
+        <div className={styles.bandText} data-reveal>
+          <h2 className={styles.bandTitle}>{L('Mỗi cánh cổng mở ra một câu chuyện', 'Every gate opens a story')}</h2>
+          <p className={styles.bandSub}>
+            {L('Ngọ Môn — cổng chính của Hoàng thành Huế, nơi hành trình của bạn bắt đầu.',
+              'Ngọ Môn, the main gate of the Huế Citadel, where your journey begins.')}
+          </p>
+          <Link href="/storyline" className={styles.btnPrimary}>
+            {L('Bước vào hành trình', 'Enter the journey')}
+            <ArrowRight className={styles.btnIcon} weight="bold" aria-hidden="true" />
+          </Link>
         </div>
       </section>
 
-      {/* ───────── What you can do ───────── */}
-      <section className={styles.pillars}>
-        <header className={styles.sectionHead} data-reveal>
-          <span className={styles.kicker}>{L('Bạn có thể làm gì', 'What you can do')}</span>
-          <h2 className={styles.sectionTitle}>
-            {L('Ba cách để bước vào văn hoá Việt', 'Three ways into Vietnamese culture')}
-          </h2>
+      {/* ───────── Explore places ───────── */}
+      <section className={styles.explore}>
+        <header className={styles.exploreHead}>
+          <h2 className={styles.sectionTitle}>{L('Khám phá điểm đến', 'Explore destinations')}</h2>
+          <Link href="/explore" className={styles.headLink}>
+            {t('common.viewAll')}
+            <ArrowRight weight="bold" aria-hidden="true" />
+          </Link>
         </header>
-        <div className={styles.pillarGrid}>
-          {pillars.map((p, i) => (
-            <Link key={p.href} href={p.href} className={styles.pillarCard} data-reveal style={revealDelay(i)}>
+        <div className={styles.placeGrid}>
+          {places.map((p, i) => (
+            <Link key={p.name.en} href="/explore" className={styles.placeCard} data-reveal style={revealDelay(i)}>
               <DashboardCardEffect className={styles.threeCardCanvas} />
-              <span className={styles.pillarIcon} aria-hidden="true">{p.icon}</span>
-              <h3 className={styles.pillarTitle}>{L(p.title.vi, p.title.en)}</h3>
-              <p className={styles.pillarDesc}>{L(p.desc.vi, p.desc.en)}</p>
-              <span className={styles.pillarMore} aria-hidden="true"><ArrowRight weight="bold" /></span>
+              <span className={styles.placeImg} style={{ backgroundImage: `url(${p.img})` }} aria-hidden="true" />
+              <div className={styles.placeBody}>
+                <span className={styles.placeCat}>{L(p.cat.vi, p.cat.en)}</span>
+                <h3 className={styles.placeName}>{L(p.name.vi, p.name.en)}</h3>
+              </div>
             </Link>
           ))}
         </div>
@@ -181,12 +180,10 @@ export default function HomePage() {
 
       {/* ───────── CTA band ───────── */}
       <section className={styles.ctaBand}>
-        <div className={styles.ctaPattern} aria-hidden="true" />
+        <div className={styles.bandPattern} aria-hidden="true" />
         <div className={styles.ctaInner} data-reveal>
-          <h2 className={styles.ctaTitle}>{L('Bắt đầu hành trình của bạn', 'Begin your journey')}</h2>
-          <p className={styles.ctaText}>
-            {L('Mở bản đồ và để Huế kể cho bạn nghe câu chuyện đầu tiên.', 'Open the map and let Huế tell you the first story.')}
-          </p>
+          <h2 className={styles.bandTitle}>{L('Bắt đầu hành trình của bạn', 'Begin your journey')}</h2>
+          <p className={styles.bandSub}>{L('Mở bản đồ và để Huế kể cho bạn nghe câu chuyện đầu tiên.', 'Open the map and let Huế tell you the first story.')}</p>
           <Link href="/explore" className={styles.btnPrimary}>
             {t('nav.explore')}
             <ArrowRight className={styles.btnIcon} weight="bold" aria-hidden="true" />
