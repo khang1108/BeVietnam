@@ -4,6 +4,7 @@ import com.bevietnam.core.data.remote.api.dto.AuthResponseDto
 import com.bevietnam.core.data.remote.api.dto.HealthResponseDto
 import com.bevietnam.core.data.remote.api.dto.LoginRequestDto
 import com.bevietnam.core.data.remote.api.dto.RegisterRequestDto
+import com.bevietnam.core.data.remote.api.dto.UserDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -24,6 +25,12 @@ interface BeVietnamApi {
 
     @POST("auth/register")
     suspend fun register(@Body request: RegisterRequestDto): AuthResponseDto
+
+    /**
+     * Lấy thông tin người dùng đang đăng nhập (dựa vào token đính kèm).
+     */
+    @GET("auth/me")
+    suspend fun getMe(): UserDto
 
     /**
      * Lấy danh sách địa điểm khám phá.
