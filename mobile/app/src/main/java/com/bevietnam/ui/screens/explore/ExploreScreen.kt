@@ -36,6 +36,9 @@ import android.content.pm.PackageManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bevietnam.R
 import com.bevietnam.core.model.Place
+import com.bevietnam.ui.components.CategoryChip
+import com.bevietnam.ui.components.CulturalBackground
+import com.bevietnam.ui.components.CulturalLoadingIndicator
 import com.bevietnam.ui.components.ErrorView
 import com.bevietnam.ui.components.PlaceCard
 import com.bevietnam.ui.components.SearchBar
@@ -119,24 +122,26 @@ fun ExploreScreenContent(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        when (uiState) {
-            is ExploreUiState.Loading -> ExploreLoadingState()
-            is ExploreUiState.Empty -> ExploreEmptyState(
-                onRetry = onRetry
-            )
-            is ExploreUiState.Error -> ErrorView(
-                message = uiState.message,
-                onRetry = onRetry
-            )
-            is ExploreUiState.Success -> ExploreSuccessContent(
-                state = uiState,
-                onCategorySelected = onCategorySelected,
-                onSearchQueryChanged = onSearchQueryChanged,
-                onPlaceClick = onPlaceClick,
-                onToggleViewMode = onToggleViewMode,
-                onPlaceFocused = onPlaceFocused,
-                onPermissionResult = onPermissionResult
-            )
+        CulturalBackground {
+            when (uiState) {
+                is ExploreUiState.Loading -> ExploreLoadingState()
+                is ExploreUiState.Empty -> ExploreEmptyState(
+                    onRetry = onRetry
+                )
+                is ExploreUiState.Error -> ErrorView(
+                    message = uiState.message,
+                    onRetry = onRetry
+                )
+                is ExploreUiState.Success -> ExploreSuccessContent(
+                    state = uiState,
+                    onCategorySelected = onCategorySelected,
+                    onSearchQueryChanged = onSearchQueryChanged,
+                    onPlaceClick = onPlaceClick,
+                    onToggleViewMode = onToggleViewMode,
+                    onPlaceFocused = onPlaceFocused,
+                    onPermissionResult = onPermissionResult
+                )
+            }
         }
     }
 }
@@ -163,6 +168,7 @@ private fun ExploreSuccessContent(
                 onCategorySelected = onCategorySelected,
                 onSearchQueryChanged = onSearchQueryChanged,
                 onPlaceClick = onPlaceClick,
+                onToggleViewMode = onToggleViewMode,
                 onPlaceFocused = onPlaceFocused,
                 onPermissionResult = onPermissionResult
             )
@@ -171,22 +177,8 @@ private fun ExploreSuccessContent(
                 state = state,
                 onCategorySelected = onCategorySelected,
                 onSearchQueryChanged = onSearchQueryChanged,
-                onPlaceClick = onPlaceClick
-            )
-        }
-
-        // FAB to toggle View Mode
-        FloatingActionButton(
-            onClick = onToggleViewMode,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 16.dp, end = 16.dp),
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = Color.White
-        ) {
-            Icon(
-                imageVector = if (state.isMapView) Icons.AutoMirrored.Filled.List else Icons.Default.Map,
-                contentDescription = stringResource(id = if (state.isMapView) R.string.list_view else R.string.map_view)
+                onPlaceClick = onPlaceClick,
+                onToggleViewMode = onToggleViewMode
             )
         }
     }
@@ -198,6 +190,7 @@ private fun ExploreMapView(
     onCategorySelected: (String) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     onPlaceClick: (Place) -> Unit,
+    onToggleViewMode: () -> Unit,
     onPlaceFocused: (String?) -> Unit,
     onPermissionResult: (Boolean) -> Unit
 ) {
@@ -248,6 +241,7 @@ private fun ExploreMapView(
                 compassEnabled = false,
                 myLocationButtonEnabled = state.hasLocationPermission
             ),
+            contentPadding = PaddingValues(top = 130.dp), // Đẩy nút My Location xuống dưới thanh SearchBar và CategoryFilter
             onMapClick = { onPlaceFocused(null) }
         ) {
             state.filteredPlaces.forEach { place ->
@@ -275,7 +269,16 @@ private fun ExploreMapView(
                 onQueryChanged = onSearchQueryChanged,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                trailingIcon = {
+                    IconButton(onClick = onToggleViewMode) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.List,
+                            contentDescription = stringResource(R.string.list_view),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             )
             CategoryFilterRow(
                 categories = categories,
@@ -291,7 +294,7 @@ private fun ExploreMapView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 80.dp), // padding to clear FAB
+                    .padding(bottom = 120.dp), // padding to clear FAB and BottomNavBar
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -319,11 +322,12 @@ private fun ExploreListView(
     state: ExploreUiState.Success,
     onCategorySelected: (String) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
-    onPlaceClick: (Place) -> Unit
+    onPlaceClick: (Place) -> Unit,
+    onToggleViewMode: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 80.dp)
+        contentPadding = PaddingValues(bottom = 120.dp)
     ) {
         // Ô Tìm kiếm (Search Bar)
         item {
@@ -332,7 +336,16 @@ private fun ExploreListView(
                 onQueryChanged = onSearchQueryChanged,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                trailingIcon = {
+                    IconButton(onClick = onToggleViewMode) {
+                        Icon(
+                            imageVector = Icons.Default.Map,
+                            contentDescription = stringResource(R.string.map_view),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             )
         }
 
@@ -399,21 +412,14 @@ private fun CategoryFilterRow(
             key = { it }
         ) { category ->
             val isSelected = category == selectedCategory
-            Surface(
-                onClick = { onCategorySelected(category) },
-                shape = RoundedCornerShape(50),
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                border = if (!isSelected) androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant) else null,
-                modifier = Modifier.animateContentSize()
-            ) {
-                Text(
-                    text = category,
-                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+            com.bevietnam.ui.components.CategoryChip(
+                category = category,
+                isSelected = isSelected,
+                onSelected = { onCategorySelected(category) },
+                modifier = Modifier.animateItem(
+                    fadeInSpec = androidx.compose.animation.core.tween(300)
                 )
-            }
+            )
         }
     }
 }
@@ -423,42 +429,12 @@ private fun CategoryFilterRow(
  */
 @Composable
 private fun ExploreLoadingState() {
-    val culturalColors = LocalCulturalColors.current
-    val shimmerColors = listOf(culturalColors.shimmerLight, culturalColors.shimmerDark, culturalColors.shimmerLight)
-    val transition = rememberInfiniteTransition(label = "shimmer")
-    val translateAnim by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "shimmer_translate"
-    )
-
-    val brush = Brush.linearGradient(
-        colors = shimmerColors,
-        start = Offset.Zero,
-        end = Offset(x = translateAnim, y = translateAnim)
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Box(modifier = Modifier.fillMaxWidth().height(52.dp).clip(RoundedCornerShape(16.dp)).background(brush))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            repeat(4) {
-                Box(modifier = Modifier.width(80.dp).height(34.dp).clip(RoundedCornerShape(20.dp)).background(brush))
-            }
-        }
-        repeat(4) {
-            Box(modifier = Modifier.fillMaxWidth().height(100.dp).clip(RoundedCornerShape(16.dp)).background(brush))
-        }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CulturalLoadingIndicator()
     }
 }
+
+
 
 /**
  * Trạng thái trống (Empty State) hiển thị khi chưa có bất kỳ địa điểm nào trên hệ thống.

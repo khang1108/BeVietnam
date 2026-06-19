@@ -33,41 +33,23 @@ val fontFamilyBeVietnamPro = FontFamily(
 )
 
 val Typography = Typography(
-    headlineLarge = TextStyle(
-        fontFamily = fontFamilyPlusJakartaSans,
-        fontWeight = FontWeight.Bold,
-        fontSize = 24.sp,
-        lineHeight = 32.sp
-    ),
-    headlineMedium = TextStyle(
-        fontFamily = fontFamilyPlusJakartaSans,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 20.sp,
-        lineHeight = 28.sp
-    ),
-    bodyLarge = TextStyle(
-        fontFamily = fontFamilyBeVietnamPro,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = fontFamilyBeVietnamPro,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        lineHeight = 20.sp
-    ),
-    labelLarge = TextStyle(
-        fontFamily = fontFamilyBeVietnamPro,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.02.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = fontFamilyBeVietnamPro,
-        fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
-        lineHeight = 16.sp
-    )
+    displayLarge = TextStyle(fontFamily = fontFamilyPlusJakartaSans, fontWeight = FontWeight.Bold, fontSize = 57.sp, lineHeight = 64.sp),
+    displayMedium = TextStyle(fontFamily = fontFamilyPlusJakartaSans, fontWeight = FontWeight.Bold, fontSize = 45.sp, lineHeight = 52.sp),
+    displaySmall = TextStyle(fontFamily = fontFamilyPlusJakartaSans, fontWeight = FontWeight.Bold, fontSize = 36.sp, lineHeight = 44.sp),
+
+    headlineLarge = TextStyle(fontFamily = fontFamilyPlusJakartaSans, fontWeight = FontWeight.Bold, fontSize = 32.sp, lineHeight = 40.sp),
+    headlineMedium = TextStyle(fontFamily = fontFamilyPlusJakartaSans, fontWeight = FontWeight.SemiBold, fontSize = 28.sp, lineHeight = 36.sp),
+    headlineSmall = TextStyle(fontFamily = fontFamilyPlusJakartaSans, fontWeight = FontWeight.SemiBold, fontSize = 24.sp, lineHeight = 32.sp),
+
+    titleLarge = TextStyle(fontFamily = fontFamilyPlusJakartaSans, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, lineHeight = 28.sp),
+    titleMedium = TextStyle(fontFamily = fontFamilyPlusJakartaSans, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, lineHeight = 24.sp),
+    titleSmall = TextStyle(fontFamily = fontFamilyPlusJakartaSans, fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp),
+
+    bodyLarge = TextStyle(fontFamily = fontFamilyBeVietnamPro, fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 24.sp),
+    bodyMedium = TextStyle(fontFamily = fontFamilyBeVietnamPro, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 20.sp),
+    bodySmall = TextStyle(fontFamily = fontFamilyBeVietnamPro, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 16.sp),
+
+    labelLarge = TextStyle(fontFamily = fontFamilyBeVietnamPro, fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp),
+    labelMedium = TextStyle(fontFamily = fontFamilyBeVietnamPro, fontWeight = FontWeight.Medium, fontSize = 12.sp, lineHeight = 16.sp),
+    labelSmall = TextStyle(fontFamily = fontFamilyBeVietnamPro, fontWeight = FontWeight.Medium, fontSize = 11.sp, lineHeight = 16.sp)
 )

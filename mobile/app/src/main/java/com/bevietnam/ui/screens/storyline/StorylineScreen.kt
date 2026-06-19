@@ -113,7 +113,7 @@ private fun StorylineSuccessContent(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 24.dp)
+        contentPadding = PaddingValues(bottom = 120.dp)
     ) {
         // Banner hiển thị nổi bật Nhiệm vụ tiếp theo cần làm
         state.nextTask?.let {

@@ -40,7 +40,8 @@ fun SearchBar(
     query: String,
     onQueryChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = stringResource(R.string.search_heritage)
+    placeholder: String = stringResource(R.string.search_heritage),
+    trailingIcon: @Composable (() -> Unit)? = null
 ) {
     TextField(
         value = query,
@@ -56,7 +57,8 @@ fun SearchBar(
                 width = 0.5.dp,
                 color = MaterialTheme.colorScheme.outlineVariant,
                 shape = RoundedCornerShape(28.dp)
-            ),
+            )
+            .clip(RoundedCornerShape(28.dp)),
         placeholder = {
             Text(
                 text = placeholder,
@@ -72,6 +74,7 @@ fun SearchBar(
                 modifier = Modifier.size(24.dp)
             )
         },
+        trailingIcon = trailingIcon,
         singleLine = true,
         shape = RoundedCornerShape(28.dp),
         colors = TextFieldDefaults.colors(

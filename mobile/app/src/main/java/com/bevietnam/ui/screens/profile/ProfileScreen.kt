@@ -93,7 +93,7 @@ fun ProfileScreen(
         val user = uiState.user
 
         when {
-            uiState.isLoading -> LoadingIndicator(
+            uiState.isLoading -> com.bevietnam.ui.components.CulturalLoadingIndicator(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
@@ -113,7 +113,7 @@ fun ProfileScreen(
                 onSaveClick = viewModel::saveProfile,
                 onCancelClick = viewModel::toggleEditMode,
                 onShareClick = {
-                    Toast.makeText(context, "Tính năng chia sẻ đang phát triển!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.share_coming_soon), Toast.LENGTH_SHORT).show()
                 },
                 onLogoutClick = viewModel::logout,
                 modifier = Modifier.padding(paddingValues)
@@ -195,7 +195,10 @@ private fun ProfileContent(
                         Icon(
                             imageVector = if (user.gender == Gender.MALE)
                                 Icons.Default.Male else Icons.Default.Female,
-                            contentDescription = if (user.gender == Gender.MALE) "Nam" else "Nữ",
+                            contentDescription = if (user.gender == Gender.MALE)
+                                stringResource(R.string.gender_male_desc)
+                            else
+                                stringResource(R.string.gender_female_desc),
                             tint = if (user.gender == Gender.MALE)
                                 MaterialTheme.colorScheme.primary
                             else MaterialTheme.colorScheme.tertiary,
@@ -256,12 +259,12 @@ private fun ProfileContent(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     ProfileStatItem(
-                        label = "Cấp độ",
+                        label = stringResource(R.string.stat_level),
                         value = user.level.toString(),
                         icon = Icons.Default.Star
                     )
                     ProfileStatItem(
-                        label = "Điểm",
+                        label = stringResource(R.string.stat_points),
                         value = user.points.toString(),
                         icon = Icons.Default.EmojiEvents
                     )
@@ -306,8 +309,8 @@ private fun ProfileContent(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (!user.location.isNullOrBlank()) ProfileInfoCard("Vị trí", user.location, Icons.Default.LocationOn)
-                if (!user.createdAt.isNullOrBlank()) ProfileInfoCard("Ngày tham gia", user.createdAt, Icons.Default.CalendarToday)
+                if (!user.location.isNullOrBlank()) ProfileInfoCard(stringResource(R.string.profile_location), user.location, Icons.Default.LocationOn)
+                if (!user.createdAt.isNullOrBlank()) ProfileInfoCard(stringResource(R.string.profile_joined_date), user.createdAt, Icons.Default.CalendarToday)
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -321,7 +324,7 @@ private fun ProfileContent(
                 shadowElevation = 4.dp
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
-                    Text("Chỉnh sửa hồ sơ", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.edit_profile_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.height(16.dp))
 
                     OutlinedTextField(
@@ -345,7 +348,7 @@ private fun ProfileContent(
                     OutlinedTextField(
                         value = uiState.editLocation,
                         onValueChange = onLocationChange,
-                        label = { Text("Vị trí") },
+                        label = { Text(stringResource(R.string.profile_location)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         leadingIcon = { Icon(Icons.Default.LocationOn, null, Modifier.size(18.dp)) },
@@ -388,7 +391,7 @@ private fun ProfileContent(
         // Nút Đăng xuất (Logout Button)
         OutlinedButton(
             onClick = onLogoutClick,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(48.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
         ) {
@@ -399,7 +402,7 @@ private fun ProfileContent(
 
         Spacer(modifier = Modifier.height(16.dp))
         Text(stringResource(R.string.app_version), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f))
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(120.dp)) // Không gian bù trừ cho BottomNavBar
     }
 }
 

@@ -14,14 +14,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bevietnam.R
 import com.bevietnam.core.model.RecommendationItem
-import com.bevietnam.ui.components.*
+import com.bevietnam.ui.components.CategoryChip
+import com.bevietnam.ui.components.CulturalBackground
+import com.bevietnam.ui.components.ErrorView
+import com.bevietnam.ui.components.RecommendationCard
+import com.bevietnam.ui.components.SearchBar
 import com.bevietnam.ui.theme.BeVietnamTheme
 import com.bevietnam.ui.theme.CulturalAmber
 import com.bevietnam.ui.theme.Dimens
@@ -37,6 +43,7 @@ import com.bevietnam.ui.theme.Dimens
  */
 @Composable
 fun FeedScreen(
+    onPlaceClick: (String) -> Unit = {},
     viewModel: FeedViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -45,7 +52,8 @@ fun FeedScreen(
         uiState = uiState,
         onRetry = viewModel::loadRecommendations,
         onSearchQueryChange = viewModel::onSearchQueryChange,
-        onCategorySelect = viewModel::onCategorySelect
+        onCategorySelect = viewModel::onCategorySelect,
+        onPlaceClick = onPlaceClick
     )
 }
 
@@ -68,14 +76,16 @@ fun FeedScreenContent(
     onRetry: () -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onCategorySelect: (String) -> Unit,
+    onPlaceClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        when {
-            uiState.isLoading -> LoadingIndicator(modifier = Modifier.fillMaxSize())
+        CulturalBackground {
+            when {
+            uiState.isLoading -> com.bevietnam.ui.components.CulturalLoadingIndicator(modifier = Modifier.fillMaxSize())
             uiState.errorMessage != null -> ErrorView(
                 message = uiState.errorMessage,
                 onRetry = onRetry
@@ -87,7 +97,7 @@ fun FeedScreenContent(
                         start = Dimens.gutterCard,
                         end = Dimens.gutterCard,
                         top = Dimens.gutterCard,
-                        bottom = 80.dp // Padding cho Bottom Navigation Bar
+                        bottom = 120.dp // Padding lớn hơn cho Floating Bottom Navigation Bar
                     ),
                     verticalArrangement = Arrangement.spacedBy(Dimens.gutterCard)
                 ) {
@@ -96,7 +106,7 @@ fun FeedScreenContent(
                         SearchBar(
                             query = uiState.searchQuery,
                             onQueryChanged = onSearchQueryChange,
-                            placeholder = "Tìm địa điểm gợi ý...",
+                            placeholder = stringResource(R.string.search_feed_hint),
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -142,6 +152,7 @@ fun FeedScreenContent(
                             RecommendationCard(
                                 item = item,
                                 rank = index + 1,
+                                onClick = { onPlaceClick(item.placeId) },
                                 modifier = Modifier.animateItem(
                                     fadeInSpec = tween(durationMillis = 300),
                                     fadeOutSpec = tween(durationMillis = 300)
@@ -150,6 +161,7 @@ fun FeedScreenContent(
                         }
                     }
                 }
+            }
             }
         }
     }
@@ -180,13 +192,13 @@ private fun RecommendationSectionHeader(
                 modifier = Modifier.size(22.dp)
             )
             Text(
-                text = "Gợi ý cho bạn",
+                text = stringResource(R.string.feed_section_header),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
         Text(
-            text = "$itemCount địa điểm",
+            text = stringResource(R.string.feed_places_count, itemCount),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -208,13 +220,13 @@ private fun FeedEmptyState() {
         Text(text = "🔍", fontSize = 64.sp)
         Spacer(modifier = Modifier.height(Dimens.gutterCard))
         Text(
-            text = "Không tìm thấy gợi ý phù hợp",
+            text = stringResource(R.string.feed_empty_title),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(Dimens.spacingBase))
         Text(
-            text = "Thử thay đổi từ khóa hoặc danh mục",
+            text = stringResource(R.string.feed_empty_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.outline
         )
@@ -255,7 +267,8 @@ fun FeedScreenPreview() {
             ),
             onRetry = {},
             onSearchQueryChange = {},
-            onCategorySelect = {}
+            onCategorySelect = {},
+            onPlaceClick = {}
         )
     }
 }

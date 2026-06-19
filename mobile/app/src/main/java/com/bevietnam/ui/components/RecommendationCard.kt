@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.bevietnam.R
 import com.bevietnam.core.model.RecommendationItem
 import com.bevietnam.ui.theme.CulturalAmber
 import com.bevietnam.ui.theme.CulturalGold
@@ -76,7 +78,7 @@ fun RecommendationCard(
                         .data(item.thumbnailUrl)
                         .crossfade(true)
                         .build(),
-                    contentDescription = "Hình ảnh ${item.name}",
+                    contentDescription = stringResource(R.string.recommendation_image_desc, item.name),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
@@ -221,7 +223,7 @@ private fun ScoreBadge(
                     )
                 }
                 Text(
-                    text = "điểm",
+                    text = stringResource(R.string.recommendation_score_unit),
                     style = MaterialTheme.typography.labelSmall,
                     color = CulturalAmber,
                     fontWeight = FontWeight.SemiBold
@@ -286,7 +288,7 @@ private fun ExplanationSection(
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
-                    text = "Tại sao gợi ý này?",
+                    text = stringResource(R.string.recommendation_why_title),
                     style = MaterialTheme.typography.labelLarge,
                     color = CulturalAmber,
                     fontWeight = FontWeight.Bold
@@ -316,7 +318,8 @@ private fun ExplanationSection(
                 horizontalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
-                    text = if (isExpanded) "Thu gọn" else "Xem thêm",
+                    text = if (isExpanded) stringResource(R.string.recommendation_collapse)
+                           else stringResource(R.string.recommendation_expand),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold
@@ -326,7 +329,10 @@ private fun ExplanationSection(
                         Icons.Outlined.KeyboardArrowUp
                     else
                         Icons.Outlined.KeyboardArrowDown,
-                    contentDescription = if (isExpanded) "Thu gọn giải thích" else "Xem thêm giải thích",
+                    contentDescription = if (isExpanded)
+                        stringResource(R.string.recommendation_collapse_desc)
+                    else
+                        stringResource(R.string.recommendation_expand_desc),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(16.dp)
                 )

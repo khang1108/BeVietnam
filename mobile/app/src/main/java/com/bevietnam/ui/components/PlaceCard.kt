@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.bevietnam.R
 import com.bevietnam.core.model.Place
 import com.bevietnam.ui.theme.BeVietnamTheme
 
@@ -78,7 +80,7 @@ fun PlaceCard(
                         .data(place.imageUrl)
                         .crossfade(true)
                         .build(),
-                    contentDescription = "Hình ảnh của ${place.name}",
+                    contentDescription = stringResource(R.string.place_image_desc, place.name),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -151,7 +153,7 @@ fun PlaceCard(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Public,
-                            contentDescription = "Tìm hiểu thêm",
+                            contentDescription = stringResource(R.string.place_learn_more),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(22.dp)
                         )

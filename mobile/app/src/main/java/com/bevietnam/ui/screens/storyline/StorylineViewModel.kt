@@ -7,6 +7,7 @@ import com.bevietnam.core.domain.usecase.CompleteTaskUseCase
 import com.bevietnam.core.domain.usecase.GetNextTaskUseCase
 import com.bevietnam.core.model.Task
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -85,6 +86,8 @@ class StorylineViewModel @Inject constructor(
                         )
                     }
                 }
+            } catch (e: CancellationException) {
+                throw e // Không nuốt CancellationException — để coroutine hủy đúng cách
             } catch (e: Exception) {
                 _uiState.value = StorylineUiState.Error(e.message ?: "Đã xảy ra lỗi không xác định")
             }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.bevietnam.core.domain.usecase.GetPlacesUseCase
 import com.bevietnam.core.model.Place
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -99,6 +100,8 @@ class ExploreViewModel @Inject constructor(
                         ExploreUiState.Success(places = places, filteredPlaces = places)
                     }
                 }
+            } catch (e: CancellationException) {
+                throw e // Không nuốt CancellationException — để coroutine hủy đúng cách
             } catch (e: Exception) {
                 _uiState.value = ExploreUiState.Error(e.message ?: "Đã xảy ra lỗi không xác định")
             }
