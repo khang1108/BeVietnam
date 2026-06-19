@@ -1,31 +1,25 @@
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, status
-from app.repositories.user_repository import UserRepository
-from app.core.security import hash_password, verify_password, create_access_token
-from app.core.logger import logger
+from app.core.database import get_db
+from app.services.auth_service import AuthService
+from app.repositories.user_repository import UserRepository   # ← THÊM dòng import này
+from app.schemas.schemas import RegisterRequest, LoginRequest, TokenResponse, UserResponse
+from app.api.dependencies import get_current_user
+from app.models.user import User
 
-class AuthService:
-    def __init__(self, db: Session):
-        self.repo = UserRepository(db)
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
-    def register(self, email: str, password: str):
-        if self.repo.get_by_email(email):
-            logger.warning(f"Register failed: email already exists {email}")
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already registered"
-            )
-        user = self.repo.create(email=email, hashed_password=hash_password(password))
-        logger.info(f"New user registered: {email}")
-        return user
+@router.post("/register", response_model=UserResponse, status_code=201)
+def register(body: RegisterRequest, db: Session = Depends(get_db)):
+    return AuthService(db).register(email=body.email, password=body.password)
 
-    def login(self, email: str, password: str) -> str:
-        user = self.repo.get_by_email(email)
-        if not user or not verify_password(password, user.hashed_password):
-            logger.warning(f"Login failed for: {email}")
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid email or password"
-            )
-        logger.info(f"User logged in: {email}")
-        return create_access_token({"sub": str(user.id)})
+@router.post("/login", response_model=TokenResponse)
+def login(body: LoginRequest, db: Session = Depends(get_db)):
+    auth_service = AuthService(db)
+    token = auth_service.login(email=body.email, password=body.password)
+    user = UserRepository(db).get_by_email(body.email)   # ← lấy user bằng Repository có sẵn
+    return TokenResponse(access_token=token, token_type="bearer", user=user)
+
+@router.get("/me", response_model=UserResponse)
+def me(current_user: User = Depends(get_current_user)):
+    return current_user
