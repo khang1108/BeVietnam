@@ -1,6 +1,7 @@
 package com.bevietnam.core.di
 
 import com.bevietnam.core.data.repository.AuthRepository
+
 import com.bevietnam.core.data.repository.PlaceRepository
 import com.bevietnam.core.data.repository.TaskRepository
 import com.bevietnam.core.data.repository.UserRepository

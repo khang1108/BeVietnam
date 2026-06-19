@@ -87,7 +87,7 @@ dependencies {
 
     // Networking
     implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.okhttp.logging)
 
     // Image Loading

@@ -90,28 +90,7 @@ fun AppNavHostContent(
         modifier = modifier,
         topBar = {
             if (isBottomBarVisible) {
-                AppTopBar(
-                    avatarUrl = currentUser?.avatarUrl,
-                    onAvatarClick = {
-                        navController.navigate(ProfileRoute(currentUser?.id ?: "-1")) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
-                    showCreatePost = true,
-                    onCreatePostClick = {
-                        navController.navigate(CameraRoute) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                )
+                AppTopBar()
             }
         },
         bottomBar = {
@@ -134,7 +113,7 @@ fun AppNavHostContent(
         NavHost(
             navController = navController,
             startDestination = AuthRoute,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
         ) {
             composable<AuthRoute> {
                 AuthScreen(
@@ -171,7 +150,11 @@ fun AppNavHostContent(
             }
             
             composable<FeedRoute> { 
-                FeedScreen() 
+                FeedScreen(
+                    onPlaceClick = { placeId ->
+                        navController.navigate(PlaceDetailRoute(placeId))
+                    }
+                ) 
             }
 
             composable<CameraRoute> {
