@@ -1,26 +1,38 @@
 package com.bevietnam.core.data.repository
 
+import com.bevietnam.core.data.remote.api.BeVietnamApi
+import com.bevietnam.core.data.remote.mapper.toTask
 import com.bevietnam.core.domain.repository.ITaskRepository
+import com.bevietnam.core.domain.session.SessionManager
 import com.bevietnam.core.model.Task
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-// TODO(Backend): Inject BeVietnamApi and implement actual API calls
 @Singleton
 class TaskRepository @Inject constructor(
-    // private val api: BeVietnamApi
+    private val api: BeVietnamApi,
+    private val sessionManager: SessionManager
 ) : ITaskRepository {
 
-    override fun getTasks(): Flow<List<Task>> {
-        TODO("Not yet implemented: connect to GET /api/v1/tasks")
+    private fun currentUserId(): String =
+        sessionManager.currentUser.value?.id?.toString() ?: "guest"
+
+    // BE hiện chỉ có GET /storyline/next-task (1 task tiếp theo), chưa có endpoint
+    // lấy cả danh sách. Tạm trả task tiếp theo dưới dạng list 1 phần tử để UI hiển thị.
+    override fun getTasks(): Flow<List<Task>> = flow {
+        val response = api.getNextTask(currentUserId())
+        emit(listOf(response.task.toTask()))
     }
 
-    override fun getNextTask(): Flow<Task?> {
-        TODO("Not yet implemented: connect to GET /api/v1/tasks/next")
+    override fun getNextTask(): Flow<Task?> = flow {
+        val response = api.getNextTask(currentUserId())
+        emit(response.task.toTask())
     }
 
+    // BE chưa có endpoint đánh dấu hoàn thành task.
     override suspend fun completeTask(taskId: String) {
-        TODO("Not yet implemented: connect to POST /api/v1/tasks/{id}/complete")
+        // TODO(Backend): chờ BE cung cấp POST /storyline/tasks/{id}/complete
     }
 }

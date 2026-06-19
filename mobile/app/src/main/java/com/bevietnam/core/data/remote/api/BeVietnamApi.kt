@@ -1,6 +1,7 @@
 package com.bevietnam.core.data.remote.api
 
 import com.bevietnam.core.data.remote.api.dto.HealthResponseDto
+import com.bevietnam.core.data.remote.api.dto.StorylineNextTaskResponseDto
 import retrofit2.http.GET
 
 /**
@@ -29,4 +30,12 @@ interface BeVietnamApi {
      */
     @GET("feed")
     suspend fun getFeed(): com.bevietnam.core.data.remote.api.dto.FeedResponseDto
+
+    /**
+     * Lấy nhiệm vụ văn hóa tiếp theo cho người dùng (khớp endpoint của BE).
+     */
+    @GET("storyline/next-task")
+    suspend fun getNextTask(
+        @retrofit2.http.Query("user_id") userId: String
+    ): StorylineNextTaskResponseDto
 }
