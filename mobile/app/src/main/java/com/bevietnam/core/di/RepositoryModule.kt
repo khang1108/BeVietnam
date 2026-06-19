@@ -1,9 +1,9 @@
 package com.bevietnam.core.di
 
-import com.bevietnam.core.data.mock.MockAuthRepository
-import com.bevietnam.core.data.mock.MockPlaceRepository
-import com.bevietnam.core.data.mock.MockUserRepository
-import com.bevietnam.core.data.mock.MockFeedRepository
+import com.bevietnam.core.data.repository.AuthRepository
+import com.bevietnam.core.data.repository.PlaceRepository
+import com.bevietnam.core.data.repository.UserRepository
+import com.bevietnam.core.data.repository.FeedRepository
 import com.bevietnam.core.data.repository.TaskRepository
 import com.bevietnam.core.data.repository.CaptureRepository
 import com.bevietnam.core.data.repository.HealthRepository
@@ -27,7 +27,7 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPlaceRepository(
-        placeRepository: MockPlaceRepository
+        placeRepository: PlaceRepository
     ): IPlaceRepository
 
     @Binds
@@ -40,19 +40,19 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAuthRepository(
-        authRepository: MockAuthRepository
+        authRepository: AuthRepository
     ): IAuthRepository
 
     @Binds
     @Singleton
     abstract fun bindUserRepository(
-        userRepository: MockUserRepository
+        userRepository: UserRepository
     ): IUserRepository
 
     @Binds
     @Singleton
     abstract fun bindFeedRepository(
-        feedRepository: MockFeedRepository
+        feedRepository: FeedRepository
     ): IFeedRepository
 
     @Binds
