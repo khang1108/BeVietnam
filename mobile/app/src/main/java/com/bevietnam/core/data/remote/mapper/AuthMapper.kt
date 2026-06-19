@@ -13,7 +13,7 @@ fun UserDto.toUser(): User = User(
     gender = gender?.let { runCatching { Gender.valueOf(it.uppercase()) }.getOrNull() },
     dateOfBirth = dateOfBirth,
     location = location,
-    joinedDate = joinedDate,
+    createdAt = joinedDate,
     level = level ?: 1,
     points = points ?: 0
 )

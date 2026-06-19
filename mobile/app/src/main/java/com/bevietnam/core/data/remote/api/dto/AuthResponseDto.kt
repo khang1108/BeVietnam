@@ -1,23 +1,26 @@
 package com.bevietnam.core.data.remote.api.dto
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class AuthResponseDto(
-    @SerializedName("access_token") val accessToken: String,
-    @SerializedName("token_type") val tokenType: String = "Bearer",
-    @SerializedName("user") val user: UserDto
+    @SerialName("access_token") val accessToken: String,
+    @SerialName("token_type") val tokenType: String = "Bearer",
+    @SerialName("user") val user: UserDto
 )
 
+@Serializable
 data class UserDto(
-    @SerializedName("id") val id: Int,
-    @SerializedName("name") val name: String,
-    @SerializedName("email") val email: String,
-    @SerializedName("avatar_url") val avatarUrl: String?,
-    @SerializedName("bio") val bio: String?,
-    @SerializedName("gender") val gender: String?,
-    @SerializedName("date_of_birth") val dateOfBirth: String?,
-    @SerializedName("location") val location: String?,
-    @SerializedName("joined_date") val joinedDate: String?,
-    @SerializedName("level") val level: Int?,
-    @SerializedName("points") val points: Int?
+    @SerialName("id") val id: String,
+    @SerialName("name") val name: String,
+    @SerialName("email") val email: String,
+    @SerialName("avatar_url") val avatarUrl: String? = null,
+    @SerialName("bio") val bio: String? = null,
+    @SerialName("gender") val gender: String? = null,
+    @SerialName("date_of_birth") val dateOfBirth: String? = null,
+    @SerialName("location") val location: String? = null,
+    @SerialName("joined_date") val joinedDate: String? = null,
+    @SerialName("level") val level: Int? = null,
+    @SerialName("points") val points: Int? = null
 )
