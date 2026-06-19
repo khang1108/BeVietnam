@@ -1,6 +1,7 @@
 package com.bevietnam.core.di
 
 import com.bevietnam.core.data.remote.api.BeVietnamApi
+import com.bevietnam.core.network.AuthInterceptor
 import com.bevietnam.core.util.Constants
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -30,9 +31,11 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        loggingInterceptor: HttpLoggingInterceptor
+        loggingInterceptor: HttpLoggingInterceptor,
+        authInterceptor: AuthInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
             .connectTimeout(Constants.NETWORK_TIMEOUT, TimeUnit.SECONDS)
             .readTimeout(Constants.NETWORK_TIMEOUT, TimeUnit.SECONDS)
