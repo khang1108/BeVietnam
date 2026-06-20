@@ -59,6 +59,9 @@ class VerifyTaskCaptureBody(BaseModel):
 
 class VerifyTaskCaptureResponse(BaseModel):
     approved: bool
+    match: bool = False
     status: str
     reason: str = ""
     confidence: float = 0.0
+    fallback: bool = False
+    ai_generated: bool = False

@@ -70,6 +70,63 @@ class VLLMGateway:
             logger.warning("vLLM call failed: %s", exc)
             return {}
 
+    def generate_vision_json(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        image_url: str,
+        max_tokens: int = 400,
+    ) -> dict[str, Any]:
+        """
+        Call the vLLM vision backend with OpenAI-compatible multimodal messages.
+
+        vLLM documents Chat Completions compatibility and multimodal
+        `image_url` content, including base64 data URLs.
+        Sources:
+        - https://docs.vllm.ai/en/v0.8.3/serving/openai_compatible_server.html#chat-api
+        - https://docs.vllm.ai/en/v0.7.3/getting_started/examples/openai_chat_completion_client_for_multimodal.html
+        """
+        import httpx
+
+        url = settings.vllm_vision_base_url.rstrip("/") + "/chat/completions"
+        headers = {"Content-Type": "application/json"}
+        if settings.vllm_api_key:
+            headers["Authorization"] = f"Bearer {settings.vllm_api_key}"
+        payload = {
+            "model": settings.vllm_vision_model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": user_prompt},
+                        {"type": "image_url", "image_url": {"url": image_url}},
+                    ],
+                },
+            ],
+            "temperature": 0.0,
+            "max_tokens": max_tokens,
+            "response_format": {"type": "json_object"},
+        }
+        try:
+            response = httpx.post(
+                url,
+                json=payload,
+                headers=headers,
+                timeout=float(settings.vllm_timeout_seconds),
+            )
+            response.raise_for_status()
+            raw_text = response.json()["choices"][0]["message"]["content"].strip()
+            result = json.loads(raw_text)
+            logger.info("vLLM vision returned valid JSON (%d keys)", len(result))
+            return result
+        except json.JSONDecodeError as exc:
+            logger.warning("vLLM vision returned invalid JSON: %s", exc)
+            return {}
+        except Exception as exc:
+            logger.warning("vLLM vision call failed: %s", exc)
+            return {}
+
 
 # ── Singleton instance ────────────────────────────────────────────────────────
 # Import in agent modules: from services.ai.common.llm import llm_gateway

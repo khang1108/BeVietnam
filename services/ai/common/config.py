@@ -54,7 +54,15 @@ class Settings(BaseSettings):
     llm_provider: str = "vllm"  # "vllm" | "mock"
     vllm_base_url: str = "https://api.iamphuckhang.dev/v1"
     vllm_model: str = "qwen2.5-14b-instruct"  # the --served-model-name
+    vllm_vision_base_url: str = "https://api.iamphuckhang.dev/vision/v1"
+    vllm_vision_model: str = "qwen2.5-vl-7b-instruct"
     vllm_api_key: str = ""  # empty = open endpoint
+    vllm_timeout_seconds: int = 90
+
+    # ── Observability (LangSmith) ────────────────────────────────────────────
+    # Set LANGSMITH_TRACING=true and LANGSMITH_API_KEY in the environment to
+    # enable traces. LANGSMITH_PROJECT controls the project name.
+    langsmith_project: str = "BeVietnam AI"
 
     # ── General ───────────────────────────────────────────────────────────────
     log_level: str = "INFO"

@@ -19,6 +19,7 @@ from services.ai.agents.culture_scout import CultureScout
 from services.ai.agents.trip_advisor import scoring
 from services.ai.common.config import settings
 from services.ai.common.llm import llm_gateway
+from services.ai.common.tracing import traceable
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,7 @@ class TripAdvisorAgent:
     def __init__(self, scout: CultureScout | None = None) -> None:
         self._scout = scout or CultureScout()
 
+    @traceable(name="Trip Advisor Explain", run_type="chain")
     def explain(self, context: dict[str, Any]) -> dict[str, Any]:
         """
         Build the recommendation result for a single place.

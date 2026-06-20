@@ -129,15 +129,19 @@ async def verify_task_capture(body: VerifyTaskCaptureBody):
                 inner = data
 
     status = str(inner.get("status", "error"))
+    match = bool(inner.get("match", status == "approved"))
     approved = status == "approved"
     reason = inner.get("reason", "")
     conf = inner.get("confidence", 0.0)
 
     return VerifyTaskCaptureResponse(
         approved=approved,
+        match=match,
         status=status,
         reason=str(reason or ""),
         confidence=float(conf) if conf is not None else 0.0,
+        fallback=bool(inner.get("fallback", False)),
+        ai_generated=bool(inner.get("ai_generated", False)),
     )
 
 

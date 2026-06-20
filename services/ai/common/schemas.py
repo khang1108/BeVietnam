@@ -113,9 +113,12 @@ class VerifyCaptureRequest(BaseModel):
 class CaptureVerification(BaseModel):
     """Response for capture verification."""
 
+    match: bool = False
     status: str  # "approved", "rejected", "needs_review"
     reason: str
     confidence: float
+    fallback: bool = False
+    ai_generated: bool = False
 
 
 # ── Quest Chain (for full chain retrieval) ────────────────────────────────────
