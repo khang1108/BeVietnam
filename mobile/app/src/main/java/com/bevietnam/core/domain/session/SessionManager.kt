@@ -11,7 +11,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SessionManager @Inject constructor() {
+class SessionManager @Inject constructor(
+    private val tokenStorage: com.bevietnam.core.data.local.TokenStorage
+) {
 
     private val _currentUser = MutableStateFlow<com.bevietnam.core.model.User?>(null)
     val currentUser: StateFlow<com.bevietnam.core.model.User?> = _currentUser.asStateFlow()
@@ -30,5 +32,6 @@ class SessionManager @Inject constructor() {
 
     fun logout() {
         _currentUser.value = null
+        tokenStorage.clearToken()
     }
 }

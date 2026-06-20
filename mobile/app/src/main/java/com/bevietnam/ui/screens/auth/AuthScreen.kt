@@ -162,15 +162,11 @@ fun AuthScreen(
                     } else {
                         RegisterForm(
                             name = uiState.name,
-                            gender = uiState.gender,
-                            dateOfBirthDisplay = uiState.dateOfBirthDisplay,
                             registerEmail = uiState.registerEmail,
                             registerPassword = uiState.registerPassword,
                             errorMessage = uiState.errorMessage,
                             isLoading = uiState.isLoading,
                             onNameChange = viewModel::onNameChange,
-                            onGenderChange = viewModel::onGenderChange,
-                            onDateOfBirthChange = viewModel::onDateOfBirthChange,
                             onRegisterEmailChange = viewModel::onRegisterEmailChange,
                             onRegisterPasswordChange = viewModel::onRegisterPasswordChange,
                             onRegisterClick = viewModel::register,
@@ -331,15 +327,11 @@ private fun LoginForm(
 @Composable
 private fun RegisterForm(
     name: String,
-    gender: Gender?,
-    dateOfBirthDisplay: String,
     registerEmail: String,
     registerPassword: String,
     errorMessage: String?,
     isLoading: Boolean,
     onNameChange: (String) -> Unit,
-    onGenderChange: (Gender) -> Unit,
-    onDateOfBirthChange: (LocalDate) -> Unit,
     onRegisterEmailChange: (String) -> Unit,
     onRegisterPasswordChange: (String) -> Unit,
     onRegisterClick: () -> Unit,
@@ -355,23 +347,7 @@ private fun RegisterForm(
             leadingIcon = Icons.Default.Person
         )
 
-        Spacer(Modifier.height(14.dp))
 
-        Text(
-            text = stringResource(R.string.gender),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(Modifier.height(6.dp))
-        GenderSelector(selected = gender, onSelect = onGenderChange)
-
-        Spacer(Modifier.height(14.dp))
-
-        DatePickerField(
-            label = stringResource(R.string.date_of_birth),
-            displayValue = dateOfBirthDisplay,
-            onDateSelected = onDateOfBirthChange
-        )
 
         Spacer(Modifier.height(14.dp))
 
@@ -480,15 +456,11 @@ private fun RegisterFormPreview() {
         Column(Modifier.padding(24.dp)) {
             RegisterForm(
                 name = "",
-                gender = null,
-                dateOfBirthDisplay = "",
                 registerEmail = "",
                 registerPassword = "",
                 errorMessage = null,
                 isLoading = false,
                 onNameChange = {},
-                onGenderChange = {},
-                onDateOfBirthChange = {},
                 onRegisterEmailChange = {},
                 onRegisterPasswordChange = {},
                 onRegisterClick = {},

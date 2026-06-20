@@ -81,6 +81,18 @@ fun AppNavHostContent(
         Screen.bottomNavItems.any { item -> dest.hasRoute(item.route::class) }
     } ?: false
 
+    // Auto-login / Auth navigation side effect
+    androidx.compose.runtime.LaunchedEffect(currentUser) {
+        if (currentUser != null) {
+            // Nếu có dữ liệu user nhưng đang ở AuthRoute (Login/Register), đẩy thẳng vào ProfileRoute
+            if (currentDestination?.hasRoute(AuthRoute::class) == true || currentDestination == null) {
+                navController.navigate(ProfileRoute(currentUser.id)) {
+                    popUpTo(AuthRoute) { inclusive = true }
+                }
+            }
+        }
+    }
+
     // Xác định KClass đại diện cho Route của màn hình đang hiển thị để làm nổi bật tab điều hướng tương ứng
     val currentRouteClass = Screen.bottomNavItems.find { item ->
         currentDestination?.hasRoute(item.route::class) == true

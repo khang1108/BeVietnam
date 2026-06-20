@@ -37,11 +37,7 @@ data class ProfileUiState(
     val errorMessage: String? = null,
     val isEditMode: Boolean = false,
     val isSaving: Boolean = false,
-    val editName: String = "",
-    val editBio: String = "",
-    val editGender: Gender? = null,
-    val editDateOfBirth: String = "",
-    val editLocation: String = ""
+    val editName: String = ""
 )
 
 /**
@@ -112,41 +108,7 @@ class ProfileViewModel @Inject constructor(
         _uiState.update { it.copy(editName = value) }
     }
 
-    /**
-     * Nhận sự kiện thay đổi lời giới thiệu bản thân chỉnh sửa từ UI.
-     *
-     * @param value Lời tự giới thiệu mới.
-     */
-    fun onBioChange(value: String) {
-        _uiState.update { it.copy(editBio = value) }
-    }
 
-    /**
-     * Nhận sự kiện thay đổi giới tính chỉnh sửa từ UI.
-     *
-     * @param value Lựa chọn giới tính ([Gender]).
-     */
-    fun onGenderChange(value: Gender) {
-        _uiState.update { it.copy(editGender = value) }
-    }
-
-    /**
-     * Nhận sự kiện thay đổi ngày sinh chỉnh sửa từ UI.
-     *
-     * @param value Chuỗi ngày sinh mới.
-     */
-    fun onDateOfBirthChange(value: String) {
-        _uiState.update { it.copy(editDateOfBirth = value) }
-    }
-
-    /**
-     * Nhận sự kiện thay đổi vị trí sinh sống chỉnh sửa từ UI.
-     *
-     * @param value Địa điểm mới.
-     */
-    fun onLocationChange(value: String) {
-        _uiState.update { it.copy(editLocation = value) }
-    }
 
     /**
      * Chuyển đổi trạng thái giữa Chế độ chỉnh sửa (Edit Mode) và Chế độ chỉ đọc (View Mode).
@@ -159,11 +121,7 @@ class ProfileViewModel @Inject constructor(
             if (!state.isEditMode) {
                 state.copy(
                     isEditMode = true,
-                    editName = state.user?.name.orEmpty(),
-                    editBio = state.user?.bio.orEmpty(),
-                    editGender = state.user?.gender,
-                    editDateOfBirth = state.user?.dateOfBirth.orEmpty(),
-                    editLocation = state.user?.location.orEmpty()
+                    editName = state.user?.name.orEmpty()
                 )
             } else {
                 state.copy(isEditMode = false)
@@ -184,11 +142,7 @@ class ProfileViewModel @Inject constructor(
             _uiState.update { it.copy(isSaving = true) }
             
             val updatedUser = currentUser.copy(
-                name = currentState.editName,
-                bio = currentState.editBio,
-                gender = currentState.editGender,
-                dateOfBirth = currentState.editDateOfBirth,
-                location = currentState.editLocation
+                name = currentState.editName
             )
 
             updateUserUseCase(updatedUser).collect { result ->

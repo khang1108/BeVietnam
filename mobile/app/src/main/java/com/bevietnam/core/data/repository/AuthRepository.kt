@@ -31,8 +31,6 @@ class AuthRepository @Inject constructor(
 
     override fun register(
         name: String,
-        gender: Gender?,
-        dateOfBirth: String?,
         email: String,
         password: String
     ): Flow<Result<User>> = flow {
@@ -40,8 +38,6 @@ class AuthRepository @Inject constructor(
             val response = api.register(
                 RegisterRequestDto(
                     name = name,
-                    gender = gender?.name?.lowercase(),
-                    dateOfBirth = dateOfBirth,
                     email = email,
                     password = password
                 )

@@ -49,9 +49,6 @@ data class AuthUiState(
     val email: String = "",
     val password: String = "",
     val name: String = "",
-    val gender: Gender? = null,
-    val dateOfBirth: LocalDate? = null,
-    val dateOfBirthDisplay: String = "",
     val registerEmail: String = "",
     val registerPassword: String = "",
     val isLoading: Boolean = false,
@@ -136,30 +133,7 @@ class AuthViewModel @Inject constructor(
         _uiState.update { it.copy(name = name) }
     }
 
-    /**
-     * Nhận sự kiện thay đổi giới tính đăng ký từ UI.
-     *
-     * @param gender Giới tính lựa chọn ([Gender]).
-     */
-    fun onGenderChange(gender: Gender) {
-        _uiState.update { it.copy(gender = gender) }
-    }
 
-    /**
-     * Nhận sự kiện chọn ngày sinh từ hộp thoại UI.
-     * Định dạng ngày sinh về dạng chuỗi "dd/MM/yyyy" thân thiện để hiển thị và lưu trữ.
-     *
-     * @param date Đối tượng ngày sinh [LocalDate].
-     */
-    fun onDateOfBirthChange(date: LocalDate) {
-        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-        _uiState.update { 
-            it.copy(
-                dateOfBirth = date,
-                dateOfBirthDisplay = date.format(formatter)
-            ) 
-        }
-    }
 
     /**
      * Nhận sự kiện thay đổi email đăng ký từ UI.
@@ -217,15 +191,13 @@ class AuthViewModel @Inject constructor(
             val state = _uiState.value
             registerUseCase(
                 name = state.name,
-                gender = state.gender,
-                dateOfBirth = state.dateOfBirthDisplay,
                 email = state.registerEmail,
                 password = state.registerPassword
             ).collect { result ->
-                result.onSuccess { _ ->
+                result.onSuccess { user ->
                     _uiState.update { it.copy(isLoading = false) }
-                    _uiEvent.emit(AuthUiEvent.ShowSnackbar("Đăng ký thành công! Vui lòng đăng nhập."))
-                    selectTab(AuthTab.LOGIN)
+                    sessionManager.login(user)
+                    _uiEvent.emit(AuthUiEvent.NavigateToProfile(user.id))
                 }.onFailure { exception ->
                     _uiState.update { 
                         it.copy(isLoading = false, errorMessage = exception.message) 

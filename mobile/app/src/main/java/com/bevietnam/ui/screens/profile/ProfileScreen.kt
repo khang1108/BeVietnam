@@ -105,10 +105,6 @@ fun ProfileScreen(
             user != null -> ProfileContent(
                 uiState = uiState,
                 onNameChange = viewModel::onNameChange,
-                onBioChange = viewModel::onBioChange,
-                onGenderChange = viewModel::onGenderChange,
-                onDateOfBirthChange = viewModel::onDateOfBirthChange,
-                onLocationChange = viewModel::onLocationChange,
                 onEditClick = viewModel::toggleEditMode,
                 onSaveClick = viewModel::saveProfile,
                 onCancelClick = viewModel::toggleEditMode,
@@ -131,10 +127,6 @@ fun ProfileScreen(
 private fun ProfileContent(
     uiState: ProfileUiState,
     onNameChange: (String) -> Unit,
-    onBioChange: (String) -> Unit,
-    onGenderChange: (Gender) -> Unit,
-    onDateOfBirthChange: (String) -> Unit,
-    onLocationChange: (String) -> Unit,
     onEditClick: () -> Unit,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
@@ -167,7 +159,7 @@ private fun ProfileContent(
                 // Tải ảnh đại diện mượt mà với Coil AsyncImage và crossfade
                 AsyncImage(
                     model = ImageRequest.Builder(context)
-                        .data(user.avatarUrl)
+                        .data(user.avatarUrl ?: R.drawable.default_avt)
                         .crossfade(true)
                         .build(),
                     contentDescription = stringResource(R.string.avatar),
@@ -190,21 +182,6 @@ private fun ProfileContent(
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center
                     )
-                    if (user.gender != null) {
-                        Spacer(Modifier.width(6.dp))
-                        Icon(
-                            imageVector = if (user.gender == Gender.MALE)
-                                Icons.Default.Male else Icons.Default.Female,
-                            contentDescription = if (user.gender == Gender.MALE)
-                                stringResource(R.string.gender_male_desc)
-                            else
-                                stringResource(R.string.gender_female_desc),
-                            tint = if (user.gender == Gender.MALE)
-                                MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -216,61 +193,9 @@ private fun ProfileContent(
                     textAlign = TextAlign.Center
                 )
 
-                if (user.dateOfBirth != null) {
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Cake,
-                            contentDescription = stringResource(R.string.date_of_birth),
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = user.dateOfBirth,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                if (user.bio.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = user.bio,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                        textAlign = TextAlign.Center,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
                 Spacer(modifier = Modifier.height(18.dp))
 
-                // Chỉ số thành tựu trong game (Gamified Stats)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    ProfileStatItem(
-                        label = stringResource(R.string.stat_level),
-                        value = user.level.toString(),
-                        icon = Icons.Default.Star
-                    )
-                    ProfileStatItem(
-                        label = stringResource(R.string.stat_points),
-                        value = user.points.toString(),
-                        icon = Icons.Default.EmojiEvents
-                    )
-                }
 
-                Spacer(modifier = Modifier.height(18.dp))
 
                 // Nút chỉnh sửa và chia sẻ (ở View Mode)
                 if (!uiState.isEditMode) {
@@ -309,7 +234,6 @@ private fun ProfileContent(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (!user.location.isNullOrBlank()) ProfileInfoCard(stringResource(R.string.profile_location), user.location, Icons.Default.LocationOn)
                 if (!user.createdAt.isNullOrBlank()) ProfileInfoCard(stringResource(R.string.profile_joined_date), user.createdAt, Icons.Default.CalendarToday)
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -336,41 +260,7 @@ private fun ProfileContent(
                         shape = RoundedCornerShape(10.dp)
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = uiState.editBio,
-                        onValueChange = onBioChange,
-                        label = { Text(stringResource(R.string.bio)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        minLines = 3,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = uiState.editLocation,
-                        onValueChange = onLocationChange,
-                        label = { Text(stringResource(R.string.profile_location)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        leadingIcon = { Icon(Icons.Default.LocationOn, null, Modifier.size(18.dp)) },
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    Spacer(Modifier.height(12.dp))
 
-                    GenderSelector(
-                        selected = uiState.editGender,
-                        onSelect = onGenderChange
-                    )
-
-                    Spacer(Modifier.height(12.dp))
-                    DatePickerField(
-                        label = stringResource(R.string.date_of_birth),
-                        displayValue = uiState.editDateOfBirth,
-                        onDateSelected = { date -> 
-                            onDateOfBirthChange(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))) 
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
 
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         OutlinedButton(onClick = onCancelClick, modifier = Modifier.weight(1f), enabled = !uiState.isSaving) {
@@ -451,20 +341,10 @@ fun ProfileScreenViewModePreview() {
                     name = "Nguyễn Văn A",
                     email = "nguyenvana@example.com",
                     avatarUrl = null,
-                    bio = "Yêu du lịch và khám phá văn hóa Việt Nam",
-                    gender = Gender.MALE,
-                    dateOfBirth = "01/01/1990",
-                    location = "Hà Nội, Việt Nam",
-                    createdAt = "01/01/2023",
-                    level = 5,
-                    points = 1250
+                    createdAt = "01/01/2023"
                 )
             ),
             onNameChange = {},
-            onBioChange = {},
-            onGenderChange = {},
-            onDateOfBirthChange = {},
-            onLocationChange = {},
             onEditClick = {},
             onSaveClick = {},
             onCancelClick = {},
@@ -486,25 +366,11 @@ fun ProfileScreenEditModePreview() {
                     name = "Nguyễn Văn A",
                     email = "nguyenvana@example.com",
                     avatarUrl = null,
-                    bio = "Yêu du lịch và khám phá văn hóa Việt Nam",
-                    gender = Gender.MALE,
-                    dateOfBirth = "01/01/1990",
-                    location = "Hà Nội, Việt Nam",
-                    createdAt = "01/01/2023",
-                    level = 5,
-                    points = 1250
+                    createdAt = "01/01/2023"
                 ),
-                editName = "Nguyễn Văn A",
-                editBio = "Yêu du lịch và khám phá văn hóa Việt Nam",
-                editGender = Gender.MALE,
-                editDateOfBirth = "01/01/1990",
-                editLocation = "Hà Nội, Việt Nam"
+                editName = "Nguyễn Văn A"
             ),
             onNameChange = {},
-            onBioChange = {},
-            onGenderChange = {},
-            onDateOfBirthChange = {},
-            onLocationChange = {},
             onEditClick = {},
             onSaveClick = {},
             onCancelClick = {},

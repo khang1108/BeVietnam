@@ -16,7 +16,9 @@ import com.bevietnam.core.model.User
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val sessionManager: SessionManager,
-    private val checkHealthUseCase: CheckHealthUseCase
+    private val checkHealthUseCase: CheckHealthUseCase,
+    private val tokenStorage: com.bevietnam.core.data.local.TokenStorage,
+    private val getUserUseCase: com.bevietnam.core.domain.usecase.GetUserUseCase
 ) : ViewModel() {
     val currentUser: StateFlow<User?> = sessionManager.currentUser
 
@@ -25,12 +27,26 @@ class MainViewModel @Inject constructor(
 
     init {
         checkBackendHealth()
+        checkAutoLogin()
     }
 
     private fun checkBackendHealth() {
         viewModelScope.launch {
             checkHealthUseCase().collect { result ->
                 _backendStatus.value = result
+            }
+        }
+    }
+
+    private fun checkAutoLogin() {
+        val token = tokenStorage.getToken()
+        if (!token.isNullOrBlank()) {
+            viewModelScope.launch {
+                getUserUseCase("me").collect { result ->
+                    result.onSuccess { user ->
+                        sessionManager.login(user)
+                    }
+                }
             }
         }
     }
