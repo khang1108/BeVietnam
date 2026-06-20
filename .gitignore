@@ -12,6 +12,7 @@
 .env.local
 .env.*.local
 scripts/vm_secrets.env
+scripts/vm_full_setup.local.sh
 
 # ─── Python ────────────────────────────────────────────
 __pycache__/
