@@ -29,6 +29,11 @@ class Settings(BaseSettings):
     OPENWEATHER_BASE_URL: str = "https://api.openweathermap.org/data/2.5"
     OPENWEATHER_TIMEOUT: int = 10
 
+    # Auth / JWT — override SECRET_KEY in production via env.
+    SECRET_KEY: str = "dev-only-change-me-in-production-32-bytes-minimum"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
+
     class Config:
         env_file = ".env"
         case_sensitive = True
