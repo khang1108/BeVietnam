@@ -35,6 +35,12 @@ AI_WORKERS="${AI_WORKERS:-1}"
 RUN_MIGRATIONS="${RUN_MIGRATIONS:-1}"
 INSTALL_DEPS="${INSTALL_DEPS:-auto}"
 AUTO_APT_INSTALL="${AUTO_APT_INSTALL:-1}"
+AUTO_POSTGRES="${AUTO_POSTGRES:-1}"
+POSTGRES_DB="${POSTGRES_DB:-bevietnam}"
+POSTGRES_USER="${POSTGRES_USER:-bevietnam}"
+POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-}"
+POSTGRES_HOST="${POSTGRES_HOST:-127.0.0.1}"
+POSTGRES_PORT="${POSTGRES_PORT:-5432}"
 START_VLLM="${START_VLLM:-0}"
 START_VLLM_TUNNEL="${START_VLLM_TUNNEL:-0}"
 
@@ -61,6 +67,10 @@ Environment knobs:
   RUN_MIGRATIONS=1                    run Alembic before backend start
   INSTALL_DEPS=auto                   auto | 1 | 0
   AUTO_APT_INSTALL=1                  install python3-venv/python3-pip on Ubuntu if missing
+  AUTO_POSTGRES=1                     install/start local PostgreSQL if DATABASE_URL is missing
+  POSTGRES_DB=bevietnam               local DB name when AUTO_POSTGRES=1
+  POSTGRES_USER=bevietnam             local DB user when AUTO_POSTGRES=1
+  POSTGRES_PASSWORD=                  generated if empty
   START_VLLM=1                        also start vllm_hosting/serve_vllm.sh
   START_VLLM_TUNNEL=1                 also start vllm_hosting/run_tunnel.sh
 
@@ -84,6 +94,17 @@ die() {
 
 command_exists() {
   command -v "$1" >/dev/null 2>&1
+}
+
+has_real_database_url() {
+  [[ -n "${DATABASE_URL:-}" ]] \
+    && [[ "${DATABASE_URL:-}" != *"..."* ]] \
+    && [[ "${DATABASE_URL:-}" != *"change-me"* ]]
+}
+
+database_url_is_local() {
+  [[ "${DATABASE_URL:-}" == *"@127.0.0.1"* ]] \
+    || [[ "${DATABASE_URL:-}" == *"@localhost"* ]]
 }
 
 load_env() {
@@ -121,6 +142,196 @@ ensure_python_tooling() {
   fi
 
   python3 -m venv --help >/dev/null 2>&1 || die "python3 venv support is missing. Install python3-venv, then rerun."
+}
+
+generate_password() {
+  if command_exists openssl; then
+    openssl rand -hex 18
+  else
+    python3 - <<'PY'
+import secrets
+
+print(secrets.token_hex(18))
+PY
+  fi
+}
+
+validate_pg_name() {
+  local label="$1"
+  local value="$2"
+
+  [[ "$value" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || die "$label must match ^[A-Za-z_][A-Za-z0-9_]*$; got: $value"
+}
+
+install_postgres_packages() {
+  if command_exists psql && command_exists pg_ctlcluster && command_exists pg_lsclusters; then
+    return
+  fi
+
+  if [[ "$AUTO_APT_INSTALL" == "1" ]] && command_exists apt-get && command_exists sudo; then
+    log "Installing PostgreSQL with apt"
+    sudo apt-get update
+    sudo apt-get install -y postgresql postgresql-contrib
+  fi
+
+  command_exists psql || die "psql is missing. Install postgresql, then rerun."
+  command_exists pg_ctlcluster || die "pg_ctlcluster is missing. Install postgresql-common, then rerun."
+  command_exists pg_lsclusters || die "pg_lsclusters is missing. Install postgresql-common, then rerun."
+}
+
+postgres_version() {
+  if [[ -d /etc/postgresql ]]; then
+    find /etc/postgresql -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort -V | tail -n 1
+  fi
+}
+
+ensure_postgres_cluster() {
+  local version
+  local clusters
+
+  clusters="$(pg_lsclusters --no-header 2>/dev/null || true)"
+  if [[ -z "$clusters" ]]; then
+    version="$(postgres_version)"
+    [[ -n "$version" ]] || die "Could not find an installed PostgreSQL version under /etc/postgresql"
+    log "Creating PostgreSQL cluster $version/main"
+    sudo pg_createcluster "$version" main --start
+    return
+  fi
+
+  while read -r version cluster _port status _rest; do
+    [[ -n "${version:-}" ]] || continue
+    if [[ "$status" != "online" ]]; then
+      log "Starting PostgreSQL cluster $version/$cluster"
+      sudo pg_ctlcluster "$version" "$cluster" start
+    fi
+  done <<< "$clusters"
+}
+
+wait_for_postgres() {
+  log "Waiting for local PostgreSQL"
+  for _ in {1..30}; do
+    if sudo -u postgres psql -tAc "select 1" >/dev/null 2>&1; then
+      log "PostgreSQL is ready"
+      return
+    fi
+    sleep 1
+  done
+
+  if command_exists service; then
+    sudo service postgresql start >/dev/null 2>&1 || true
+    for _ in {1..15}; do
+      if sudo -u postgres psql -tAc "select 1" >/dev/null 2>&1; then
+        log "PostgreSQL is ready"
+        return
+      fi
+      sleep 1
+    done
+  fi
+
+  die "PostgreSQL did not start. Run pg_lsclusters for details."
+}
+
+write_env_values() {
+  local db_url="$1"
+  local db_password="$2"
+
+  python3 - "$ENV_FILE" "$db_url" "$POSTGRES_DB" "$POSTGRES_USER" "$db_password" <<'PY'
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+updates = {
+    "DATABASE_URL": sys.argv[2],
+    "POSTGRES_DB": sys.argv[3],
+    "POSTGRES_USER": sys.argv[4],
+    "POSTGRES_PASSWORD": sys.argv[5],
+}
+
+lines = path.read_text().splitlines() if path.exists() else []
+seen = set()
+next_lines = []
+
+for line in lines:
+    key = line.split("=", 1)[0] if "=" in line and not line.lstrip().startswith("#") else None
+    if key in updates:
+        next_lines.append(f"{key}={updates[key]}")
+        seen.add(key)
+    else:
+        next_lines.append(line)
+
+if any(key not in seen for key in updates):
+    if next_lines and next_lines[-1] != "":
+        next_lines.append("")
+    next_lines.append("# Local PostgreSQL generated by scripts/vm_start.sh")
+    for key, value in updates.items():
+        if key not in seen:
+            next_lines.append(f"{key}={value}")
+
+path.write_text("\n".join(next_lines) + "\n")
+PY
+}
+
+ensure_local_postgres() {
+  local sql_password
+  local db_url
+
+  if [[ "$AUTO_POSTGRES" != "1" ]]; then
+    log "Skipping local PostgreSQL setup (AUTO_POSTGRES=$AUTO_POSTGRES)"
+    return
+  fi
+
+  if has_real_database_url; then
+    if database_url_is_local; then
+      install_postgres_packages
+      ensure_postgres_cluster
+      wait_for_postgres
+    fi
+    log "DATABASE_URL is already configured"
+    return
+  fi
+
+  validate_pg_name "POSTGRES_DB" "$POSTGRES_DB"
+  validate_pg_name "POSTGRES_USER" "$POSTGRES_USER"
+
+  install_postgres_packages
+  ensure_postgres_cluster
+  wait_for_postgres
+
+  if [[ -z "$POSTGRES_PASSWORD" || "$POSTGRES_PASSWORD" == "change-me" ]]; then
+    POSTGRES_PASSWORD="$(generate_password)"
+  fi
+
+  sql_password="${POSTGRES_PASSWORD//\'/\'\'}"
+
+  log "Creating/updating PostgreSQL role and database"
+  sudo -u postgres psql -v ON_ERROR_STOP=1 <<SQL
+DO \$\$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '$POSTGRES_USER') THEN
+    CREATE ROLE "$POSTGRES_USER" LOGIN PASSWORD '$sql_password';
+  ELSE
+    ALTER ROLE "$POSTGRES_USER" WITH LOGIN PASSWORD '$sql_password';
+  END IF;
+END
+\$\$;
+SELECT 'CREATE DATABASE "$POSTGRES_DB" OWNER "$POSTGRES_USER"'
+WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = '$POSTGRES_DB') \gexec
+ALTER DATABASE "$POSTGRES_DB" OWNER TO "$POSTGRES_USER";
+GRANT ALL PRIVILEGES ON DATABASE "$POSTGRES_DB" TO "$POSTGRES_USER";
+SQL
+
+  db_url="$(python3 - "$POSTGRES_USER" "$POSTGRES_PASSWORD" "$POSTGRES_HOST" "$POSTGRES_PORT" "$POSTGRES_DB" <<'PY'
+import sys
+from urllib.parse import quote
+
+user, password, host, port, db = sys.argv[1:]
+print(f"postgresql+asyncpg://{quote(user, safe='')}:{quote(password, safe='')}@{host}:{port}/{quote(db, safe='')}")
+PY
+)"
+
+  export DATABASE_URL="$db_url"
+  write_env_values "$db_url" "$POSTGRES_PASSWORD"
+  log "DATABASE_URL written to $ENV_FILE"
 }
 
 python_bin() {
@@ -332,6 +543,7 @@ run_migrations() {
 
 start_all() {
   load_env
+  ensure_local_postgres
   guard_vllm_port
   ensure_venv "backend" "$BACKEND_VENV" "$ROOT/services/backend/requirements.txt"
   ensure_venv "ai" "$AI_VENV" "$ROOT/services/ai/requirements.txt"
