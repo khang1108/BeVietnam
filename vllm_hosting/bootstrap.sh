@@ -85,6 +85,9 @@ python -m pip install --no-cache-dir "fastapi<0.137"
 echo "[bootstrap] pinning transformers==4.51.3 for vLLM 0.8.5 compatibility"
 python -m pip install --no-cache-dir "transformers==4.51.3"
 python -m pip install --no-cache-dir "huggingface_hub[cli]"
+# Qwen2.5-VL image preprocessing (vision backend).
+echo "[bootstrap] installing qwen-vl-utils for the vision model"
+python -m pip install --no-cache-dir "qwen-vl-utils"
 
 # ── 3. L40 / Thundercompute environment fixes ─────────────────────────────────
 echo "[bootstrap] running ldconfig"
@@ -122,28 +125,34 @@ else
   echo "[bootstrap] cloudflared present: $(cloudflared --version)"
 fi
 
+# ── 4b. nginx (model path-router) ─────────────────────────────────────────────
+echo "[bootstrap] ensuring nginx is installed"
+if ! command -v nginx >/dev/null 2>&1; then
+  sudo apt-get update && sudo apt-get install -y nginx-light || sudo apt-get install -y nginx
+else
+  echo "[bootstrap] nginx present: $(nginx -v 2>&1)"
+fi
+
 if [[ "$LAUNCH" -eq 0 ]]; then
   echo "[bootstrap] --no-launch: install + config done. Start manually with:"
-  echo "             bash serve_vllm.sh    # terminal 1"
-  echo "             bash run_tunnel.sh    # terminal 2"
+  echo "             bash serve_models.sh   # terminal 1 — text + vision + embed backends"
+  echo "             bash serve_router.sh   # terminal 2 — nginx path-router"
+  echo "             bash run_tunnel.sh     # terminal 3 — cloudflared"
   exit 0
 fi
 
-# ── 5. launch vLLM (background, detached) ──────────────────────────────────────
-echo "[bootstrap] launching vLLM server (logs/vllm.log)"
-setsid bash "$ROOT/serve_vllm.sh" >> "$ROOT/logs/vllm.log" 2>&1 < /dev/null &
-echo "[bootstrap] vLLM started (PID $!)"
+# ── 5. launch model backends (text + vision + embed), wait for health ─────────
+echo "[bootstrap] launching vLLM backends (logs/text.log, vision.log, embed.log)"
+bash "$ROOT/serve_models.sh"   # blocks until each enabled backend is healthy
 
-# ── 6. wait for vLLM /health ──────────────────────────────────────────────────
-PORT="${VLLM_PORT:-8000}"
-echo "[bootstrap] waiting for vLLM /health on 127.0.0.1:$PORT (model download can take a while)..."
-for i in $(seq 1 180); do
-  if curl -fsS "http://127.0.0.1:$PORT/health" >/dev/null 2>&1; then
-    echo "[bootstrap] vLLM is healthy."
-    break
-  fi
-  [[ $((i % 12)) -eq 0 ]] && echo "[bootstrap]   still waiting (${i}0s)... tail logs/vllm.log for progress"
-  sleep 10
+# ── 6. launch nginx router (background) ───────────────────────────────────────
+echo "[bootstrap] launching nginx router (logs/nginx-*.log)"
+setsid bash "$ROOT/serve_router.sh" >> "$ROOT/logs/router.log" 2>&1 < /dev/null &
+echo "[bootstrap] router started (PID $!)"
+RP="${ROUTER_PORT:-8000}"
+for i in $(seq 1 30); do
+  curl -fsS "http://127.0.0.1:$RP/health" >/dev/null 2>&1 && { echo "[bootstrap] router healthy."; break; }
+  sleep 2
 done
 
 # ── 7. launch cloudflared tunnel (background, detached) ────────────────────────
@@ -151,11 +160,12 @@ echo "[bootstrap] launching cloudflared tunnel (logs/cloudflared.log)"
 setsid bash "$ROOT/run_tunnel.sh" >> "$ROOT/logs/cloudflared.log" 2>&1 < /dev/null &
 echo "[bootstrap] cloudflared started (PID $!)"
 
-touch "$ROOT/logs/vllm.log" "$ROOT/logs/cloudflared.log"
+touch "$ROOT/logs/cloudflared.log" "$ROOT/logs/router.log"
 echo ""
 echo "[bootstrap] done."
-echo "[bootstrap]   local : http://127.0.0.1:$PORT/v1/models"
-echo "[bootstrap]   public: https://${CF_HOSTNAME:-api.iamphuckhang.dev}/v1/models"
+echo "[bootstrap]   text  : https://${CF_HOSTNAME:-api.iamphuckhang.dev}/v1/models"
+echo "[bootstrap]   vision: https://${CF_HOSTNAME:-api.iamphuckhang.dev}/vision/v1/models"
+echo "[bootstrap]   embed : https://${CF_HOSTNAME:-api.iamphuckhang.dev}/embed/v1/models"
 echo "[bootstrap]   test  : bash test_api.sh"
 echo "[bootstrap] === Tailing logs — Ctrl+C stops tailing; services keep running ==="
-exec tail -f "$ROOT/logs/vllm.log" "$ROOT/logs/cloudflared.log"
+exec tail -f "$ROOT/logs"/*.log

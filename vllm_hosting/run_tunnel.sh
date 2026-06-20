@@ -40,7 +40,7 @@ cat > "$CRED" <<JSON
 JSON
 chmod 600 "$CRED"
 
-echo "[tunnel] writing config: $CONF (→ http://127.0.0.1:${VLLM_PORT:-8000})"
+echo "[tunnel] writing config: $CONF (→ http://127.0.0.1:${ROUTER_PORT:-8000} nginx router)"
 cat > "$CONF" <<YAML
 # cloudflared tunnel "vllm" — managed by vllm_hosting/run_tunnel.sh
 tunnel: $CF_TUNNEL_ID
@@ -48,7 +48,7 @@ credentials-file: $CRED
 
 ingress:
   - hostname: $CF_HOSTNAME
-    service: http://127.0.0.1:${VLLM_PORT:-8000}
+    service: http://127.0.0.1:${ROUTER_PORT:-8000}
   - service: http_status:404
 YAML
 

@@ -1,90 +1,123 @@
 # vllm_hosting
 
-Self-hosted **vLLM** OpenAI-compatible API for BeVietnam, served from a GPU VM
+Self-hosted **vLLM** OpenAI-compatible API for BeVietnam, served from GPU VM(s)
 (Thundercompute, **L40 48 GB**) and exposed at **`https://api.iamphuckhang.dev`**
-through the existing cloudflared **`vllm`** tunnel.
+through the cloudflared **`vllm`** tunnel.
 
-This exists to replace the quota-blocked Gemini provider (the free-tier key is
-`429 RESOURCE_EXHAUSTED`) for LLM work like book ingestion and cultural
-explanation generation.
+This is the **only** model provider for the AI service (Gemini retired). It hosts
+**three** backends behind one nginx path-router, so a single hostname serves all
+of them — chosen by URL path:
 
-## What it serves
+| Backend | Model | Public path | Used by |
+|---|---|---|---|
+| **text** | `Qwen2.5-14B-Instruct-FP8` | `https://api.iamphuckhang.dev/v1` | Trip Advisor explain, offline quest/post gen, Ask Huế |
+| **vision** | `Qwen2.5-VL-7B-Instruct` | `https://api.iamphuckhang.dev/vision/v1` | Capture Judge (image vs task), Lens |
+| **embed** | `BAAI/bge-m3` | `https://api.iamphuckhang.dev/embed/v1` | query embeddings (only if Ask Huế RAG is live; `EMBED_ENABLED=0` to skip) |
 
-- Model: **`Qwen/Qwen2.5-14B-Instruct`** (`bfloat16`, fits the L40 with KV-cache
-  headroom; strong Vietnamese + JSON). Change via `VLLM_MODEL` in `.env`.
-- OpenAI-compatible routes: `/v1/models`, `/v1/chat/completions`, `/v1/completions`.
-- Endpoint auth: **open** by default. Set `VLLM_API_KEY` in `.env` to require
-  `Authorization: Bearer <key>`.
+The **text path is unchanged** (`/v1`), so existing clients keep working.
+
+## GPU layout
+
+Default = **one L40 (48 GB)** hosts all three (FP8 text leaves KV headroom):
+
+```
+GPU0:  text  (FP8 ~14 GB, util 0.32) + vision (bf16 ~16 GB, util 0.40) + embed (~2.3 GB, util 0.10)
+       → 0.82 of the GPU, ~16 GB free for KV cache. Fine for pilot traffic.
+```
+
+**Two L40s** — give vision its own card: set `VISION_GPU=1`, raise `TEXT_GPU_UTIL`
+and `VISION_GPU_UTIL` toward `0.90`. (Optionally swap the text model to the
+non-FP8 `Qwen/Qwen2.5-14B-Instruct`.)
+
+Per-model GPU, port, and memory fraction are all in `.env`.
+
+## Architecture
+
+```
+                 cloudflared (vllm tunnel)
+                          │  api.iamphuckhang.dev
+                          ▼
+                 nginx router  (ROUTER_PORT 8000)
+        ┌─────────────────┼──────────────────┐
+        ▼                 ▼                   ▼
+   text :8001        vision :8002        embed :8003
+   (vllm serve)      (vllm serve)        (vllm serve --task embed)
+```
+
+Each backend binds to `127.0.0.1`; only the router port is tunnelled.
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `bootstrap.sh` | **All-in-one, after-clone entrypoint** — installs vLLM + cloudflared, applies L40 fixes, launches both. Committed; holds no secrets |
-| `serve_vllm.sh` | Launch the vLLM OpenAI server from `.env` (restart without reinstalling) |
-| `run_tunnel.sh` | Write cloudflared creds/config and run the `vllm` tunnel (restart tunnel only) |
-| `test_api.sh` | curl smoke test (local or public) |
+| `bootstrap.sh` | **After-clone entrypoint** — installs vLLM + qwen-vl-utils + cloudflared + nginx, applies L40 fixes, launches backends → router → tunnel. Holds no secrets |
+| `serve_models.sh` | Launch the text + vision + embed backends from `.env`, wait for health |
+| `serve_router.sh` | Generate `nginx.conf` from `.env` and run the path-router |
+| `run_tunnel.sh` | Write cloudflared creds/config and run the `vllm` tunnel |
+| `test_api.sh` | curl smoke test of all three backends (local or public) |
 | `.env.example` | Config template (placeholders) |
 | `.env` | Real config — **gitignored**, holds HF token + tunnel secret |
 
-## Usage (fresh GPU VM, after cloning the repo)
+## Usage (fresh GPU VM, after cloning)
 
 ```bash
 cd BeVietnam/vllm_hosting
-cp .env.example .env     # then fill in HF_TOKEN, CF_ACCOUNT_TAG, CF_TUNNEL_SECRET
+cp .env.example .env     # fill in HF_TOKEN, CF_ACCOUNT_TAG, CF_TUNNEL_SECRET
 bash bootstrap.sh
 ```
 
-`bootstrap.sh` will:
-1. on first run, if `.env` is missing it creates one from `.env.example` and stops
-   so you can fill in the secrets (it never embeds any),
-2. create `.venv`, install `vllm==0.8.5` (+ `fastapi<0.137`),
-3. apply the L40 fixes (`ldconfig`, `libcuda.so` symlink for Triton JIT, remove
-   flashinfer/tvm-ffi),
-4. install cloudflared,
-5. start vLLM (background, `logs/vllm.log`), wait for `/health`,
-6. write the cloudflared credential from `.env` into `~/.cloudflared` and start the
-   tunnel (background, `logs/cloudflared.log`).
+`bootstrap.sh`:
+1. creates `.env` from the template on first run and stops for you to fill secrets,
+2. creates `.venv`, installs `vllm==0.8.5` (+ `fastapi<0.137`, `transformers==4.51.3`, `qwen-vl-utils`),
+3. applies L40 fixes (`ldconfig`, `libcuda.so` symlink, remove flashinfer/tvm-ffi),
+4. installs cloudflared + nginx,
+5. launches the backends (`logs/text.log`, `vision.log`, `embed.log`), waits for each `/health`,
+6. starts the nginx router, then the tunnel.
 
-First run downloads the model (~28 GB) to `~/.cache/huggingface` — watch
-`logs/vllm.log`. Ctrl+C only stops the log tail; the services keep running.
+First run downloads the models (~14 + 16 + 2 GB) to `~/.cache/huggingface` — watch
+the logs. Ctrl+C only stops the tail; services keep running.
 
-Install/configure without launching:
+Install without launching:
 
 ```bash
 bash bootstrap.sh --no-launch
-bash serve_vllm.sh   # terminal 1
-bash run_tunnel.sh   # terminal 2
+bash serve_models.sh   # terminal 1
+bash serve_router.sh   # terminal 2
+bash run_tunnel.sh     # terminal 3
 ```
 
 ## Verify
 
 ```bash
-bash test_api.sh local   # http://127.0.0.1:8000
+bash test_api.sh local   # http://127.0.0.1:8000 (router)
 bash test_api.sh         # https://api.iamphuckhang.dev
 ```
 
 ## Point the BeVietnam AI service at it
 
-vLLM is OpenAI-compatible, so any OpenAI client works:
-
 ```python
 from openai import OpenAI
-client = OpenAI(base_url="https://api.iamphuckhang.dev/v1", api_key="EMPTY")
-resp = client.chat.completions.create(
-    model="qwen2.5-14b-instruct",
-    messages=[{"role": "user", "content": "..."}],
-)
+
+# text (default — what services/ai/common/config.py already uses)
+text = OpenAI(base_url="https://api.iamphuckhang.dev/v1", api_key="EMPTY")
+text.chat.completions.create(model="qwen2.5-14b-instruct", messages=[...])
+
+# vision (Capture Judge / Lens)
+vision = OpenAI(base_url="https://api.iamphuckhang.dev/vision/v1", api_key="EMPTY")
+
+# embeddings (Ask Huế RAG)
+embed = OpenAI(base_url="https://api.iamphuckhang.dev/embed/v1", api_key="EMPTY")
 ```
 
-(If `VLLM_API_KEY` is set, pass it as `api_key` instead of `"EMPTY"`.)
+(If `VLLM_API_KEY` is set, pass it instead of `"EMPTY"`.)
 
 ## Notes / prerequisites
 
-- The DNS route `api.iamphuckhang.dev → <tunnel-id>.cfargotunnel.com` must already
-  exist in the Cloudflare dashboard. This stack does not create it.
-- Only one process can run the `vllm` tunnel at a time — don't run this and the
-  EXACT stack's tunnel simultaneously (they share the same tunnel credentials).
-- vLLM binds to `127.0.0.1` only; the public entry point is the tunnel.
-- Secrets live in `.env` (gitignored). Never commit real tokens or the tunnel
-  secret.
+- DNS route `api.iamphuckhang.dev → <tunnel-id>.cfargotunnel.com` must already
+  exist in Cloudflare. This stack does not create it.
+- Only one process can run the `vllm` tunnel at a time (shared credentials).
+- On a shared GPU the per-model `*_GPU_UTIL` fractions **must sum under ~0.9** or
+  the later backends OOM at startup. Defaults already do (0.82).
+- Backends bind to `127.0.0.1`; the public entry point is the tunnel.
+- Secrets live in `.env` (gitignored). Never commit real tokens or the tunnel secret.
+</content>

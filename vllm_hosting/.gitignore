@@ -5,6 +5,8 @@ setup.sh
 .venv/
 logs/
 *.log
+# nginx router config is generated from .env at runtime by serve_router.sh
+nginx.conf
 # cloudflared tunnel credential files (written to ~/.cloudflared by setup.sh,
 # but ignore any local copies too)
 *.json
