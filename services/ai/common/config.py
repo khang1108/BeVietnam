@@ -55,7 +55,7 @@ class Settings(BaseSettings):
     vllm_base_url: str = "https://api.iamphuckhang.dev/v1"
     vllm_model: str = "qwen2.5-14b-instruct"  # the --served-model-name
     vllm_vision_base_url: str = "https://api.iamphuckhang.dev/vision/v1"
-    vllm_vision_model: str = "qwen2.5-vl-7b-instruct"
+    vllm_vision_model: str = "qwen2.5-vl-7b"  # the --served-model-name
     vllm_api_key: str = ""  # empty = open endpoint
     vllm_timeout_seconds: int = 90
 

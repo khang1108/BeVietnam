@@ -56,10 +56,15 @@ def test_mock_mode_needs_review_not_approved():
 
 
 def test_vision_match_approves_when_confident():
+    old_provider = settings.llm_provider
+    settings.llm_provider = "vllm"
     gateway = _StubGateway(
         {"match": True, "confidence": 0.88, "reason": "The image shows the gate."}
     )
-    result = CaptureJudge(gateway=gateway).verify(_context())
+    try:
+        result = CaptureJudge(gateway=gateway).verify(_context())
+    finally:
+        settings.llm_provider = old_provider
 
     assert gateway.calls == 1
     assert result["match"] is True
@@ -70,10 +75,15 @@ def test_vision_match_approves_when_confident():
 
 
 def test_vision_mismatch_rejects():
+    old_provider = settings.llm_provider
+    settings.llm_provider = "vllm"
     gateway = _StubGateway(
         {"match": False, "confidence": 0.81, "reason": "The image is unrelated."}
     )
-    result = CaptureJudge(gateway=gateway).verify(_context())
+    try:
+        result = CaptureJudge(gateway=gateway).verify(_context())
+    finally:
+        settings.llm_provider = old_provider
 
     assert result["match"] is False
     assert result["status"] == "rejected"
@@ -81,7 +91,12 @@ def test_vision_mismatch_rejects():
 
 
 def test_vision_failure_needs_review():
-    result = CaptureJudge(gateway=_StubGateway({})).verify(_context())
+    old_provider = settings.llm_provider
+    settings.llm_provider = "vllm"
+    try:
+        result = CaptureJudge(gateway=_StubGateway({})).verify(_context())
+    finally:
+        settings.llm_provider = old_provider
 
     assert result["match"] is False
     assert result["status"] == "needs_review"
