@@ -4,15 +4,15 @@
 
 ### An Agent-Based Smart Tourism System for Vietnam
 
-*Discover Vietnam with cultural depth — powered by AI*
+*Discover Vietnam with cultural depth — grounded, AI-powered, self-hosted.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)](backend/)
-[![Next.js](https://img.shields.io/badge/Web-Next.js_15-black?logo=next.js)](web/)
-[![Android](https://img.shields.io/badge/Mobile-Android_(Kotlin)-3DDC84?logo=android)](mobile/)
-[![AI Core](https://img.shields.io/badge/AI-LangGraph_+_Gemini-4285F4?logo=google)](ai-core/)
+[![Backend](https://img.shields.io/badge/Backend-FastAPI_(async)-009688?logo=fastapi)](services/backend/)
+[![Web](https://img.shields.io/badge/Web-Next.js_16-black?logo=next.js)](services/web/)
+[![Mobile](https://img.shields.io/badge/Mobile-Android_(Kotlin)-3DDC84?logo=android)](mobile/)
+[![AI](https://img.shields.io/badge/AI-vLLM_self--hosted-5A2D81)](vllm_hosting/)
 
-[Overview](#overview) · [Architecture](#architecture) · [Tech Stack](#tech-stack) · [Getting Started](#getting-started) · [API Reference](#api-reference) · [Contributing](#contributing)
+[Overview](#overview) · [Architecture](#architecture) · [AI Service](#ai-service-v2) · [Tech Stack](#tech-stack) · [Folder Structure](#folder-structure) · [Getting Started](#getting-started)
 
 </div>
 
@@ -20,105 +20,146 @@
 
 ## Overview
 
-**BeVietnam** is a multi-platform smart tourism system that helps travelers — both domestic and international — discover Vietnam's cultural heritage through AI-powered, personalized experiences.
+**BeVietnam** helps travelers — domestic and international — engage with Vietnamese cultural
+heritage. It is **not** a strict itinerary planner. The main loop:
 
-### Core Features
+> Share your location → see a **Facebook-style feed** of nearby cultural places, each explaining
+> *why it's worth visiting right now* → the map renders places as **dynamic bubbles** (bigger =
+> better current suitability) → optionally follow **storyline quests** (check-in / capture tasks)
+> that unlock cultural context as you go.
+
+Every cultural claim is **grounded in reviewed sources** (official/UNESCO/approved books), and all
+recommendation scores are **computed in code** — the LLM phrases explanations, it does not invent
+numbers.
+
+**Current focus:** a **Huế pilot** (8-day window, small tourist survey). Active surfaces = backend,
+AI service, web.
+
+### Core features
 
 | Feature | Description |
 |---------|-------------|
-| 🗺️ **Storyline Quests** | Duolingo-style cultural exploration tasks that guide travelers through meaningful experiences |
-| 🤖 **AI Personalization** | Intelligent feed recommendations with cultural context and explanation |
-| 📸 **Capture & Verify** | Photo check-ins verified by AI to confirm task completion |
-| 📖 **Travel Memories** | Auto-generated travel vlogs from a user's daily captures |
-| 🌐 **Bilingual** | Full Vietnamese and English support across all platforms |
-
-### Platforms
-
-- **Android App** — Native Kotlin + Jetpack Compose
-- **Web App / PWA** — Next.js 15 + TypeScript
-- **Backend API** — FastAPI (Python)
-- **AI Core** — LangGraph agent workflows + Gemini
+| 🗺️ **Cultural feed + map bubbles** | Nearby places ranked by live suitability (weather, traffic, distance, crowd, cultural relevance) with a grounded "why now" |
+| 🧭 **Storyline quests** | Geocaching-style cultural tasks (check-in, capture, observe), pre-built and reviewed |
+| 📸 **Capture & verify** | A **vision agent** checks an uploaded photo against the task and returns a verdict |
+| 🌐 **Bilingual** | Vietnamese / English across all surfaces |
 
 ---
 
 ## Architecture
 
-### System Context
+The system is a **monorepo** of independently deployable services. Clients talk to the **Backend**;
+the Backend owns product data and calls the **AI service** only for real-time decisions.
+
+### System context
 
 ```mermaid
 flowchart LR
-    traveler["👤 Traveler\n(Domestic & International)"]
+    traveler(["👤 Traveler<br/>domestic & international"])
     bevietnam["🇻🇳 BeVietnam System"]
-    llm["☁️ LLM Provider\n(Gemini / OpenAI)"]
-    maps["🗺️ Map Provider\n(Google Maps)"]
+    vllm["🧠 Self-hosted vLLM<br/>api.iamphuckhang.dev"]
+    goong["🗺️ Goong Maps<br/>tiles + geocoding"]
+    weather["🌦️ OpenWeather<br/>/ Google traffic"]
 
-    traveler -->|Android App / Web| bevietnam
-    bevietnam -->|Cultural generation & reasoning| llm
-    bevietnam -->|Map tiles & geocoding| maps
+    traveler -->|Web / Android| bevietnam
+    bevietnam -->|text · vision · embeddings| vllm
+    bevietnam -->|map tiles, places| goong
+    bevietnam -->|live context| weather
 ```
 
-### Container Architecture
+### Container architecture
 
 ```mermaid
 flowchart TB
-    traveler["👤 Traveler"]
+    traveler(["👤 Traveler"])
 
-    subgraph system["BeVietnam System"]
-        android["📱 Android App\nKotlin + Jetpack Compose"]
-        web["🌐 Web App / PWA\nNext.js + TypeScript"]
-        backend["⚙️ Backend API\nFastAPI + PostgreSQL"]
-        aicore["🤖 AI Core\nFastAPI + LangGraph"]
-        qdrant[("🔍 Qdrant\nCultural vector knowledge")]
-        postgres[("🗄️ PostgreSQL\nProduct & user data")]
-        storage[("☁️ Object Storage\nCaptures & media")]
+    subgraph clients["Clients"]
+        web["🌐 Web / PWA<br/>Next.js 16 + TS"]
+        android["📱 Android<br/>Kotlin + Compose"]
     end
 
-    llm["☁️ LLM Provider"]
+    subgraph core["BeVietnam services"]
+        backend["⚙️ Backend API<br/>FastAPI (async)"]
+        ai["🤖 AI Service<br/>FastAPI agents"]
+        postgres[("🗄️ PostgreSQL<br/>product & user data")]
+        minio[("🪣 MinIO<br/>capture media")]
+        qdrant[("🔍 Qdrant<br/>cultural vectors")]
+    end
 
-    traveler --> android
-    traveler --> web
-    android -->|REST / HTTPS| backend
-    web -->|REST / HTTPS| backend
+    vllm["🧠 vLLM<br/>text · vision · embed"]
+
+    traveler --> web & android
+    web -->|REST/HTTPS + JWT| backend
+    android -->|REST/HTTPS + JWT| backend
     backend --> postgres
-    backend --> storage
-    backend -->|AI requests| aicore
-    aicore --> qdrant
-    aicore --> llm
+    backend --> minio
+    backend -->|real-time AI calls| ai
+    ai --> qdrant
+    ai -->|OpenAI-compatible| vllm
 ```
 
-### AI Agent Pipeline
+**Data flow:** Web/Mobile → **Backend** (`/api/v1`, JWT) → **AI service** (internal HTTP). The
+backend normalizes inputs, calls the AI, and adapts AI output into its own client shapes. The AI
+service **never writes to PostgreSQL**.
 
-The AI Core is a **separate service** from the Backend. Each AI feature runs as an explicit LangGraph workflow with defined inputs, outputs, validation, and fallback behavior.
+---
 
-| Agent | Role | Realtime? |
-|-------|------|-----------|
-| **Culture Scout** | Retrieves cultural facts from Qdrant | ✅ Yes (vector search) |
-| **Quest Maker** | Generates storyline tasks via LLM | ✅ Yes |
-| **Trip Advisor** | Explains feed recommendations | ✅ Yes (can be templated) |
-| **Capture Judge** | Verifies photo task completion | ⚡ Async for vision |
-| **Memory Curator** | Selects captures for vlog generation | 🔁 Background job |
-| **Story Weaver** | Writes travel memory narrative | 🔁 Background job |
-| **Safety Keeper** | Validates all AI outputs | ✅ Yes (lightweight) |
-| **Publisher Agent** | Packages AI output for Backend | ✅ Final step |
+## AI Service (v2)
 
-**Workflow — Cultural Task Generation:**
+The AI **runtime** serves only what must respond to **live user context**. Everything that can be
+decided ahead of time is **pre-built offline**, reviewed once, and served by the backend from the
+database — no LLM in the request path. (Full design: [`docs/AI_AGENT_ARCHITECTURE_V2.md`](docs/AI_AGENT_ARCHITECTURE_V2.md).)
+
+```mermaid
+flowchart TB
+    subgraph offline["🛠️ Offline build (one-time, reviewed) → DB / JSON"]
+        qm["Quest Maker"]
+        qp["Question-Pool Maker"]
+        sp["Spotlight Maker (posts)"]
+    end
+
+    subgraph runtime["⚡ Runtime agents (live, in request path)"]
+        ta["Trip Advisor<br/>/explain-recommendation"]
+        cj["Capture Judge — VISION<br/>/verify-capture"]
+        cs["Culture Scout<br/>(retrieval dependency)"]
+        ta --> cs
+    end
+
+    backend["⚙️ Backend"]
+    backend -->|serves pre-built<br/>quests · posts · chain| db[("🗄️ DB")]
+    offline --> db
+    backend -->|live feed scoring| ta
+    backend -->|photo verdict| cj
+    cs --> qdrant[("🔍 Qdrant")]
+```
+
+| Agent | Role | When |
+|-------|------|------|
+| **Trip Advisor** | Scores a place + grounded "why visit now" (numbers in Python, LLM phrases) | ⚡ Runtime |
+| **Capture Judge** | Vision agent — image vs task → match verdict | ⚡ Runtime *(WIP)* |
+| **Culture Scout** | Source-backed retrieval from Qdrant | ⚡ Runtime (dep of Trip Advisor) |
+| **Safety Keeper** | Validates AI output (grounded, sized, safe) | Build-time + guard |
+| **Publisher** | Wraps output in `{status, data, metadata}` | Utility |
+| **Quest / Question-Pool / Spotlight Maker** | Generate quests, question pool, feed posts | 🛠️ Offline |
+
+### Model serving — vLLM only
+
+All text / vision / embedding runs on **self-hosted vLLM** at `api.iamphuckhang.dev` (Gemini
+retired). Three backends sit behind one nginx path-router, fitting **one L40 (48 GB)** for the pilot:
+
 ```mermaid
 flowchart LR
-    A[Backend] --> B[Culture Scout\nQdrant retrieval]
-    B --> C[Quest Maker\nLLM task generation]
-    C --> D[Safety Keeper\nValidation]
-    D -->|valid| E[Publisher Agent\nStructured JSON]
-    D -->|invalid| F[Fallback Task]
-    F --> E
-    E --> G[Backend → Client]
+    cf["cloudflared<br/>api.iamphuckhang.dev"] --> nginx["nginx router"]
+    nginx -->|/v1| text["text · Qwen2.5-14B-FP8"]
+    nginx -->|/vision/v1| vision["vision · Qwen2.5-VL-7B"]
+    nginx -->|/embed/v1| embed["embed · bge-m3"]
 ```
 
-**AI Core Design Principles:**
-1. **Backend owns product data** — AI Core never writes directly to PostgreSQL
-2. **Structured outputs only** — all AI responses are validated Pydantic schemas
-3. **Retrieval before generation** — cultural claims must be grounded in Qdrant context
-4. **Fail safe** — every workflow has a defined fallback response
-5. **Mock first** — ship vertical slices with mocks, replace with real AI incrementally
+Serving stack + GPU layout: [`vllm_hosting/README.md`](vllm_hosting/README.md).
+
+**Design principles:** backend owns product data · structured Pydantic outputs only · retrieval
+before generation (claims grounded in `source_refs`) · every workflow has a fallback · scores are
+deterministic and code-computed.
 
 ---
 
@@ -126,73 +167,85 @@ flowchart LR
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| **Mobile** | Kotlin + Jetpack Compose | Native Android UI |
-| | Retrofit + OkHttp | API communication |
-| | Hilt | Dependency injection |
-| | CameraX | Photo capture for check-ins |
-| | Google Maps SDK | Map-based place discovery |
-| **Web** | Next.js 15 + TypeScript | Responsive web app & PWA |
-| | CSS Modules | Component-scoped styling |
-| | i18n (custom) | Vietnamese / English |
-| **Backend** | FastAPI + Python | REST API service |
-| | PostgreSQL + SQLAlchemy | Relational data storage |
-| | Alembic | Database migrations |
-| | JWT | Authentication |
-| **AI Core** | FastAPI + LangGraph | Agent workflow orchestration |
-| | LangChain | LLM & tool integration |
-| | Qdrant | Cultural vector knowledge base |
-| | Gemini / OpenAI | Language & vision models |
-| **Infrastructure** | Docker + Docker Compose | Local & production containerization |
-| | GitHub Actions | CI/CD |
+| **Web** | Next.js 16 + TypeScript, CSS Modules | Web app / PWA, custom i18n (vi/en) |
+| **Mobile** | Kotlin + Jetpack Compose, Retrofit, Hilt, CameraX | Native Android |
+| **Backend** | FastAPI (async), SQLAlchemy + asyncpg, Alembic | REST API, product/user data |
+| | JWT (python-jose, bcrypt), MinIO (boto3) | Auth + capture storage |
+| **AI service** | FastAPI, Qdrant, bge-m3 embeddings | Real-time agents + retrieval |
+| **Models** | Self-hosted **vLLM** — Qwen2.5-14B (text), Qwen2.5-VL-7B (vision), bge-m3 (embed) | Generation / vision / embeddings |
+| **Infra** | Docker Compose, GitHub Actions, Azure (web), Cloudflare tunnel (AI) | Local + production |
+
+---
+
+## Folder Structure
+
+```
+.
+├── services/
+│   ├── ai/                     # AI service — FastAPI agents + retrieval
+│   │   ├── agents/             #   trip_advisor, capture_judge, culture_scout,
+│   │   │                       #   safety_keeper, publisher, quest_maker,
+│   │   │                       #   question_pool_maker, spotlight_maker
+│   │   ├── api/                #   HTTP routes the backend calls
+│   │   ├── common/             #   config, llm gateway (vLLM), schemas, qdrant_store
+│   │   └── main.py
+│   ├── backend/                # FastAPI backend (async)
+│   │   └── app/
+│   │       ├── api/endpoints/  #   HTTP route handlers (auth, feed, places, uploads…)
+│   │       ├── services/       #   business logic
+│   │       ├── repositories/   #   async DB access
+│   │       ├── models/         #   SQLAlchemy ORM
+│   │       └── schemas/        #   Pydantic request/response
+│   └── web/                    # Next.js web app
+│       └── src/
+│           ├── app/            #   route wrappers (thin)
+│           ├── features/       #   feature modules (auth, explore, storyline…)
+│           ├── components/     #   shared UI
+│           └── styles/         #   design tokens + globals (lacquer theme)
+├── mobile/                     # Native Android (Kotlin + Compose)
+├── vllm_hosting/               # Self-hosted vLLM stack (3 backends + nginx + tunnel)
+├── data/                       # Knowledge base, sources, question_pool.json, posts, books
+├── scripts/data-pipeline/      # Offline builders (knowledge, quests, posts)
+├── database/                   # DB init / migrations
+├── docs/                       # Architecture & design docs (AI_AGENT_ARCHITECTURE_V2.md …)
+├── docker-compose.yaml         # Local multi-service setup
+├── CONTRIBUTING.md             # Team standards & workflow
+└── CLAUDE.md                   # Engineering guidelines
+```
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
-
 - Docker & Docker Compose
-- Node.js ≥ 20 (for web)
-- Python ≥ 3.11 (for backend / AI Core)
-- Android Studio Hedgehog+ (for mobile)
+- Node.js ≥ 20 (web), Python ≥ 3.11 (backend / AI)
+- A reachable vLLM endpoint (see [`vllm_hosting/`](vllm_hosting/)) or set the AI service to mock
 
-### Quick Start (Docker)
+### Quick start (Docker)
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-org/An-Agent-Based-Smart-Tourism-System-for-Vietnam.git
-cd An-Agent-Based-Smart-Tourism-System-for-Vietnam
-
-# Copy environment config
-cp .env.example .env
-
-# Start all services
+cp .env.example .env          # configure
 docker compose up
 ```
 
 | Service | URL |
 |---------|-----|
-| Backend API | http://localhost:8000 |
-| Backend Swagger | http://localhost:8000/docs |
-| Web App | http://localhost:3000 |
-| AI Core | http://localhost:8001 |
+| Backend API | http://localhost:8000 · Swagger `/docs` |
+| Web app | http://localhost:3000 |
+| AI service | http://localhost:8001 |
 
-### Local Development
+### Local development
 
 <details>
 <summary><strong>Backend</strong></summary>
 
 ```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-
-# Copy and configure environment
-cp .env.example .env
-
-# Run with hot reload
-uvicorn app.main:app --reload --port 8000
+# from repo root (absolute `services.backend.*` imports need root on PYTHONPATH)
+python -m venv services/backend/venv && source services/backend/venv/bin/activate
+pip install -r services/backend/requirements.txt
+cp services/backend/.env.example services/backend/.env   # DATABASE_URL, SECRET_KEY, MINIO_*, AI_CORE_BASE_URL
+PYTHONPATH=. uvicorn services.backend.app.main:app --reload --port 8000
 ```
 </details>
 
@@ -200,110 +253,52 @@ uvicorn app.main:app --reload --port 8000
 <summary><strong>Web</strong></summary>
 
 ```bash
-cd web
+cd services/web
 npm install
-npm run dev
-# App runs at http://localhost:3000
+npm run dev                   # http://localhost:3000
 ```
 </details>
 
 <details>
-<summary><strong>Mobile</strong></summary>
+<summary><strong>AI service</strong></summary>
 
-1. Open `mobile/` in Android Studio
-2. Sync Gradle dependencies
-3. Update `BASE_URL` in `core/util/Constants.kt` to point to your Backend
-4. Run on emulator or physical device (API level 26+)
+```bash
+# from repo root
+PYTHONPATH=. python -m uvicorn services.ai.main:app --port 8001
+# config: services/ai/common/config.py — vllm_base_url, qdrant, llm_provider (vllm|mock)
+```
 </details>
 
 ---
 
 ## API Reference
 
-Base URL: `http://localhost:8000/api/v1`
-
-### Backend Endpoints
+Backend base URL: `http://localhost:8000/api/v1` (interactive docs at `/docs`).
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/health` | Service health check |
-| `GET` | `/places` | List places (supports `?category=`, `?limit=`, `?offset=`) |
-| `GET` | `/feed` | Personalized place recommendations |
-| `GET` | `/storyline/quest` | Full quest chain for storyline UI |
-| `GET` | `/storyline/next-task` | Generate next AI cultural task |
-| `POST` | `/storyline/verify-capture` | Verify task completion via photo |
-| `POST` | `/captures` | Submit photo capture metadata |
+| `POST` | `/auth/register` · `/auth/login` · `GET /auth/me` | JWT auth |
+| `GET` | `/places` · `/feed` | Places + personalized feed |
+| `GET` | `/storyline/quest` · `/storyline/next-task` | Quest chain / next task |
+| `POST` | `/storyline/verify-capture` · `/uploads/capture` | Capture verify + media upload |
 
-> Full interactive docs: **http://localhost:8000/docs**
-
-### AI Core Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/health` | AI Core availability |
-| `POST` | `/generate-task` | Generate cultural storyline task |
-| `POST` | `/explain-recommendation` | Explain feed recommendation |
-| `POST` | `/verify-capture` | Vision-based task verification |
-| `POST` | `/generate-vlog` | Generate travel memory draft |
-
----
-
-## Project Structure
-
-```
-.
-├── backend/                 # FastAPI backend service
-│   └── app/
-│       ├── api/endpoints/   # HTTP route handlers
-│       ├── services/        # Business logic
-│       ├── repositories/    # Database access layer
-│       ├── models/          # SQLAlchemy ORM models
-│       └── schemas/         # Pydantic request/response schemas
-├── web/                     # Next.js web application
-│   └── src/
-│       ├── app/             # Route wrappers (thin layer)
-│       ├── features/        # Feature modules (auth, explore, storyline...)
-│       ├── components/      # Shared UI components
-│       └── styles/          # Global CSS
-├── mobile/                  # Native Android application
-│   └── app/src/main/java/com/bevietnam/
-│       ├── core/            # Domain, data, DI layers
-│       └── ui/              # Screens, components, navigation, theme
-├── ai-core/                 # LangGraph AI agent service
-├── docs/                    # Architecture & design documents
-├── CONTRIBUTING.md          # Team code standards & workflow
-└── docker-compose.yml       # Local multi-service setup
-```
+**AI service** (internal): `POST /explain-recommendation`, `POST /verify-capture`,
+`POST /generate-task`, `POST /generate-question-pool`, `GET /quest-chain`.
 
 ---
 
 ## Contributing
 
-Please read **[CONTRIBUTING.md](./CONTRIBUTING.md)** before submitting any pull request. It covers:
-
-- Git branch naming and commit message conventions
-- Code style rules per platform (Python, TypeScript, Kotlin)
-- Layer architecture rules (what belongs where)
-- Testing requirements
-- PR review checklist
-
-### Team
-
-| Role | Responsibility |
-|------|---------------|
-| **Backend** | FastAPI API, PostgreSQL schema, Auth, REST contracts |
-| **AI Core** | LangGraph agents, Qdrant indexing, LLM integration |
-| **Android** | Kotlin app, Jetpack Compose UI, Hilt DI |
-| **Web** | Next.js frontend, PWA, i18n, feature modules |
+Read **[CONTRIBUTING.md](./CONTRIBUTING.md)** (branch/commit conventions, per-platform code style,
+layer rules, PR checklist) and **[CLAUDE.md](./CLAUDE.md)** (engineering guidelines).
 
 ---
 
 ## License
 
-This project is licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
-
----
+MIT — see [LICENSE](LICENSE).
 
 <div align="center">
   <sub>Built with ❤️ for Vietnam's cultural heritage · HCMUS 2026</sub>
 </div>
+</content>
