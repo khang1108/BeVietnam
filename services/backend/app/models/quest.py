@@ -1,7 +1,8 @@
 # models/quest.py
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
-from ..core.database import Base
+
+from services.backend.app.core.database import Base
 
 class QuestChain(Base):
     __tablename__ = "quest_chains"
@@ -23,7 +24,7 @@ class QuestTask(Base):
 class UserProgress(Base):
     __tablename__ = "user_progress"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), index=True)
+    user_id = Column(String, ForeignKey("users.id"), index=True)
     chain_id = Column(Integer, ForeignKey("quest_chains.id"))
     current_task_id = Column(Integer, ForeignKey("quest_tasks.id"))
     is_completed = Column(Boolean, default=False)

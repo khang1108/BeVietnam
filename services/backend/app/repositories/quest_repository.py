@@ -1,13 +1,14 @@
 # repositories/quest_repository.py
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from models.quest import UserProgress, QuestTask
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from services.backend.app.models.quest import QuestTask, UserProgress
 
 class QuestRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_user_progress(self, user_id: int, chain_id: int) -> UserProgress | None:
+    async def get_user_progress(self, user_id: str, chain_id: int) -> UserProgress | None:
         stmt = select(UserProgress).where(
             UserProgress.user_id == user_id, 
             UserProgress.chain_id == chain_id
