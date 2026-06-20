@@ -1,0 +1,354 @@
+#!/usr/bin/env bash
+# Unified VM runner for BeVietnam.
+#
+# Starts/stops the production-style local services on a VM:
+#   - AI Core   -> default http://0.0.0.0:8001
+#   - Backend   -> default http://0.0.0.0:8000
+# Optional:
+#   - vLLM      -> existing vllm_hosting/serve_vllm.sh
+#   - tunnel    -> existing vllm_hosting/run_tunnel.sh
+#
+# Usage:
+#   bash scripts/vm_start.sh bootstrap
+#   bash scripts/vm_start.sh start
+#   bash scripts/vm_start.sh status
+#   bash scripts/vm_start.sh stop
+#   bash scripts/vm_start.sh restart
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ENV_FILE="${ENV_FILE:-$ROOT/.env}"
+LOG_DIR="${LOG_DIR:-$ROOT/logs}"
+PID_DIR="${PID_DIR:-$ROOT/.run}"
+
+BACKEND_VENV="${BACKEND_VENV:-$ROOT/services/backend/venv}"
+AI_VENV="${AI_VENV:-$ROOT/services/ai/venv}"
+
+BACKEND_HOST="${BACKEND_HOST:-0.0.0.0}"
+BACKEND_PORT="${BACKEND_PORT:-8000}"
+BACKEND_WORKERS="${BACKEND_WORKERS:-1}"
+
+AI_HOST="${AI_HOST:-0.0.0.0}"
+AI_PORT="${AI_PORT:-8001}"
+AI_WORKERS="${AI_WORKERS:-1}"
+
+RUN_MIGRATIONS="${RUN_MIGRATIONS:-1}"
+INSTALL_DEPS="${INSTALL_DEPS:-0}"
+START_VLLM="${START_VLLM:-0}"
+START_VLLM_TUNNEL="${START_VLLM_TUNNEL:-0}"
+
+mkdir -p "$LOG_DIR" "$PID_DIR"
+
+usage() {
+  cat <<EOF
+Unified VM runner for BeVietnam.
+
+Commands:
+  bootstrap    create venvs and install Backend/AI dependencies
+  start        start AI Core and Backend, optionally vLLM
+  stop         stop managed services
+  restart      stop then start
+  status       show managed process status
+  logs         tail Backend and AI Core logs
+  help         show this message
+
+Environment knobs:
+  ENV_FILE=/path/to/.env              default: $ROOT/.env
+  BACKEND_HOST=0.0.0.0                BACKEND_PORT=8000
+  AI_HOST=0.0.0.0                     AI_PORT=8001
+  BACKEND_WORKERS=1                   AI_WORKERS=1
+  RUN_MIGRATIONS=1                    run Alembic before backend start
+  INSTALL_DEPS=1                      pip install requirements during start
+  START_VLLM=1                        also start vllm_hosting/serve_vllm.sh
+  START_VLLM_TUNNEL=1                 also start vllm_hosting/run_tunnel.sh
+
+Recommended VM start:
+  AI_CORE_USE_MOCK=false LLM_PROVIDER=vllm bash scripts/vm_start.sh start
+
+With local vLLM on same VM:
+  Set vllm_hosting/.env VLLM_PORT to a port that does not conflict with BACKEND_PORT.
+  START_VLLM=1 START_VLLM_TUNNEL=1 bash scripts/vm_start.sh start
+EOF
+}
+
+log() {
+  printf '[vm] %s\n' "$*"
+}
+
+die() {
+  printf '[vm] ERROR: %s\n' "$*" >&2
+  exit 1
+}
+
+load_env() {
+  if [[ ! -f "$ENV_FILE" ]]; then
+    if [[ -f "$ROOT/.env.example" ]]; then
+      cp "$ROOT/.env.example" "$ENV_FILE"
+      die "Created $ENV_FILE from .env.example. Fill secrets/URLs, then rerun."
+    fi
+    die "$ENV_FILE not found"
+  fi
+
+  set -a
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+  set +a
+
+  export PYTHONPATH="$ROOT"
+  export AI_CORE_BASE_URL="${AI_CORE_BASE_URL:-http://127.0.0.1:$AI_PORT}"
+  export AI_CORE_USE_MOCK="${AI_CORE_USE_MOCK:-false}"
+  export AI_CORE_TIMEOUT="${AI_CORE_TIMEOUT:-300}"
+  export LLM_PROVIDER="${LLM_PROVIDER:-vllm}"
+}
+
+python_bin() {
+  local venv="$1"
+  printf '%s/bin/python' "$venv"
+}
+
+ensure_venv() {
+  local name="$1"
+  local venv="$2"
+  local req="$3"
+  local py
+
+  py="$(python_bin "$venv")"
+  if [[ ! -x "$py" ]]; then
+    log "Creating $name virtualenv at $venv"
+    python3 -m venv "$venv"
+  fi
+
+  if [[ "$INSTALL_DEPS" == "1" || ! -f "$venv/.deps-installed" ]]; then
+    log "Installing $name dependencies"
+    "$py" -m pip install --upgrade pip
+    "$py" -m pip install -r "$req"
+    date -u +%Y-%m-%dT%H:%M:%SZ > "$venv/.deps-installed"
+  fi
+}
+
+pid_file() {
+  printf '%s/%s.pid' "$PID_DIR" "$1"
+}
+
+is_running() {
+  local pidfile="$1"
+  [[ -f "$pidfile" ]] && kill -0 "$(cat "$pidfile")" 2>/dev/null
+}
+
+start_process() {
+  local name="$1"
+  local pidfile
+  local logfile
+  shift
+
+  pidfile="$(pid_file "$name")"
+  logfile="$LOG_DIR/$name.log"
+
+  if is_running "$pidfile"; then
+    log "$name already running (pid $(cat "$pidfile"))"
+    return
+  fi
+
+  rm -f "$pidfile"
+  log "Starting $name -> $logfile"
+  (
+    cd "$ROOT"
+    exec "$@"
+  ) >> "$logfile" 2>&1 &
+  echo "$!" > "$pidfile"
+  sleep 1
+
+  if ! is_running "$pidfile"; then
+    tail -n 80 "$logfile" >&2 || true
+    die "$name failed to start"
+  fi
+}
+
+stop_process() {
+  local name="$1"
+  local pidfile
+  pidfile="$(pid_file "$name")"
+
+  if ! is_running "$pidfile"; then
+    rm -f "$pidfile"
+    log "$name is not running"
+    return
+  fi
+
+  log "Stopping $name (pid $(cat "$pidfile"))"
+  kill "$(cat "$pidfile")" 2>/dev/null || true
+  for _ in {1..20}; do
+    if ! is_running "$pidfile"; then
+      rm -f "$pidfile"
+      return
+    fi
+    sleep 0.5
+  done
+
+  log "$name did not stop gracefully; killing"
+  kill -9 "$(cat "$pidfile")" 2>/dev/null || true
+  rm -f "$pidfile"
+}
+
+health_check() {
+  local name="$1"
+  local url="$2"
+  local attempts="${3:-30}"
+
+  log "Waiting for $name health: $url"
+  for _ in $(seq 1 "$attempts"); do
+    if python3 - "$url" <<'PY' >/dev/null 2>&1
+import sys
+from urllib.request import urlopen
+
+with urlopen(sys.argv[1], timeout=2) as response:
+    if response.status < 500:
+        sys.exit(0)
+sys.exit(1)
+PY
+    then
+      log "$name is ready"
+      return
+    fi
+    sleep 2
+  done
+
+  die "$name did not become healthy at $url"
+}
+
+read_vllm_env_value() {
+  local key="$1"
+  local file="$ROOT/vllm_hosting/.env"
+  [[ -f "$file" ]] || return 0
+  awk -F= -v k="$key" '$1 == k {print $2}' "$file" | tail -n 1
+}
+
+guard_vllm_port() {
+  local vllm_host
+  local vllm_port
+
+  vllm_host="$(read_vllm_env_value VLLM_HOST)"
+  vllm_port="$(read_vllm_env_value VLLM_PORT)"
+  vllm_host="${vllm_host:-127.0.0.1}"
+  vllm_port="${vllm_port:-8000}"
+
+  if [[ "$START_VLLM" == "1" && "$vllm_port" == "$BACKEND_PORT" ]]; then
+    die "vLLM and Backend both want port $BACKEND_PORT. Set VLLM_PORT=8010 in vllm_hosting/.env or BACKEND_PORT=8080 before starting."
+  fi
+
+  export VLLM_BASE_URL="${VLLM_BASE_URL:-http://$vllm_host:$vllm_port/v1}"
+}
+
+bootstrap() {
+  load_env
+  ensure_venv "backend" "$BACKEND_VENV" "$ROOT/services/backend/requirements.txt"
+  ensure_venv "ai" "$AI_VENV" "$ROOT/services/ai/requirements.txt"
+
+  if [[ "$START_VLLM" == "1" ]]; then
+    [[ -f "$ROOT/vllm_hosting/.env" ]] || die "vllm_hosting/.env missing. Copy vllm_hosting/.env.example and fill secrets."
+    log "Bootstrapping vLLM hosting stack"
+    (cd "$ROOT/vllm_hosting" && bash bootstrap.sh --no-launch)
+  fi
+}
+
+run_migrations() {
+  if [[ "$RUN_MIGRATIONS" != "1" ]]; then
+    log "Skipping migrations (RUN_MIGRATIONS=$RUN_MIGRATIONS)"
+    return
+  fi
+
+  if [[ -z "${DATABASE_URL:-}" ]]; then
+    log "Skipping migrations because DATABASE_URL is not set"
+    return
+  fi
+
+  log "Running Alembic migrations"
+  "$(python_bin "$BACKEND_VENV")" -m alembic -c "$ROOT/database/alembic.ini" upgrade head
+}
+
+start_all() {
+  load_env
+  guard_vllm_port
+  ensure_venv "backend" "$BACKEND_VENV" "$ROOT/services/backend/requirements.txt"
+  ensure_venv "ai" "$AI_VENV" "$ROOT/services/ai/requirements.txt"
+
+  if [[ "$START_VLLM" == "1" ]]; then
+    [[ -f "$ROOT/vllm_hosting/.env" ]] || die "vllm_hosting/.env missing. Copy vllm_hosting/.env.example and fill secrets."
+    start_process "vllm" bash "$ROOT/vllm_hosting/serve_vllm.sh"
+    health_check "vLLM" "${VLLM_BASE_URL%/v1}/health" 180
+
+    if [[ "$START_VLLM_TUNNEL" == "1" ]]; then
+      start_process "vllm-tunnel" bash "$ROOT/vllm_hosting/run_tunnel.sh"
+    fi
+  fi
+
+  start_process "ai-core" "$(python_bin "$AI_VENV")" -m uvicorn services.ai.main:app \
+    --host "$AI_HOST" --port "$AI_PORT" --workers "$AI_WORKERS"
+  health_check "AI Core" "http://127.0.0.1:$AI_PORT/health" 45
+
+  run_migrations
+
+  start_process "backend" "$(python_bin "$BACKEND_VENV")" -m uvicorn services.backend.app.main:app \
+    --host "$BACKEND_HOST" --port "$BACKEND_PORT" --workers "$BACKEND_WORKERS"
+  health_check "Backend" "http://127.0.0.1:$BACKEND_PORT/docs" 45
+
+  status
+  log "Backend: http://$BACKEND_HOST:$BACKEND_PORT/docs"
+  log "AI Core: http://$AI_HOST:$AI_PORT/health"
+}
+
+stop_all() {
+  stop_process "backend"
+  stop_process "ai-core"
+  stop_process "vllm-tunnel"
+  stop_process "vllm"
+}
+
+status_one() {
+  local name="$1"
+  local pidfile
+  pidfile="$(pid_file "$name")"
+
+  if is_running "$pidfile"; then
+    printf '%-12s running pid=%s log=%s/%s.log\n' "$name" "$(cat "$pidfile")" "$LOG_DIR" "$name"
+  else
+    printf '%-12s stopped\n' "$name"
+  fi
+}
+
+status() {
+  status_one "vllm"
+  status_one "vllm-tunnel"
+  status_one "ai-core"
+  status_one "backend"
+}
+
+case "${1:-start}" in
+  bootstrap)
+    INSTALL_DEPS=1 bootstrap
+    ;;
+  start)
+    start_all
+    ;;
+  stop)
+    stop_all
+    ;;
+  restart)
+    stop_all
+    start_all
+    ;;
+  status)
+    status
+    ;;
+  logs)
+    tail -n 120 -f "$LOG_DIR"/backend.log "$LOG_DIR"/ai-core.log
+    ;;
+  help|-h|--help)
+    usage
+    ;;
+  *)
+    usage
+    die "Unknown command: ${1:-}"
+    ;;
+esac
