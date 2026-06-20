@@ -2,7 +2,7 @@
 AI Core Configuration.
 
 Loads settings from environment variables (via pydantic-settings).
-All external service connections (Qdrant, Gemini, embedding model)
+All external service connections (Qdrant, vLLM, embedding model)
 are configured here so agent code never hardcodes URLs or keys.
 
 Supports both:
@@ -12,7 +12,7 @@ Supports both:
 
 Usage:
     from services.ai.common.config import settings
-    print(settings.gemini_api_key)
+    print(settings.vllm_base_url)
 """
 
 from pydantic_settings import BaseSettings
@@ -49,13 +49,9 @@ class Settings(BaseSettings):
     embedding_dimension: int = 1024  # bge-m3 dense embedding dimension
     hf_token: str = ""               # HuggingFace token — get free at hf.co/settings/tokens
 
-    # ── LLM (Gemini) ─────────────────────────────────────────────────────────
-    gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.0-flash"
-    llm_provider: str = "gemini"  # "gemini" | "vllm" | "mock"
-
-    # ── LLM (self-hosted vLLM — OpenAI-compatible, replaces quota-dead Gemini) ─
-    # Served by vllm_hosting/ on a Thundercompute L40, exposed via cloudflared.
+    # ── LLM (self-hosted vLLM — OpenAI-compatible, only provider) ─────────────
+    # Served by vllm_hosting/ on L40 GPU(s), exposed via cloudflared.
+    llm_provider: str = "vllm"  # "vllm" | "mock"
     vllm_base_url: str = "https://api.iamphuckhang.dev/v1"
     vllm_model: str = "qwen2.5-14b-instruct"  # the --served-model-name
     vllm_api_key: str = ""  # empty = open endpoint

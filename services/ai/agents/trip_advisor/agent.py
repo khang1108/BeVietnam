@@ -195,13 +195,13 @@ class TripAdvisorAgent:
         is_fallback: bool,
     ) -> tuple[str, bool]:
         """Return (explanation_text, ai_generated)."""
-        if settings.llm_provider == "gemini" and cultural_highlight and not is_fallback:
-            text = self._gemini_explanation(place_name, language, cultural_highlight, reason_codes)
+        if settings.llm_provider != "mock" and cultural_highlight and not is_fallback:
+            text = self._llm_explanation(place_name, language, cultural_highlight, reason_codes)
             if text:
                 return text, True
         return self._template_explanation(place_name, language, reason_codes), False
 
-    def _gemini_explanation(
+    def _llm_explanation(
         self,
         place_name: str,
         language: str,
@@ -220,7 +220,7 @@ class TripAdvisorAgent:
             explanation = str(result.get("explanation", "")).strip()
             return explanation
         except Exception as exc:
-            logger.warning("Gemini explanation failed, using template: %s", exc)
+            logger.warning("LLM explanation failed, using template: %s", exc)
             return ""
 
     @staticmethod

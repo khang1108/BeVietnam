@@ -6,8 +6,7 @@ python-multipart>=0.0.8
 pydantic>=2.10.0
 pydantic-settings>=2.6.0
 
-# LLM integration (Gemini)
-google-genai>=1.0
+# LLM integration: self-hosted vLLM (OpenAI-compatible) via httpx — see below.
 
 # Agent workflow orchestration
 langgraph>=0.2
