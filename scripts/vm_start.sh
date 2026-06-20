@@ -9,7 +9,6 @@
 #   - tunnel    -> existing vllm_hosting/run_tunnel.sh
 #
 # Usage:
-#   bash scripts/vm_start.sh bootstrap
 #   bash scripts/vm_start.sh start
 #   bash scripts/vm_start.sh status
 #   bash scripts/vm_start.sh stop
@@ -34,7 +33,8 @@ AI_PORT="${AI_PORT:-8001}"
 AI_WORKERS="${AI_WORKERS:-1}"
 
 RUN_MIGRATIONS="${RUN_MIGRATIONS:-1}"
-INSTALL_DEPS="${INSTALL_DEPS:-0}"
+INSTALL_DEPS="${INSTALL_DEPS:-auto}"
+AUTO_APT_INSTALL="${AUTO_APT_INSTALL:-1}"
 START_VLLM="${START_VLLM:-0}"
 START_VLLM_TUNNEL="${START_VLLM_TUNNEL:-0}"
 
@@ -45,8 +45,8 @@ usage() {
 Unified VM runner for BeVietnam.
 
 Commands:
-  bootstrap    create venvs and install Backend/AI dependencies
-  start        start AI Core and Backend, optionally vLLM
+  bootstrap    create venvs and install Backend/AI dependencies only
+  start        prepare everything, then start AI Core and Backend
   stop         stop managed services
   restart      stop then start
   status       show managed process status
@@ -59,12 +59,13 @@ Environment knobs:
   AI_HOST=0.0.0.0                     AI_PORT=8001
   BACKEND_WORKERS=1                   AI_WORKERS=1
   RUN_MIGRATIONS=1                    run Alembic before backend start
-  INSTALL_DEPS=1                      pip install requirements during start
+  INSTALL_DEPS=auto                   auto | 1 | 0
+  AUTO_APT_INSTALL=1                  install python3-venv/python3-pip on Ubuntu if missing
   START_VLLM=1                        also start vllm_hosting/serve_vllm.sh
   START_VLLM_TUNNEL=1                 also start vllm_hosting/run_tunnel.sh
 
 Recommended VM start:
-  AI_CORE_USE_MOCK=false LLM_PROVIDER=vllm bash scripts/vm_start.sh start
+  bash scripts/vm_start.sh start
 
 With local vLLM on same VM:
   Set vllm_hosting/.env VLLM_PORT to a port that does not conflict with BACKEND_PORT.
@@ -79,6 +80,10 @@ log() {
 die() {
   printf '[vm] ERROR: %s\n' "$*" >&2
   exit 1
+}
+
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
 }
 
 load_env() {
@@ -102,9 +107,59 @@ load_env() {
   export LLM_PROVIDER="${LLM_PROVIDER:-vllm}"
 }
 
+ensure_python_tooling() {
+  command_exists python3 || die "python3 is required but was not found"
+
+  if python3 -m venv --help >/dev/null 2>&1; then
+    return
+  fi
+
+  if [[ "$AUTO_APT_INSTALL" == "1" ]] && command_exists apt-get && command_exists sudo; then
+    log "Installing Python venv tooling with apt"
+    sudo apt-get update
+    sudo apt-get install -y python3-venv python3-pip
+  fi
+
+  python3 -m venv --help >/dev/null 2>&1 || die "python3 venv support is missing. Install python3-venv, then rerun."
+}
+
 python_bin() {
   local venv="$1"
   printf '%s/bin/python' "$venv"
+}
+
+requirements_hash() {
+  local req="$1"
+
+  if command_exists sha256sum; then
+    sha256sum "$req" | awk '{print $1}'
+  else
+    python3 - "$req" <<'PY'
+import hashlib
+import sys
+from pathlib import Path
+
+print(hashlib.sha256(Path(sys.argv[1]).read_bytes()).hexdigest())
+PY
+  fi
+}
+
+should_install_deps() {
+  local venv="$1"
+  local req="$2"
+  local marker="$venv/.deps-installed"
+  local hash_file="$venv/.requirements.sha256"
+  local current_hash
+
+  [[ "$INSTALL_DEPS" == "1" ]] && return 0
+  [[ "$INSTALL_DEPS" == "0" ]] && return 1
+  [[ -f "$marker" ]] || return 0
+  [[ "$req" -nt "$marker" ]] && return 0
+
+  current_hash="$(requirements_hash "$req")"
+  [[ -f "$hash_file" ]] || return 0
+  [[ "$(cat "$hash_file")" == "$current_hash" ]] || return 0
+  return 1
 }
 
 ensure_venv() {
@@ -112,18 +167,26 @@ ensure_venv() {
   local venv="$2"
   local req="$3"
   local py
+  local current_hash
 
+  [[ -f "$req" ]] || die "$name requirements file not found: $req"
+  ensure_python_tooling
   py="$(python_bin "$venv")"
+
   if [[ ! -x "$py" ]]; then
     log "Creating $name virtualenv at $venv"
     python3 -m venv "$venv"
   fi
 
-  if [[ "$INSTALL_DEPS" == "1" || ! -f "$venv/.deps-installed" ]]; then
+  if should_install_deps "$venv" "$req"; then
     log "Installing $name dependencies"
     "$py" -m pip install --upgrade pip
     "$py" -m pip install -r "$req"
+    current_hash="$(requirements_hash "$req")"
+    printf '%s\n' "$current_hash" > "$venv/.requirements.sha256"
     date -u +%Y-%m-%dT%H:%M:%SZ > "$venv/.deps-installed"
+  else
+    log "$name dependencies are up to date"
   fi
 }
 
