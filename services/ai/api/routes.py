@@ -18,14 +18,12 @@ from services.ai.common.schemas import (
     ExplainRecommendationRequest,
     GenerateQuestionPoolRequest,
     GenerateTaskRequest,
-    GenerateVlogRequest,
     VerifyCaptureRequest,
 )
 from services.ai.agents.publisher import PublisherAgent
 from services.ai.agents.question_pool_maker import QuestionPoolMaker
 from services.ai.agents.quest_maker import generate_task_workflow
 from services.ai.agents.quest_maker.fallback import get_fallback_chain
-from services.ai.agents.story_weaver import generate_vlog_workflow
 from services.ai.agents.trip_advisor import explain_recommendation_workflow
 
 router = APIRouter()
@@ -100,11 +98,5 @@ def explain_recommendation(request: ExplainRecommendationRequest) -> dict:
 
 @router.post("/verify-capture")
 def verify_capture(request: VerifyCaptureRequest) -> dict:
-    """Verify if a capture completes a task (stub for future implementation)."""
+    """Verify if a capture completes a task (Capture Judge — vision agent, WIP)."""
     return verify_capture_workflow(request.model_dump())
-
-
-@router.post("/generate-vlog")
-def generate_vlog(request: GenerateVlogRequest) -> dict:
-    """Generate a travel memory vlog (stub for future implementation)."""
-    return generate_vlog_workflow(request.model_dump())

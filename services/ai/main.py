@@ -5,7 +5,7 @@ This is the AI service entry point. It provides:
   - /health          — service health check
   - /generate-task   — cultural task generation (Quest Maker pipeline)
   - /quest-chain     — full quest chain for UI rendering
-  - /explain-recommendation, /verify-capture, /generate-vlog — stubs
+  - /explain-recommendation — Trip Advisor scoring; /verify-capture — Capture Judge (vision, WIP)
 
 The AI Core is a separate service from the Backend.
 Backend owns product data; AI Core owns retrieval, reasoning, and generation.

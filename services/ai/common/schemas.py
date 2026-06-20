@@ -118,24 +118,6 @@ class CaptureVerification(BaseModel):
     confidence: float
 
 
-# ── Vlog Generation ──────────────────────────────────────────────────────────
-
-class GenerateVlogRequest(BaseModel):
-    """Request body for POST /generate-vlog."""
-
-    user_id: str
-    local_date: str
-    captures: list[dict] = []
-
-
-class GeneratedVlog(BaseModel):
-    """Response for generated travel memory."""
-
-    title: str
-    summary: str
-    body: str
-
-
 # ── Quest Chain (for full chain retrieval) ────────────────────────────────────
 
 class QuestChainRequest(BaseModel):
