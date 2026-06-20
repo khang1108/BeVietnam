@@ -11,8 +11,9 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 # 2. Import Base và TẤT CẢ các model từ ứng dụng của bạn
-from app.core.database import Base
-from app.models.models import UserModel, PlaceModel, CaptureModel
+from services.backend.app.core.database import Base
+from services.backend.app.models.models import CaptureModel, PlaceModel, UserModel
+from services.backend.app.models.quest import QuestChain, QuestTask, UserProgress
 
 # --- PHẦN THÊM MỚI KẾT THÚC ---
 # this is the Alembic Config object, which provides

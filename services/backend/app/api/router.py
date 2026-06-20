@@ -8,6 +8,7 @@ To add a new feature:
 from fastapi import APIRouter
 from services.backend.app.api.endpoints import storyline
 from services.backend.app.api.endpoints import (
+    auth,
     captures,
     feed,
     health,
@@ -21,6 +22,7 @@ from services.backend.app.api.endpoints import (
 api_router = APIRouter()
 
 api_router.include_router(health.router)
+api_router.include_router(auth.router)
 api_router.include_router(places.router)
 api_router.include_router(feed.router)
 api_router.include_router(storyline.router)
