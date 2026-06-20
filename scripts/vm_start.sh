@@ -312,38 +312,41 @@ path.write_text("\n".join(next_lines) + "\n")
 PY
 }
 
-ensure_local_postgres() {
+load_postgres_settings_from_database_url() {
+  local parsed
+
+  parsed="$(python3 - "$DATABASE_URL" <<'PY'
+import sys
+from urllib.parse import unquote, urlparse
+
+url = urlparse(sys.argv[1])
+scheme = url.scheme
+if scheme not in {"postgresql+asyncpg", "postgresql", "postgres"}:
+    raise SystemExit(f"Unsupported DATABASE_URL scheme: {scheme}")
+
+user = unquote(url.username or "")
+password = unquote(url.password or "")
+host = url.hostname or "127.0.0.1"
+port = str(url.port or 5432)
+database = unquote((url.path or "").lstrip("/"))
+
+if not user or not database:
+    raise SystemExit("DATABASE_URL must include user and database name")
+
+print("\t".join([user, password, host, port, database]))
+PY
+)"
+
+  IFS=$'\t' read -r POSTGRES_USER POSTGRES_PASSWORD POSTGRES_HOST POSTGRES_PORT POSTGRES_DB <<< "$parsed"
+}
+
+configure_postgres_role_database() {
   local sql_password
-  local db_url
-
-  if [[ "$AUTO_POSTGRES" != "1" ]]; then
-    log "Skipping local PostgreSQL setup (AUTO_POSTGRES=$AUTO_POSTGRES)"
-    return
-  fi
-
-  if has_real_database_url; then
-    if database_url_is_local; then
-      install_postgres_packages
-      ensure_postgres_cluster
-      wait_for_postgres
-    fi
-    log "DATABASE_URL is already configured"
-    return
-  fi
 
   validate_pg_name "POSTGRES_DB" "$POSTGRES_DB"
   validate_pg_name "POSTGRES_USER" "$POSTGRES_USER"
 
-  install_postgres_packages
-  ensure_postgres_cluster
-  wait_for_postgres
-
-  if [[ -z "$POSTGRES_PASSWORD" || "$POSTGRES_PASSWORD" == "change-me" ]]; then
-    POSTGRES_PASSWORD="$(generate_password)"
-  fi
-
   sql_password="${POSTGRES_PASSWORD//\'/\'\'}"
-
   log "Creating/updating PostgreSQL role and database"
   sudo -u postgres psql -v ON_ERROR_STOP=1 <<SQL
 DO \$\$
@@ -360,15 +363,48 @@ WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = '$POSTGRES_DB') \gex
 ALTER DATABASE "$POSTGRES_DB" OWNER TO "$POSTGRES_USER";
 GRANT ALL PRIVILEGES ON DATABASE "$POSTGRES_DB" TO "$POSTGRES_USER";
 SQL
+}
 
-  db_url="$(python3 - "$POSTGRES_USER" "$POSTGRES_PASSWORD" "$POSTGRES_HOST" "$POSTGRES_PORT" "$POSTGRES_DB" <<'PY'
+build_database_url() {
+  python3 - "$POSTGRES_USER" "$POSTGRES_PASSWORD" "$POSTGRES_HOST" "$POSTGRES_PORT" "$POSTGRES_DB" <<'PY'
 import sys
 from urllib.parse import quote
 
 user, password, host, port, db = sys.argv[1:]
 print(f"postgresql+asyncpg://{quote(user, safe='')}:{quote(password, safe='')}@{host}:{port}/{quote(db, safe='')}")
 PY
-)"
+}
+
+ensure_local_postgres() {
+  local db_url
+
+  if [[ "$AUTO_POSTGRES" != "1" ]]; then
+    log "Skipping local PostgreSQL setup (AUTO_POSTGRES=$AUTO_POSTGRES)"
+    return
+  fi
+
+  if has_real_database_url; then
+    if database_url_is_local; then
+      load_postgres_settings_from_database_url
+      install_postgres_packages
+      ensure_postgres_cluster
+      wait_for_postgres
+      configure_postgres_role_database
+    fi
+    log "DATABASE_URL is already configured"
+    return
+  fi
+
+  if [[ -z "$POSTGRES_PASSWORD" || "$POSTGRES_PASSWORD" == "change-me" ]]; then
+    POSTGRES_PASSWORD="$(generate_password)"
+  fi
+
+  install_postgres_packages
+  ensure_postgres_cluster
+  wait_for_postgres
+  configure_postgres_role_database
+
+  db_url="$(build_database_url)"
 
   export DATABASE_URL="$db_url"
   write_env_values "$db_url" "$POSTGRES_PASSWORD"
