@@ -14,6 +14,7 @@ import logging
 import time
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 import httpx
 from qdrant_client import QdrantClient
@@ -133,8 +134,10 @@ class QdrantStore:
         if self._qdrant_client is None:
             if settings.use_qdrant_cloud:
                 cloud_url = settings.qdrant_cluster_endpoint.rstrip("/")
-                if ":6333" not in cloud_url:
-                    cloud_url = f"{cloud_url}:6333"
+                if not urlparse(cloud_url).scheme:
+                    cloud_url = f"https://{cloud_url}"
+                # Qdrant Cloud Python quickstart passes the cluster URL directly.
+                # Source: https://qdrant.tech/documentation/cloud-quickstart/#3-connect-to-qdrant-cloud
                 self._qdrant_client = QdrantClient(
                     url=cloud_url,
                     api_key=settings.qdrant_api_key,
