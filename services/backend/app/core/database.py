@@ -18,22 +18,27 @@ load_dotenv(dotenv_path=env_path)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Nếu vẫn không thấy, nó sẽ in ra đúng cái đường dẫn nó vừa tìm để ta dễ bắt lỗi
-if not DATABASE_URL:
-    raise ValueError(f"DATABASE_URL is not set in environment variables. Đã thử tìm tại: {env_path}")
+if DATABASE_URL:
+    # Khởi tạo Async Engine
+    engine = create_async_engine(
+        DATABASE_URL,
+        echo=False,
+        future=True,
+    )
 
-# Khởi tạo Async Engine
-engine = create_async_engine(
-    DATABASE_URL,
-    echo=False, 
-    future=True
-)
+    # Khởi tạo Session factory
+    AsyncSessionLocal = async_sessionmaker(
+        bind=engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+        autocommit=False,
+        autoflush=False,
+    )
+else:
+    engine = None
 
-# Khởi tạo Session factory
-AsyncSessionLocal = async_sessionmaker(
-    bind=engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-    autocommit=False,
-    autoflush=False,
-)
+    def AsyncSessionLocal() -> None:  # type: ignore[no-redef]
+        raise RuntimeError(
+            "DATABASE_URL is not set in environment variables. "
+            f"Đã thử tìm tại: {env_path}"
+        )

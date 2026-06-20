@@ -13,6 +13,7 @@ from services.backend.app.api.endpoints import (
     health,
     logs,
     places,
+    quest,
     question_pool,
     weather,
 )
@@ -25,5 +26,6 @@ api_router.include_router(feed.router)
 api_router.include_router(storyline.router)
 api_router.include_router(captures.router)
 api_router.include_router(logs.router)
+api_router.include_router(quest.router)
 api_router.include_router(question_pool.router)
 api_router.include_router(weather.router)

@@ -1,8 +1,8 @@
 """
 Schemas package — re-exports all schemas for backward compatibility.
 Import directly from sub-modules for new code:
-    from app.schemas.place import PlaceSchema, PlacesResponse
-    from app.schemas.feed import FeedItem, FeedResponse
+    from services.backend.app.schemas.place import PlaceSchema, PlacesResponse
+    from services.backend.app.schemas.feed import FeedItem, FeedResponse
     ...
 """
 from services.backend.app.schemas.base import HealthResponse
