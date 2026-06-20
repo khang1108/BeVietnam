@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material3.*
@@ -44,6 +45,7 @@ import com.bevietnam.ui.theme.BeVietnamTheme
 fun PlaceCard(
     place: Place,
     onClick: () -> Unit,
+    onLocateClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     index: Int? = null
 ) {
@@ -77,7 +79,7 @@ fun PlaceCard(
                 // Tải ảnh mượt mà với Coil AsyncImage và hiệu ứng crossfade
                 AsyncImage(
                     model = ImageRequest.Builder(context)
-                        .data(place.imageUrl)
+                        .data(place.imageUrl?.toIntOrNull() ?: place.imageUrl)
                         .crossfade(true)
                         .build(),
                     contentDescription = stringResource(R.string.place_image_desc, place.name),
@@ -144,18 +146,32 @@ fun PlaceCard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                if (onLocateClick != null) {
+                    IconButton(
+                        onClick = onLocateClick,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.MyLocation,
+                            contentDescription = stringResource(R.string.place_locate),
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+                
                 val referenceUrl = place.referenceUrl
                 if (!referenceUrl.isNullOrEmpty()) {
                     val uriHandler = LocalUriHandler.current
                     IconButton(
                         onClick = { uriHandler.openUri(referenceUrl) },
-                        modifier = Modifier.size(48.dp) // Kích thước chuẩn Touch Target (Accessibility)
+                        modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Public,
                             contentDescription = stringResource(R.string.place_learn_more),
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }

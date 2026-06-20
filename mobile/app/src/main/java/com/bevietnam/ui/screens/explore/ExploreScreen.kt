@@ -1,58 +1,71 @@
 package com.bevietnam.ui.screens.explore
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Map
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
-import android.Manifest
-import android.content.pm.PackageManager
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.bevietnam.BuildConfig
 import com.bevietnam.R
 import com.bevietnam.core.model.Place
-import com.bevietnam.ui.components.CategoryChip
 import com.bevietnam.ui.components.CulturalBackground
 import com.bevietnam.ui.components.CulturalLoadingIndicator
 import com.bevietnam.ui.components.ErrorView
 import com.bevietnam.ui.components.PlaceCard
 import com.bevietnam.ui.components.SearchBar
 import com.bevietnam.ui.theme.BeVietnamTheme
-import com.bevietnam.ui.theme.LocalCulturalColors
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberCameraPositionState
-import kotlinx.coroutines.launch
+import org.maplibre.android.MapLibre
+import org.maplibre.android.annotations.MarkerOptions
+import org.maplibre.android.camera.CameraPosition
+import org.maplibre.android.camera.CameraUpdateFactory
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapLibreMapOptions
+import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.Style
 
 /**
  * Màn hình Khám phá địa điểm du lịch văn hóa (Explore Screen) của ứng dụng BeVietnam.
@@ -66,19 +79,12 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun ExploreScreen(
+    modifier: Modifier = Modifier,
     viewModel: ExploreViewModel = hiltViewModel(),
-    onPlaceClick: (Place) -> Unit = {},
-    modifier: Modifier = Modifier
+    onPlaceClick: (Place) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-
-    // Cập nhật trạng thái quyền vị trí ban đầu cho ViewModel
-    LaunchedEffect(Unit) {
-        val hasPerm = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                      ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        viewModel.updateLocationPermission(hasPerm)
-    }
 
     ExploreScreenContent(
         uiState = uiState,
@@ -88,7 +94,6 @@ fun ExploreScreen(
         onPlaceClick = onPlaceClick,
         onToggleViewMode = viewModel::toggleViewMode,
         onPlaceFocused = viewModel::onPlaceFocused,
-        onPermissionResult = viewModel::updateLocationPermission,
         modifier = modifier
     )
 }
@@ -115,7 +120,6 @@ fun ExploreScreenContent(
     onPlaceClick: (Place) -> Unit,
     onToggleViewMode: () -> Unit,
     onPlaceFocused: (String?) -> Unit,
-    onPermissionResult: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -138,8 +142,7 @@ fun ExploreScreenContent(
                     onSearchQueryChanged = onSearchQueryChanged,
                     onPlaceClick = onPlaceClick,
                     onToggleViewMode = onToggleViewMode,
-                    onPlaceFocused = onPlaceFocused,
-                    onPermissionResult = onPermissionResult
+                    onPlaceFocused = onPlaceFocused
                 )
             }
         }
@@ -158,8 +161,7 @@ private fun ExploreSuccessContent(
     onSearchQueryChanged: (String) -> Unit,
     onPlaceClick: (Place) -> Unit,
     onToggleViewMode: () -> Unit,
-    onPlaceFocused: (String?) -> Unit,
-    onPermissionResult: (Boolean) -> Unit
+    onPlaceFocused: (String?) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         if (state.isMapView) {
@@ -169,8 +171,7 @@ private fun ExploreSuccessContent(
                 onSearchQueryChanged = onSearchQueryChanged,
                 onPlaceClick = onPlaceClick,
                 onToggleViewMode = onToggleViewMode,
-                onPlaceFocused = onPlaceFocused,
-                onPermissionResult = onPermissionResult
+                onPlaceFocused = onPlaceFocused
             )
         } else {
             ExploreListView(
@@ -191,37 +192,12 @@ private fun ExploreMapView(
     onSearchQueryChanged: (String) -> Unit,
     onPlaceClick: (Place) -> Unit,
     onToggleViewMode: () -> Unit,
-    onPlaceFocused: (String?) -> Unit,
-    onPermissionResult: (Boolean) -> Unit
+    onPlaceFocused: (String?) -> Unit
 ) {
-    val daNangLocation = LatLng(16.047079, 108.206230)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(daNangLocation, 5.5f)
-    }
-    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val listState = rememberLazyListState()
-
-    // Launcher yêu cầu quyền vị trí
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { permissions ->
-            val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-                          permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-            onPermissionResult(granted)
-        }
-    )
-
-    // Tự động yêu cầu quyền khi mở map nếu chưa có
-    LaunchedEffect(Unit) {
-        if (!state.hasLocationPermission) {
-            permissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
-        }
-    }
+    var mapState by remember { mutableStateOf<MapLibreMap?>(null) }
 
     // Sync Carousel to Map selection
     LaunchedEffect(state.focusedPlaceId) {
@@ -231,30 +207,98 @@ private fun ExploreMapView(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            properties = MapProperties(isMyLocationEnabled = state.hasLocationPermission),
-            uiSettings = MapUiSettings(
-                zoomControlsEnabled = false, 
-                compassEnabled = false,
-                myLocationButtonEnabled = state.hasLocationPermission
-            ),
-            contentPadding = PaddingValues(top = 130.dp), // Đẩy nút My Location xuống dưới thanh SearchBar và CategoryFilter
-            onMapClick = { onPlaceFocused(null) }
-        ) {
-            state.filteredPlaces.forEach { place ->
-                val position = LatLng(place.latitude, place.longitude)
-                Marker(
-                    state = MarkerState(position = position),
-                    title = place.name,
-                    onClick = {
-                        onPlaceFocused(place.id)
-                        true // Consume click to prevent default InfoWindow from automatically centering if desired
+    val mapView = remember {
+        MapLibre.getInstance(context)
+        val options = MapLibreMapOptions.createFromAttributes(context, null).textureMode(true)
+        MapView(context, options).apply {
+            onCreate(null)
+            getMapAsync { map ->
+                mapState = map
+                map.setStyle(Style.Builder().fromUri("https://tiles.goong.io/assets/goong_map_web.json?api_key=${BuildConfig.GOONG_MAPTILES_KEY}"))
+                
+                val daNangLocation = LatLng(16.047079, 108.206230)
+                map.cameraPosition = CameraPosition.Builder()
+                    .target(daNangLocation)
+                    .zoom(5.5)
+                    .build()
+                
+                map.uiSettings.isCompassEnabled = false
+                map.uiSettings.isLogoEnabled = false
+                map.uiSettings.isAttributionEnabled = false
+
+                map.addOnMapClickListener {
+                    onPlaceFocused(null)
+                    true
+                }
+
+                map.setOnMarkerClickListener { marker ->
+                    val placeId = marker.snippet
+                    if (placeId != null) {
+                        onPlaceFocused(placeId)
                     }
+                    true
+                }
+            }
+        }
+    }
+
+
+    // Sync markers
+    LaunchedEffect(state.filteredPlaces) {
+        mapView.getMapAsync { map ->
+            map.clear()
+            state.filteredPlaces.forEach { place ->
+                map.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(place.latitude, place.longitude))
+                        .title(place.name)
+                        .snippet(place.id) // Use snippet to store the place ID
                 )
             }
+        }
+    }
+
+    // Handle MapView Lifecycle
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> mapView.onStart()
+                Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                Lifecycle.Event.ON_STOP -> mapView.onStop()
+                Lifecycle.Event.ON_DESTROY -> mapView.onDestroy()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView(factory = { mapView }, modifier = Modifier.fillMaxSize())
+
+        // Map Reset Button
+        FloatingActionButton(
+            onClick = {
+                mapState?.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        LatLng(16.047079, 108.206230),
+                        5.5
+                    )
+                )
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 130.dp, end = 16.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.primary
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Map,
+                contentDescription = stringResource(R.string.map_reset_view)
+            )
         }
 
         // Overlay Search and Filters (Glassmorphism effect is on the components)
@@ -306,6 +350,14 @@ private fun ExploreMapView(
                         place = place,
                         index = index + 1,
                         onClick = { onPlaceClick(place) },
+                        onLocateClick = {
+                            mapState?.animateCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    LatLng(place.latitude, place.longitude),
+                                    14.0
+                                )
+                            )
+                        },
                         modifier = Modifier
                             .width(280.dp)
                             .height(130.dp)
@@ -485,8 +537,7 @@ fun ExploreScreenLoadingPreview() {
             onSearchQueryChanged = {},
             onPlaceClick = {},
             onToggleViewMode = {},
-            onPlaceFocused = {},
-            onPermissionResult = {}
+            onPlaceFocused = {}
         )
     }
 }
@@ -507,8 +558,7 @@ fun ExploreScreenMapViewPreview() {
             onSearchQueryChanged = {},
             onPlaceClick = {},
             onToggleViewMode = {},
-            onPlaceFocused = {},
-            onPermissionResult = {}
+            onPlaceFocused = {}
         )
     }
 }
@@ -528,8 +578,7 @@ fun ExploreScreenListViewPreview() {
             onSearchQueryChanged = {},
             onPlaceClick = {},
             onToggleViewMode = {},
-            onPlaceFocused = {},
-            onPermissionResult = {}
+            onPlaceFocused = {}
         )
     }
 }

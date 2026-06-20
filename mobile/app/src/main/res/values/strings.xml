@@ -54,6 +54,7 @@
     <string name="empty_places">Chưa có địa điểm nào</string>
     <string name="retry">Thử lại</string>
     <string name="search_not_found">Không tìm thấy \"%1$s\"</string>
+    <string name="map_reset_view">Toàn cảnh</string>
 
     <!-- Feed Screen -->
     <string name="search_feed_hint">Tìm địa điểm gợi ý...</string>
@@ -74,6 +75,7 @@
     <!-- Place Card -->
     <string name="place_image_desc">Hình ảnh của %1$s</string>
     <string name="place_learn_more">Tìm hiểu thêm</string>
+    <string name="place_locate">Định vị trên bản đồ</string>
 
     <!-- Error View -->
     <string name="error_icon_desc">Biểu tượng lỗi</string>

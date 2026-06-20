@@ -12,13 +12,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.bevietnam.core.model.User
-
+import com.bevietnam.core.data.local.TokenStorage
+import com.bevietnam.core.domain.usecase.GetUserUseCase
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val checkHealthUseCase: CheckHealthUseCase,
-    private val tokenStorage: com.bevietnam.core.data.local.TokenStorage,
-    private val getUserUseCase: com.bevietnam.core.domain.usecase.GetUserUseCase
+    private val tokenStorage: TokenStorage,
+    private val getUserUseCase: GetUserUseCase
 ) : ViewModel() {
     val currentUser: StateFlow<User?> = sessionManager.currentUser
 

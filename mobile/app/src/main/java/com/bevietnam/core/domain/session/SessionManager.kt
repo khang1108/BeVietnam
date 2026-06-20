@@ -9,10 +9,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.SharingStarted
 import javax.inject.Inject
 import javax.inject.Singleton
-
+import com.bevietnam.core.data.local.TokenStorage
 @Singleton
 class SessionManager @Inject constructor(
-    private val tokenStorage: com.bevietnam.core.data.local.TokenStorage
+    private val tokenStorage: TokenStorage
 ) {
 
     private val _currentUser = MutableStateFlow<com.bevietnam.core.model.User?>(null)

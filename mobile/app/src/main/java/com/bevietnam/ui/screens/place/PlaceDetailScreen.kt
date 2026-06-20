@@ -65,7 +65,7 @@ fun PlaceDetailScreen(
                     if (!place.imageUrl.isNullOrEmpty()) {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data(place.imageUrl)
+                                .data(place.imageUrl?.toIntOrNull() ?: place.imageUrl)
                                 .crossfade(true)
                                 .build(),
                             contentDescription = place.name,

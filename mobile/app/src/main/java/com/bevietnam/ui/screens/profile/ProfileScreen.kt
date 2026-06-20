@@ -37,14 +37,11 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.bevietnam.R
-import com.bevietnam.core.model.Gender
 import com.bevietnam.core.model.User
 import com.bevietnam.ui.theme.BeVietnamTheme
 import com.bevietnam.ui.components.ErrorView
 import com.bevietnam.ui.components.LoadingIndicator
 import com.bevietnam.ui.navigation.BottomNavBar
-import com.bevietnam.ui.components.DatePickerField
-import com.bevietnam.ui.components.GenderSelector
 import com.bevietnam.ui.components.PrimaryLoadingButton
 import java.time.format.DateTimeFormatter
 import java.util.Calendar

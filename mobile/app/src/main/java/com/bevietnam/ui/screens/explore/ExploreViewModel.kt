@@ -39,8 +39,7 @@ sealed class ExploreUiState {
         val selectedCategory: String = "Tất cả",
         val searchQuery: String = "",
         val isMapView: Boolean = true,
-        val focusedPlaceId: String? = null,
-        val hasLocationPermission: Boolean = false
+        val focusedPlaceId: String? = null
     ) : ExploreUiState()
     
     /** Trạng thái danh sách địa điểm trống */
@@ -179,21 +178,6 @@ class ExploreViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Cập nhật trạng thái cấp quyền vị trí từ UI.
-     *
-     * @param isGranted Người dùng đã cấp quyền vị trí chưa.
-     */
-    fun updateLocationPermission(isGranted: Boolean) {
-        val current = _uiState.value as? ExploreUiState.Success ?: return
-        if (current.hasLocationPermission != isGranted) {
-            _uiState.update { currentState ->
-                if (currentState is ExploreUiState.Success) {
-                    currentState.copy(hasLocationPermission = isGranted)
-                } else currentState
-            }
-        }
-    }
 
     /**
      * Hàm phụ trợ thực hiện lọc danh sách địa điểm theo từ khóa và danh mục.

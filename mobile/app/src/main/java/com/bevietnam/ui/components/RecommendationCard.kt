@@ -75,7 +75,7 @@ fun RecommendationCard(
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(context)
-                        .data(item.thumbnailUrl)
+                        .data(item.thumbnailUrl?.toIntOrNull() ?: item.thumbnailUrl)
                         .crossfade(true)
                         .build(),
                     contentDescription = stringResource(R.string.recommendation_image_desc, item.name),
