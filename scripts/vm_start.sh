@@ -57,6 +57,7 @@ Commands:
   restart      stop then start
   status       show managed process status
   logs         tail Backend and AI Core logs
+  validate-env validate .env parsing without starting services
   help         show this message
 
 Environment knobs:
@@ -96,6 +97,49 @@ command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
+trim() {
+  local value="$1"
+
+  value="${value#"${value%%[![:space:]]*}"}"
+  value="${value%"${value##*[![:space:]]}"}"
+  printf '%s' "$value"
+}
+
+load_dotenv_file() {
+  local line
+  local key
+  local value
+  local line_number=0
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line_number=$((line_number + 1))
+    line="$(trim "$line")"
+
+    [[ -z "$line" || "$line" == \#* ]] && continue
+
+    if [[ "$line" != *=* ]]; then
+      log "Ignoring invalid .env line $line_number: $line"
+      continue
+    fi
+
+    key="$(trim "${line%%=*}")"
+    value="$(trim "${line#*=}")"
+
+    if [[ ! "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+      log "Ignoring invalid .env key on line $line_number: $key"
+      continue
+    fi
+
+    if [[ "$value" == \"*\" && "$value" == *\" ]]; then
+      value="${value:1:${#value}-2}"
+    elif [[ "$value" == \'*\' && "$value" == *\' ]]; then
+      value="${value:1:${#value}-2}"
+    fi
+
+    export "$key=$value"
+  done < "$ENV_FILE"
+}
+
 has_real_database_url() {
   [[ -n "${DATABASE_URL:-}" ]] \
     && [[ "${DATABASE_URL:-}" != *"..."* ]] \
@@ -116,10 +160,7 @@ load_env() {
     die "$ENV_FILE not found"
   fi
 
-  set -a
-  # shellcheck disable=SC1090
-  source "$ENV_FILE"
-  set +a
+  load_dotenv_file
 
   export PYTHONPATH="$ROOT"
   export AI_CORE_BASE_URL="${AI_CORE_BASE_URL:-http://127.0.0.1:$AI_PORT}"
@@ -599,6 +640,11 @@ status() {
   status_one "backend"
 }
 
+validate_env() {
+  load_env
+  log "Environment loaded from $ENV_FILE"
+}
+
 case "${1:-start}" in
   bootstrap)
     INSTALL_DEPS=1 bootstrap
@@ -618,6 +664,9 @@ case "${1:-start}" in
     ;;
   logs)
     tail -n 120 -f "$LOG_DIR"/backend.log "$LOG_DIR"/ai-core.log
+    ;;
+  validate-env)
+    validate_env
     ;;
   help|-h|--help)
     usage
