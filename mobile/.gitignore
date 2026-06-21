@@ -8,6 +8,3 @@
 # Ignore documentation files
 Agent.md
 CONTRIBUTING.md
-
-# Ignore mock data
-/app/src/main/java/com/bevietnam/core/data/mock/

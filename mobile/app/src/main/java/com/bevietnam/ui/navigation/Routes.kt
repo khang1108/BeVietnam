@@ -56,3 +56,15 @@ object FeedRoute
  */
 @Serializable
 object CameraRoute
+
+/**
+ * Tuyến đường tới màn hình chi tiết món ăn (Food Detail), kèm danh sách quán tham khảo.
+ */
+@Serializable
+data class FoodDetailRoute(val foodId: String)
+
+/**
+ * Tuyến đường tới màn hình chi tiết câu chuyện văn hóa (Story Detail).
+ */
+@Serializable
+data class StoryDetailRoute(val storyId: String)

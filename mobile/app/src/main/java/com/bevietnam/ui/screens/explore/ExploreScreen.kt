@@ -15,6 +15,22 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Restaurant
+import com.bevietnam.ui.content.CultureContent
+import com.bevietnam.ui.content.CultureStory
+import com.bevietnam.ui.content.FoodItem
+import com.bevietnam.ui.theme.LocalCulturalColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Map
@@ -81,7 +97,9 @@ import org.maplibre.android.maps.Style
 fun ExploreScreen(
     modifier: Modifier = Modifier,
     viewModel: ExploreViewModel = hiltViewModel(),
-    onPlaceClick: (Place) -> Unit = {}
+    onPlaceClick: (Place) -> Unit = {},
+    onFoodClick: (String) -> Unit = {},
+    onStoryClick: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -94,6 +112,8 @@ fun ExploreScreen(
         onPlaceClick = onPlaceClick,
         onToggleViewMode = viewModel::toggleViewMode,
         onPlaceFocused = viewModel::onPlaceFocused,
+        onFoodClick = onFoodClick,
+        onStoryClick = onStoryClick,
         modifier = modifier
     )
 }
@@ -120,6 +140,8 @@ fun ExploreScreenContent(
     onPlaceClick: (Place) -> Unit,
     onToggleViewMode: () -> Unit,
     onPlaceFocused: (String?) -> Unit,
+    onFoodClick: (String) -> Unit = {},
+    onStoryClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -142,7 +164,9 @@ fun ExploreScreenContent(
                     onSearchQueryChanged = onSearchQueryChanged,
                     onPlaceClick = onPlaceClick,
                     onToggleViewMode = onToggleViewMode,
-                    onPlaceFocused = onPlaceFocused
+                    onPlaceFocused = onPlaceFocused,
+                    onFoodClick = onFoodClick,
+                    onStoryClick = onStoryClick
                 )
             }
         }
@@ -161,7 +185,9 @@ private fun ExploreSuccessContent(
     onSearchQueryChanged: (String) -> Unit,
     onPlaceClick: (Place) -> Unit,
     onToggleViewMode: () -> Unit,
-    onPlaceFocused: (String?) -> Unit
+    onPlaceFocused: (String?) -> Unit,
+    onFoodClick: (String) -> Unit,
+    onStoryClick: (String) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         if (state.isMapView) {
@@ -179,7 +205,9 @@ private fun ExploreSuccessContent(
                 onCategorySelected = onCategorySelected,
                 onSearchQueryChanged = onSearchQueryChanged,
                 onPlaceClick = onPlaceClick,
-                onToggleViewMode = onToggleViewMode
+                onToggleViewMode = onToggleViewMode,
+                onFoodClick = onFoodClick,
+                onStoryClick = onStoryClick
             )
         }
     }
@@ -375,7 +403,9 @@ private fun ExploreListView(
     onCategorySelected: (String) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     onPlaceClick: (Place) -> Unit,
-    onToggleViewMode: () -> Unit
+    onToggleViewMode: () -> Unit,
+    onFoodClick: (String) -> Unit,
+    onStoryClick: (String) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -410,13 +440,22 @@ private fun ExploreListView(
             )
         }
 
-        // Dòng hiển thị tổng số kết quả
+        // Ẩm thực Việt (carousel)
+        item { FoodSection(onFoodClick = onFoodClick) }
+
+        // Bạn có biết? (fun fact)
+        item { FactCard() }
+
+        // Tiêu đề mục địa điểm + tổng số kết quả
+        item {
+            SectionHeader(title = "Địa điểm nổi bật", icon = Icons.Default.Place)
+        }
         item {
             Text(
                 text = stringResource(R.string.places_count, state.filteredPlaces.size),
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
         }
 
@@ -440,6 +479,9 @@ private fun ExploreListView(
                 )
             }
         }
+
+        // Câu chuyện văn hóa
+        item { StorySection(onStoryClick = onStoryClick) }
     }
 }
 
@@ -523,6 +565,150 @@ private fun SearchEmptyState(query: String) {
     ) {
         Text(text = "🔍", fontSize = 48.sp)
         Text(text = stringResource(R.string.search_not_found, query), fontWeight = FontWeight.SemiBold)
+    }
+}
+
+/**
+ * Tiêu đề một mục nội dung (icon + chữ).
+ */
+@Composable
+private fun SectionHeader(title: String, icon: ImageVector) {
+    Row(
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(6.dp))
+        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+/**
+ * Mục Ẩm thực Việt: carousel cuộn ngang các món ăn, bấm vào mở chi tiết.
+ */
+@Composable
+private fun FoodSection(onFoodClick: (String) -> Unit) {
+    Column {
+        SectionHeader(title = "Ẩm thực Việt", icon = Icons.Default.Restaurant)
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(items = CultureContent.foods, key = { it.id }) { food ->
+                FoodCard(food = food, onClick = { onFoodClick(food.id) })
+            }
+        }
+    }
+}
+
+@Composable
+private fun FoodCard(food: FoodItem, onClick: () -> Unit) {
+    Surface(
+        modifier = Modifier
+            .width(112.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 1.dp
+    ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(74.dp)
+                    .background(Color(food.colorHex)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Default.Restaurant,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.55f),
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+            Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp)) {
+                Text(food.name, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
+                Text(food.region, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
+/**
+ * Mục "Bạn có biết?": thẻ fun fact văn hóa.
+ */
+@Composable
+private fun FactCard() {
+    val culturalColors = LocalCulturalColors.current
+    val fact = "Áo dài Việt Nam có nguồn gốc từ thế kỷ 18, được cách tân thành dáng hiện đại vào những năm 1930."
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        shape = RoundedCornerShape(12.dp),
+        color = culturalColors.amberColor.copy(alpha = 0.12f)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Lightbulb, contentDescription = null, tint = culturalColors.amberColor, modifier = Modifier.size(17.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("Bạn có biết?", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = culturalColors.amberColor)
+            }
+            Spacer(Modifier.height(5.dp))
+            Text(fact, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface, lineHeight = 17.sp)
+        }
+    }
+}
+
+/**
+ * Mục Câu chuyện văn hóa: thẻ truyện, bấm vào mở trang đọc đầy đủ.
+ */
+@Composable
+private fun StorySection(onStoryClick: (String) -> Unit) {
+    val story: CultureStory = CultureContent.stories.first()
+    Column {
+        SectionHeader(title = "Câu chuyện văn hóa", icon = Icons.Default.MenuBook)
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .clickable { onStoryClick(story.id) },
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.surface,
+            shadowElevation = 1.dp
+        ) {
+            Column {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp)
+                        .background(Color(story.colorHex)),
+                    contentAlignment = Alignment.BottomStart
+                ) {
+                    Surface(
+                        modifier = Modifier.padding(9.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        color = Color.Black.copy(alpha = 0.4f)
+                    ) {
+                        Text(story.tag, color = Color.White, fontSize = 10.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
+                    }
+                }
+                Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
+                    Text(story.title, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
+                    Spacer(Modifier.height(3.dp))
+                    Text(story.excerpt, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, lineHeight = 16.sp)
+                    Spacer(Modifier.height(6.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("Đọc tiếp", fontSize = 11.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.primary)
+                        Spacer(Modifier.width(3.dp))
+                        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(13.dp))
+                    }
+                }
+            }
+        }
+        Spacer(Modifier.height(8.dp))
     }
 }
 

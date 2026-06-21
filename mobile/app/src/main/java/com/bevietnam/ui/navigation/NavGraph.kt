@@ -28,7 +28,16 @@ import com.bevietnam.ui.screens.feed.FeedScreen
 import com.bevietnam.ui.screens.storyline.StorylineScreen
 import com.bevietnam.ui.screens.place.PlaceDetailScreen
 import com.bevietnam.ui.screens.place.PlaceDetailViewModel
+import com.bevietnam.ui.screens.food.FoodDetailScreen
+import com.bevietnam.ui.screens.story.StoryDetailScreen
+import com.bevietnam.ui.content.CultureContent
+import androidx.navigation.toRoute
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
 
 /**
  * Điểm điều hướng chính (Main App Navigation Host) của ứng dụng BeVietnam.
@@ -120,6 +129,19 @@ fun AppNavHostContent(
                     }
                 )
             }
+        },
+        floatingActionButton = {
+            if (isBottomBarVisible) {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate(CameraRoute) { launchSingleTop = true }
+                    },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Icon(Icons.Default.AddAPhoto, contentDescription = "Đăng bài mới")
+                }
+            }
         }
     ) { paddingValues ->
         NavHost(
@@ -137,12 +159,18 @@ fun AppNavHostContent(
                 )
             }
 
-            composable<ExploreRoute> { 
+            composable<ExploreRoute> {
                 ExploreScreen(
                     onPlaceClick = { place ->
                         navController.navigate(PlaceDetailRoute(place.id))
+                    },
+                    onFoodClick = { foodId ->
+                        navController.navigate(FoodDetailRoute(foodId))
+                    },
+                    onStoryClick = { storyId ->
+                        navController.navigate(StoryDetailRoute(storyId))
                     }
-                ) 
+                )
             }
             
             composable<PlaceDetailRoute> {
@@ -177,8 +205,28 @@ fun AppNavHostContent(
                 )
             }
             
-            composable<StorylineRoute> { 
-                StorylineScreen() 
+            composable<StorylineRoute> {
+                StorylineScreen()
+            }
+
+            composable<FoodDetailRoute> { backStackEntry ->
+                val food = CultureContent.food(backStackEntry.toRoute<FoodDetailRoute>().foodId)
+                if (food != null) {
+                    FoodDetailScreen(
+                        food = food,
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
+            }
+
+            composable<StoryDetailRoute> { backStackEntry ->
+                val story = CultureContent.story(backStackEntry.toRoute<StoryDetailRoute>().storyId)
+                if (story != null) {
+                    StoryDetailScreen(
+                        story = story,
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
             }
 
 
