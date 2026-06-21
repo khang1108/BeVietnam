@@ -4,472 +4,692 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.RadioButtonUnchecked
-import androidx.compose.material.icons.outlined.Lightbulb
-import androidx.compose.material.icons.outlined.TaskAlt
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import com.bevietnam.core.model.QuestChain
 import com.bevietnam.core.model.Task
 import com.bevietnam.core.model.TaskDifficulty
+import com.bevietnam.core.model.TaskStatus
+import com.bevietnam.ui.components.CulturalBackground
 import com.bevietnam.ui.theme.BeVietnamTheme
 import com.bevietnam.ui.theme.LocalCulturalColors
+import androidx.compose.ui.res.stringResource
+import com.bevietnam.R
 
 /**
- * Màn hình Hành trình cốt truyện & Nhiệm vụ (Storyline Screen) của ứng dụng BeVietnam.
+ * Màn hình Hành trình cốt truyện & Nhiệm vụ (Storyline Screen) — Duolingo-style.
  *
- * Cung cấp hành trình trò chơi hóa (gamification) tìm hiểu văn hóa Việt Nam của người dùng.
- * Cho phép xem nhiệm vụ hiện tại, theo dõi tiến độ tổng thể và mở rộng xem giải thích chi tiết về văn hóa lịch sử Việt Nam.
+ * Hiển thị chuỗi nhiệm vụ hành trình (quest chain) dạng danh sách dọc với:
+ * - Progress header (thanh tiến độ)
+ * - Horizontal path thumbnails (mini-map hành trình)
+ * - Vertical task cards với connector lines và capture thumbnails
  *
- * @param viewModel ViewModel quản lý trạng thái dữ liệu màn hình cốt truyện ([StorylineViewModel]). Mặc định là [hiltViewModel].
- * @param onTaskClick Callback kích hoạt khi người dùng nhấn chọn một thẻ nhiệm vụ ([Task]).
- * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
+ * @param viewModel ViewModel quản lý trạng thái dữ liệu ([StorylineViewModel]).
+ * @param onTaskClick Callback khi nhấn vào thẻ nhiệm vụ — navigate sang TaskDetailScreen.
+ * @param onCheckInTask Callback khi nhấn nút Check-in — navigate sang CaptureScreen.
+ * @param modifier [Modifier] dùng để định hình bố cục bên ngoài.
  */
 @Composable
 fun StorylineScreen(
     viewModel: StorylineViewModel = hiltViewModel(),
-    onTaskClick: (Task) -> Unit = {},
+    onTaskClick: (String) -> Unit = {},
+    onCheckInTask: (String, String?) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     StorylineScreenContent(
         uiState = uiState,
-        onRetry = viewModel::loadTasks,
+        onRetry = viewModel::loadQuestChain,
         onTaskClick = onTaskClick,
-        onTaskCompleted = viewModel::onTaskCompleted,
+        onCheckInTask = onCheckInTask,
         modifier = modifier
     )
 }
 
-/**
- * Triển khai phân phối giao diện chính của màn hình Cốt truyện & Nhiệm vụ.
- *
- * Tự động chuyển đổi giữa các giao diện đang tải (Shimmer), giao diện lỗi/rỗng và giao diện danh sách nhiệm vụ thành công.
- *
- * @param uiState Đối tượng đại diện cho trạng thái màn hình ([StorylineUiState]).
- * @param onRetry Callback nhấn thử lại khi tải dữ liệu gặp sự cố.
- * @param onTaskClick Callback nhấn xem thông tin thẻ nhiệm vụ.
- * @param onTaskCompleted Callback nhấn xác nhận hoàn thành nhiệm vụ.
- * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
- */
 @Composable
 fun StorylineScreenContent(
     uiState: StorylineUiState,
     onRetry: () -> Unit,
-    onTaskClick: (Task) -> Unit,
-    onTaskCompleted: (String) -> Unit,
+    onTaskClick: (String) -> Unit,
+    onCheckInTask: (String, String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        when (uiState) {
-            is StorylineUiState.Loading -> StorylineLoadingState()
-            is StorylineUiState.Empty -> StorylineEmptyState(onRetry = onRetry)
-            is StorylineUiState.Error -> StorylineEmptyState(
-                message = uiState.message,
-                onRetry = onRetry
-            )
-            is StorylineUiState.Success -> StorylineSuccessContent(
-                state = uiState,
-                onTaskClick = onTaskClick,
-                onTaskCompleted = onTaskCompleted
-            )
+        CulturalBackground {
+            when (uiState) {
+                is StorylineUiState.Loading -> StorylineLoadingState()
+                is StorylineUiState.Empty -> StorylineEmptyState(onRetry = onRetry)
+                is StorylineUiState.Error -> StorylineEmptyState(
+                    message = uiState.message,
+                    onRetry = onRetry
+                )
+                is StorylineUiState.Success -> StorylineSuccessContent(
+                    questChain = uiState.questChain,
+                    onTaskClick = onTaskClick,
+                    onCheckInTask = onCheckInTask
+                )
+            }
         }
     }
 }
 
-/**
- * Giao diện khi tải dữ liệu thành công (Success State) của màn hình Cốt truyện.
- *
- * Hiển thị Banner nhiệm vụ tiếp theo nổi bật trên cùng, thanh tiến độ tổng thể,
- * và danh sách cuộn mượt mà tất cả nhiệm vụ đã được giao.
- */
+// ──────────────────────────────────────────────────────────────
+// SUCCESS CONTENT
+// ──────────────────────────────────────────────────────────────
+
 @Composable
 private fun StorylineSuccessContent(
-    state: StorylineUiState.Success,
-    onTaskClick: (Task) -> Unit,
-    onTaskCompleted: (String) -> Unit
+    questChain: QuestChain,
+    onTaskClick: (String) -> Unit,
+    onCheckInTask: (String, String?) -> Unit
 ) {
+    val completedCount = questChain.tasks.count { it.status == TaskStatus.COMPLETED }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 120.dp)
     ) {
-        // Banner hiển thị nổi bật Nhiệm vụ tiếp theo cần làm
-        state.nextTask?.let {
-            item {
-                NextTaskBanner(
-                    task = it,
-                    onTaskCompleted = onTaskCompleted
+        // Progress Header
+        item {
+            QuestProgressHeader(
+                completed = completedCount,
+                total = questChain.totalTasks
+            )
+        }
+
+        // Task Cards with Connector Lines
+        itemsIndexed(
+            items = questChain.tasks,
+            key = { _, task -> task.id }
+        ) { index, task ->
+            Column {
+                // Connector line (giữa các card, không vẽ trước card đầu tiên)
+                if (index > 0) {
+                    TaskConnectorLine(
+                        previousStatus = questChain.tasks[index - 1].status,
+                        currentStatus = task.status
+                    )
+                }
+                // Task Card
+                QuestTaskCard(
+                    task = task,
+                    stepNumber = index + 1,
+                    onCardClick = { onTaskClick(task.id) },
+                    onCheckInClick = { onCheckInTask(task.id, task.placeId) },
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
             }
-        }
-
-        // Thanh tiến độ tổng thể hành trình
-        item {
-            val completedCount = state.tasks.count { it.isCompleted }
-            TaskProgressBar(
-                completed = completedCount,
-                total = state.tasks.size,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-        }
-
-        // Tiêu đề danh sách
-        item {
-            Text(
-                text = "Tất cả nhiệm vụ",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-        }
-
-        // Danh sách tất cả các nhiệm vụ với stable key đảm bảo hiệu năng
-        itemsIndexed(
-            items = state.tasks,
-            key = { _, task -> task.id }
-        ) { _, task ->
-            TaskCard(
-                task = task,
-                onClick = { onTaskClick(task) },
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 6.dp)
-            )
         }
     }
 }
 
-/**
- * Banner hiển thị nổi bật Nhiệm vụ tiếp theo cần làm (Next Task Banner).
- *
- * Sử dụng hình nền dải màu chuyển sắc (gradient) đỏ nổi bật mang bản sắc văn hóa Việt Nam.
- */
+// ──────────────────────────────────────────────────────────────
+// PROGRESS HEADER
+// ──────────────────────────────────────────────────────────────
+
 @Composable
-private fun NextTaskBanner(
-    task: Task,
-    onTaskCompleted: (String) -> Unit
+private fun QuestProgressHeader(
+    completed: Int,
+    total: Int
 ) {
+    val progress = if (total > 0) completed.toFloat() / total else 0f
+    val percentage = (progress * 100).toInt()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primaryContainer),
-                        start = Offset.Zero,
-                        end = Offset(Float.POSITIVE_INFINITY, 0f)
-                    )
-                )
-                .padding(16.dp)
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    val culturalColors = LocalCulturalColors.current
-                    Icon(
-                        imageVector = Icons.Default.EmojiEvents,
-                        contentDescription = null, // Icon trang trí
-                        tint = culturalColors.goldColor,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Text(
-                        text = "NHIỆM VỤ TIẾP THEO",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White.copy(alpha = 0.9f),
-                        letterSpacing = 1.sp
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    DifficultyBadge(
-                        difficulty = task.difficulty,
-                        onDark = true
-                    )
-                }
-
-                Text(
-                    text = task.title,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-
-                Text(
-                    text = task.description,
-                    fontSize = 13.sp,
-                    color = Color.White.copy(alpha = 0.85f),
-                    lineHeight = 19.sp,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier
-                        .background(
-                            color = Color.White.copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.TaskAlt,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Text(
-                        text = task.completionRequirement,
-                        fontSize = 12.sp,
-                        color = Color.White,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                Button(
-                    onClick = { onTaskCompleted(task.id) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = "Bắt đầu nhiệm vụ",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
-    }
-}
-
-/**
- * Thanh chỉ báo tiến độ tổng thể của Hành trình (Task Progress Bar).
- */
-@Composable
-private fun TaskProgressBar(
-    completed: Int,
-    total: Int,
-    modifier: Modifier = Modifier
-) {
-    val progress = if (total > 0) completed.toFloat() / total else 0f
-
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Tiến độ hành trình",
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = "$completed/$total nhiệm vụ",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-        LinearProgressIndicator(
-            progress = { progress },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(8.dp)
-                .clip(RoundedCornerShape(4.dp)),
-            color = MaterialTheme.colorScheme.primary,
-            trackColor = MaterialTheme.colorScheme.outlineVariant
-        )
-    }
-}
-
-/**
- * Thẻ hiển thị một nhiệm vụ cụ thể (Task Card).
- *
- * Cho phép nhấn để mở rộng/thu gọn hiển thị phần giải thích văn hóa bổ sung.
- *
- * @param task Đối tượng dữ liệu chứa thông tin chi tiết nhiệm vụ ([Task]).
- * @param onClick Callback kích hoạt khi người dùng nhấn chọn thẻ.
- * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
- */
-@Composable
-fun TaskCard(
-    task: Task,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    val culturalColors = LocalCulturalColors.current
-
-    Card(
-        onClick = {
-            expanded = !expanded
-            onClick()
-        },
-        modifier = modifier.fillMaxWidth(),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (task.isCompleted) culturalColors.shimmerLight else MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (task.isCompleted) 0.dp else 3.dp
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Progress Section
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = if (task.isCompleted)
-                        Icons.Default.CheckCircle
-                    else
-                        Icons.Default.RadioButtonUnchecked,
-                    contentDescription = if (task.isCompleted) "Nhiệm vụ đã hoàn thành" else "Nhiệm vụ chưa hoàn thành",
-                    tint = if (task.isCompleted) culturalColors.easyColor else culturalColors.completedGray,
-                    modifier = Modifier.size(22.dp)
-                )
-
-                Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .background(
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Flag,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                     Text(
-                        text = task.title,
-                        fontSize = 15.sp,
+                        text = stringResource(R.string.storyline_journey),
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (task.isCompleted) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
-
-                DifficultyBadge(difficulty = task.difficulty)
+                Text(
+                    text = "$percentage%",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
 
+            // Progress Bar text
             Text(
-                text = task.description,
-                fontSize = 13.sp,
-                color = if (task.isCompleted) culturalColors.completedGray else MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 18.sp,
-                maxLines = if (expanded) Int.MAX_VALUE else 2,
-                overflow = if (expanded) TextOverflow.Visible else TextOverflow.Ellipsis
+                text = stringResource(R.string.storyline_progress, completed, total),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Medium
             )
 
-            // Phần giải thích ý nghĩa văn hóa hấp dẫn
-            InfoSection(
-                icon = Icons.Outlined.Lightbulb,
-                label = "Giải thích văn hóa",
-                content = task.culturalExplanation,
-                accentColor = culturalColors.amberColor,
-                isCompleted = task.isCompleted
-            )
-
-            // Phần yêu cầu chụp ảnh check-in
-            InfoSection(
-                icon = Icons.Outlined.TaskAlt,
-                label = "Yêu cầu hoàn thành",
-                content = task.completionRequirement,
-                accentColor = culturalColors.completionBlue,
-                isCompleted = task.isCompleted
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(6.dp)),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
             )
         }
     }
 }
 
-/**
- * Mục thông tin bổ sung (Info Section) nằm bên trong thẻ nhiệm vụ.
- *
- * Phân tách màu sắc trực quan tùy chọn (ví dụ màu vàng hổ phách cho Giải thích văn hóa).
- */
+// ──────────────────────────────────────────────────────────────
+// HORIZONTAL PATH THUMBNAILS
+// ──────────────────────────────────────────────────────────────
+
 @Composable
-private fun InfoSection(
-    icon: ImageVector,
-    label: String,
-    content: String,
-    accentColor: Color,
-    isCompleted: Boolean
+private fun HorizontalPathThumbnails(
+    tasks: List<Task>,
+    modifier: Modifier = Modifier
 ) {
     val culturalColors = LocalCulturalColors.current
-    val effectiveAccent = if (isCompleted) culturalColors.completedGray else accentColor
 
-    Row(
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(0.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        itemsIndexed(tasks) { index, task ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Connector line (giữa các node)
+                if (index > 0) {
+                    val lineColor = when {
+                        task.status == TaskStatus.COMPLETED -> culturalColors.easyColor
+                        task.status == TaskStatus.ACTIVE -> MaterialTheme.colorScheme.primary
+                        else -> culturalColors.completedGray
+                    }
+                    Canvas(
+                        modifier = Modifier
+                            .width(24.dp)
+                            .height(2.dp)
+                    ) {
+                        val dashEffect = if (task.status == TaskStatus.LOCKED) {
+                            PathEffect.dashPathEffect(floatArrayOf(6f, 4f), 0f)
+                        } else null
+
+                        drawLine(
+                            color = lineColor,
+                            start = Offset(0f, size.height / 2),
+                            end = Offset(size.width, size.height / 2),
+                            strokeWidth = 2.dp.toPx(),
+                            pathEffect = dashEffect,
+                            cap = StrokeCap.Round
+                        )
+                    }
+                }
+
+                // Node circle
+                val nodeColor = when (task.status) {
+                    TaskStatus.COMPLETED -> culturalColors.easyColor
+                    TaskStatus.ACTIVE -> MaterialTheme.colorScheme.primary
+                    TaskStatus.LOCKED -> culturalColors.completedGray
+                }
+
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(nodeColor.copy(alpha = 0.15f))
+                        .border(2.dp, nodeColor, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    when (task.status) {
+                        TaskStatus.COMPLETED -> Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = stringResource(R.string.storyline_completed),
+                            tint = culturalColors.easyColor,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        TaskStatus.ACTIVE -> Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primary)
+                        )
+                        TaskStatus.LOCKED -> Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = stringResource(R.string.storyline_locked_status),
+                            tint = culturalColors.completedGray,
+                            modifier = Modifier.size(12.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ──────────────────────────────────────────────────────────────
+// CONNECTOR LINE
+// ──────────────────────────────────────────────────────────────
+
+@Composable
+private fun TaskConnectorLine(
+    previousStatus: TaskStatus,
+    currentStatus: TaskStatus
+) {
+    val culturalColors = LocalCulturalColors.current
+
+    val lineColor = when {
+        previousStatus == TaskStatus.COMPLETED && currentStatus == TaskStatus.COMPLETED ->
+            culturalColors.easyColor
+        previousStatus == TaskStatus.COMPLETED && currentStatus == TaskStatus.ACTIVE ->
+            MaterialTheme.colorScheme.primary
+        else -> culturalColors.completedGray
+    }
+
+    val isDashed = currentStatus == TaskStatus.LOCKED
+
+    Canvas(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                color = effectiveAccent.copy(alpha = 0.08f),
-                shape = RoundedCornerShape(10.dp)
-            )
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            .height(32.dp)
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = effectiveAccent,
-            modifier = Modifier
-                .size(16.dp)
-                .padding(top = 1.dp)
+        val centerX = size.width / 2
+        val dashEffect = if (isDashed) {
+            PathEffect.dashPathEffect(floatArrayOf(8f, 6f), 0f)
+        } else null
+
+        drawLine(
+            color = lineColor,
+            start = Offset(centerX, 0f),
+            end = Offset(centerX, size.height),
+            strokeWidth = 2.5.dp.toPx(),
+            pathEffect = dashEffect,
+            cap = StrokeCap.Round
         )
-        Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            Text(
-                text = label,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = effectiveAccent,
-                letterSpacing = 0.3.sp
+    }
+}
+
+// ──────────────────────────────────────────────────────────────
+// QUEST TASK CARD
+// ──────────────────────────────────────────────────────────────
+
+@Composable
+fun QuestTaskCard(
+    task: Task,
+    stepNumber: Int,
+    onCardClick: () -> Unit,
+    onCheckInClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val culturalColors = LocalCulturalColors.current
+    val isLocked = task.status == TaskStatus.LOCKED
+    val isCompleted = task.status == TaskStatus.COMPLETED
+    val isActive = task.status == TaskStatus.ACTIVE
+
+    val cardAlpha = if (isLocked) 0.55f else 1f
+    val borderColor = when (task.status) {
+        TaskStatus.COMPLETED -> culturalColors.easyColor.copy(alpha = 0.5f)
+        TaskStatus.ACTIVE -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+        TaskStatus.LOCKED -> Color.Transparent
+    }
+    val cardElevation = when (task.status) {
+        TaskStatus.ACTIVE -> 6.dp
+        TaskStatus.COMPLETED -> 2.dp
+        TaskStatus.LOCKED -> 0.dp
+    }
+
+    Box(modifier = modifier.alpha(cardAlpha)) {
+        Card(
+            onClick = { if (!isLocked) onCardClick() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(
+                    if (borderColor != Color.Transparent) {
+                        Modifier.border(1.5.dp, borderColor, RoundedCornerShape(16.dp))
+                    } else Modifier
+                ),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = cardElevation),
+            enabled = !isLocked
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                // Row 1: Step badge + Title & Difficulty
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.padding(end = 24.dp) // Avoid overlapping with Thumbnail
+                ) {
+                    // Step Number Badge
+                    StepBadge(
+                        stepNumber = stepNumber,
+                        status = task.status
+                    )
+
+                    // Title and Difficulty
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = task.title,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isLocked) MaterialTheme.colorScheme.onSurfaceVariant
+                            else MaterialTheme.colorScheme.onSurface,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        DifficultyBadge(difficulty = task.difficulty)
+                    }
+                }
+
+                // Description
+                Text(
+                    text = task.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isLocked) culturalColors.completedGray
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 18.sp
+                )
+
+                // Check-in Button (chỉ cho ACTIVE) hoặc Status Badge
+                when (task.status) {
+                    TaskStatus.ACTIVE -> {
+                        Button(
+                            onClick = onCheckInClick,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CameraAlt,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.storyline_checkin_button),
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                    TaskStatus.COMPLETED -> {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier
+                                .background(
+                                    culturalColors.easyColor.copy(alpha = 0.1f),
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = culturalColors.easyColor,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.storyline_checkin_success),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = culturalColors.easyColor,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                    TaskStatus.LOCKED -> {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier
+                                .background(
+                                    culturalColors.completedGray.copy(alpha = 0.1f),
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Lock,
+                                contentDescription = null,
+                                tint = culturalColors.completedGray,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.storyline_locked),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = culturalColors.completedGray
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Capture Thumbnail — góc trên phải card
+        CaptureThumbnail(
+            captureImageUrl = task.captureImageUrl,
+            status = task.status,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .offset(x = (-8).dp, y = (-6).dp)
+        )
+
+        // Lock Icon Overlay cho thẻ bị khóa
+        if (isLocked) {
+            Box(
+                modifier = Modifier.matchParentSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = stringResource(R.string.storyline_locked),
+                    modifier = Modifier.size(56.dp),
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                )
+            }
+        }
+    }
+}
+
+// ──────────────────────────────────────────────────────────────
+// STEP BADGE
+// ──────────────────────────────────────────────────────────────
+
+@Composable
+private fun StepBadge(
+    stepNumber: Int,
+    status: TaskStatus
+) {
+    val culturalColors = LocalCulturalColors.current
+
+    val bgColor = when (status) {
+        TaskStatus.COMPLETED -> culturalColors.easyColor
+        TaskStatus.ACTIVE -> MaterialTheme.colorScheme.primary
+        TaskStatus.LOCKED -> culturalColors.completedGray
+    }
+
+    Box(
+        modifier = Modifier
+            .size(32.dp)
+            .clip(CircleShape)
+            .background(bgColor),
+        contentAlignment = Alignment.Center
+    ) {
+        when (status) {
+            TaskStatus.COMPLETED -> Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = stringResource(R.string.storyline_completed),
+                tint = Color.White,
+                modifier = Modifier.size(18.dp)
             )
-            Text(
-                text = content,
-                fontSize = 12.sp,
-                color = if (isCompleted) culturalColors.completedGray else MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 17.sp
+            else -> Text(
+                text = "$stepNumber",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
         }
     }
 }
 
-/**
- * Nhãn mức độ khó (Difficulty Badge) của từng thử thách nhiệm vụ.
- *
- * @param difficulty Mức độ khó của nhiệm vụ ([TaskDifficulty]).
- * @param onDark Xác định xem có vẽ trên nền dải màu tối hay không để căn chỉnh tương phản. Mặc định là `false`.
- */
+// ──────────────────────────────────────────────────────────────
+// CAPTURE THUMBNAIL (góc trên phải card)
+// ──────────────────────────────────────────────────────────────
+
+@Composable
+private fun CaptureThumbnail(
+    captureImageUrl: String?,
+    status: TaskStatus,
+    modifier: Modifier = Modifier
+) {
+    // Không hiển thị thumbnail cho task LOCKED
+    if (status == TaskStatus.LOCKED) return
+
+    val culturalColors = LocalCulturalColors.current
+
+    Box(
+        modifier = modifier
+            .size(48.dp)
+            .shadow(4.dp, RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .then(
+                if (captureImageUrl != null) {
+                    Modifier.border(
+                        2.dp,
+                        culturalColors.easyColor,
+                        RoundedCornerShape(10.dp)
+                    )
+                } else {
+                    Modifier.border(
+                        1.5.dp,
+                        culturalColors.completedGray,
+                        RoundedCornerShape(10.dp)
+                    )
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        if (captureImageUrl != null) {
+            // Ảnh đã chụp
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(captureImageUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Ảnh đã chụp",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            // Checkmark overlay
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 2.dp, y = 2.dp)
+                    .size(18.dp)
+                    .clip(CircleShape)
+                    .background(culturalColors.easyColor),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(12.dp)
+                )
+            }
+        } else {
+            // Chưa chụp — icon dấu chấm hỏi
+            Icon(
+                imageVector = Icons.Outlined.QuestionMark,
+                contentDescription = "Chưa chụp ảnh",
+                tint = culturalColors.completedGray,
+                modifier = Modifier.size(22.dp)
+            )
+        }
+    }
+}
+
+// ──────────────────────────────────────────────────────────────
+// DIFFICULTY BADGE (giữ nguyên logic từ phiên bản cũ)
+// ──────────────────────────────────────────────────────────────
+
 @Composable
 fun DifficultyBadge(
     difficulty: TaskDifficulty,
@@ -499,9 +719,10 @@ fun DifficultyBadge(
     }
 }
 
-/**
- * Trạng thái đang tải hành trình nhiệm vụ (Shimmer Loading State).
- */
+// ──────────────────────────────────────────────────────────────
+// LOADING STATE
+// ──────────────────────────────────────────────────────────────
+
 @Composable
 private fun StorylineLoadingState() {
     val transition = rememberInfiniteTransition(label = "shimmer")
@@ -528,25 +749,28 @@ private fun StorylineLoadingState() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        // Header shimmer
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
-                .clip(RoundedCornerShape(20.dp))
+                .height(120.dp)
+                .clip(RoundedCornerShape(16.dp))
                 .background(brush)
         )
+        // Path shimmer
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(40.dp)
+                .height(50.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(brush)
         )
+        // Card shimmers
         repeat(3) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp)
+                    .height(150.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(brush)
             )
@@ -554,12 +778,13 @@ private fun StorylineLoadingState() {
     }
 }
 
-/**
- * Trạng thái rỗng (Empty State) hiển thị khi chưa có nhiệm vụ nào được giao.
- */
+// ──────────────────────────────────────────────────────────────
+// EMPTY STATE
+// ──────────────────────────────────────────────────────────────
+
 @Composable
 private fun StorylineEmptyState(
-    message: String = "Chưa có nhiệm vụ nào",
+    message: String = stringResource(R.string.storyline_empty_title),
     onRetry: () -> Unit
 ) {
     Column(
@@ -573,14 +798,14 @@ private fun StorylineEmptyState(
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = message,
-            fontSize = 18.sp,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Hành trình của bạn sắp bắt đầu. Hãy thử lại sau!",
-            fontSize = 14.sp,
+            text = stringResource(R.string.storyline_empty_subtitle),
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(24.dp))
@@ -589,40 +814,41 @@ private fun StorylineEmptyState(
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text(text = "Thử lại", color = Color.White)
+            Text(text = stringResource(R.string.storyline_retry), color = Color.White)
         }
     }
 }
+
+// ──────────────────────────────────────────────────────────────
+// PREVIEWS
+// ──────────────────────────────────────────────────────────────
 
 @Preview(showBackground = true)
 @Composable
 fun StorylineScreenSuccessPreview() {
     val mockTasks = listOf(
         Task(
-            id = "1",
-            title = "Thử thách Phở",
-            description = "Tìm và thưởng thức một bát phở truyền thống.",
-            culturalExplanation = "Phở là món ăn quốc hồn quốc túy của Việt Nam.",
-            completionRequirement = "Chụp ảnh bát phở của bạn.",
-            difficulty = TaskDifficulty.EASY,
-            isCompleted = true
+            id = "1", title = "Thử thách Phở", description = "Tìm và thưởng thức một bát phở truyền thống.",
+            culturalExplanation = "Phở là món ăn quốc hồn quốc túy.", completionRequirement = "Chụp ảnh bát phở.",
+            difficulty = TaskDifficulty.EASY, isCompleted = true,
+            captureImageUrl = "https://example.com/pho.jpg", status = TaskStatus.COMPLETED
         ),
         Task(
-            id = "2",
-            title = "Khám phá Văn Miếu",
-            description = "Ghé thăm trường đại học đầu tiên của Việt Nam.",
-            culturalExplanation = "Nơi thờ Khổng Tử và các bậc hiền triết.",
-            completionRequirement = "Check-in tại cổng Văn Miếu.",
-            difficulty = TaskDifficulty.MEDIUM,
-            isCompleted = false
+            id = "2", title = "Khám phá Văn Miếu", description = "Ghé thăm trường đại học đầu tiên.",
+            culturalExplanation = "Nơi thờ Khổng Tử.", completionRequirement = "Check-in tại Văn Miếu.",
+            difficulty = TaskDifficulty.MEDIUM, status = TaskStatus.ACTIVE
+        ),
+        Task(
+            id = "3", title = "Hoàng thành Thăng Long", description = "Di sản UNESCO.",
+            culturalExplanation = "Trung tâm quyền lực.", completionRequirement = "Chụp ảnh Cột cờ.",
+            difficulty = TaskDifficulty.HARD, status = TaskStatus.LOCKED
         )
     )
+    val mockChain = QuestChain("q1", "Di Sản Việt Nam", "Khám phá hành trình.", 3, 2, mockTasks)
     BeVietnamTheme {
         StorylineScreenContent(
-            uiState = StorylineUiState.Success(tasks = mockTasks, nextTask = mockTasks[1]),
-            onRetry = {},
-            onTaskClick = {},
-            onTaskCompleted = {}
+            uiState = StorylineUiState.Success(questChain = mockChain),
+            onRetry = {}, onTaskClick = {}, onCheckInTask = { _, _ -> }
         )
     }
 }
@@ -633,30 +859,7 @@ fun StorylineScreenLoadingPreview() {
     BeVietnamTheme {
         StorylineScreenContent(
             uiState = StorylineUiState.Loading,
-            onRetry = {},
-            onTaskClick = {},
-            onTaskCompleted = {}
+            onRetry = {}, onTaskClick = {}, onCheckInTask = { _, _ -> }
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TaskCardPreview() {
-    BeVietnamTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            TaskCard(
-                task = Task(
-                    id = "preview",
-                    title = "Nhiệm vụ mẫu",
-                    description = "Mô tả nhiệm vụ mẫu cho preview.",
-                    culturalExplanation = "Giải thích văn hóa.",
-                    completionRequirement = "Yêu cầu hoàn thành.",
-                    difficulty = TaskDifficulty.MEDIUM
-                ),
-                onClick = {},
-                modifier = Modifier.padding(16.dp)
-            )
-        }
     }
 }

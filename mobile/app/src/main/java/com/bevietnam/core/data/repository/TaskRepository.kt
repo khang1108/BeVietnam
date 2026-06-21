@@ -1,6 +1,7 @@
 package com.bevietnam.core.data.repository
 
 import com.bevietnam.core.domain.repository.ITaskRepository
+import com.bevietnam.core.model.QuestChain
 import com.bevietnam.core.model.Task
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -20,7 +21,15 @@ class TaskRepository @Inject constructor(
         TODO("Not yet implemented: connect to GET /api/v1/tasks/next")
     }
 
-    override suspend fun completeTask(taskId: String) {
+    override suspend fun completeTask(taskId: String, captureImageUrl: String?, captureNote: String?) {
         TODO("Not yet implemented: connect to POST /api/v1/tasks/{id}/complete")
+    }
+
+    override fun getQuestChain(): Flow<QuestChain> {
+        TODO("Not yet implemented: connect to GET /api/v1/storyline/quest-chain")
+    }
+
+    override fun getTaskById(taskId: String): Flow<Task?> {
+        TODO("Not yet implemented: connect to GET /api/v1/tasks/{id}")
     }
 }

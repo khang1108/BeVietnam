@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bevietnam.core.domain.usecase.GetUserUseCase
 import com.bevietnam.core.domain.usecase.UpdateUserUseCase
+import com.bevietnam.core.domain.usecase.GetQuestChainUseCase
 import com.bevietnam.core.model.User
 import com.bevietnam.core.domain.session.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,13 +32,18 @@ import javax.inject.Inject
  * @property editDateOfBirth Trường chỉnh sửa Ngày sinh nhật.
  * @property editLocation Trường chỉnh sửa Địa điểm sinh sống.
  */
+data class JourneyImage(val url: String, val note: String?)
+
 data class ProfileUiState(
     val isLoading: Boolean = false,
     val user: User? = null,
     val errorMessage: String? = null,
     val isEditMode: Boolean = false,
     val isSaving: Boolean = false,
-    val editName: String = ""
+    val editName: String = "",
+    val totalTasks: Int = 0,
+    val completedTasks: Int = 0,
+    val journeyImages: List<JourneyImage> = emptyList()
 )
 
 /**
@@ -68,6 +75,7 @@ sealed class ProfileUiEvent {
 class ProfileViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val updateUserUseCase: UpdateUserUseCase,
+    private val getQuestChainUseCase: GetQuestChainUseCase,
     private val sessionManager: SessionManager
 ) : ViewModel() {
 
@@ -79,6 +87,7 @@ class ProfileViewModel @Inject constructor(
 
     init {
         loadUserProfile()
+        loadJourneyStats()
     }
 
     /**
@@ -95,6 +104,31 @@ class ProfileViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
                 }
             }
+        }
+    }
+
+    /**
+     * Tải thông tin thống kê tiến độ khám phá (Gamification) và ảnh Check-in
+     */
+    private fun loadJourneyStats() {
+        viewModelScope.launch {
+            getQuestChainUseCase()
+                .catch { /* ignore error on stats */ }
+                .collect { questChain ->
+                    val total = questChain.totalTasks
+                    val completed = questChain.tasks.count { it.isCompleted }
+                    val images = questChain.tasks
+                        .filter { it.isCompleted && !it.captureImageUrl.isNullOrEmpty() }
+                        .map { JourneyImage(url = it.captureImageUrl!!, note = it.captureNote) }
+                    
+                    _uiState.update { 
+                        it.copy(
+                            totalTasks = total,
+                            completedTasks = completed,
+                            journeyImages = images
+                        )
+                    }
+                }
         }
     }
 

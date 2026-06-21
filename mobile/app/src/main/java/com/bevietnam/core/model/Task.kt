@@ -24,7 +24,10 @@ data class Task(
     val difficulty: TaskDifficulty,
     val placeId: String? = null,
     val score: Float = 0f,
-    val isCompleted: Boolean = false
+    val isCompleted: Boolean = false,
+    val captureImageUrl: String? = null,
+    val captureNote: String? = null,
+    val status: TaskStatus = TaskStatus.LOCKED
 )
 
 /**
@@ -37,4 +40,17 @@ enum class TaskDifficulty {
     MEDIUM,
     /** Mức độ Khó */
     HARD
+}
+
+/**
+ * Các trạng thái khác nhau của nhiệm vụ trong chuỗi quest chain.
+ * Khớp với backend schema QuestTask.status: "locked | active | completed".
+ */
+enum class TaskStatus {
+    /** Nhiệm vụ chưa mở khóa — cần hoàn thành nhiệm vụ trước đó */
+    LOCKED,
+    /** Nhiệm vụ đang hoạt động — người dùng có thể check-in */
+    ACTIVE,
+    /** Nhiệm vụ đã hoàn thành */
+    COMPLETED
 }

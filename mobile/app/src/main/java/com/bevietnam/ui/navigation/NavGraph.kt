@@ -26,6 +26,7 @@ import com.bevietnam.ui.screens.capture.CaptureScreen
 import com.bevietnam.ui.screens.explore.ExploreScreen
 import com.bevietnam.ui.screens.feed.FeedScreen
 import com.bevietnam.ui.screens.storyline.StorylineScreen
+import com.bevietnam.ui.screens.storyline.TaskDetailScreen
 import com.bevietnam.ui.screens.place.PlaceDetailScreen
 import com.bevietnam.ui.screens.place.PlaceDetailViewModel
 import androidx.compose.material3.CircularProgressIndicator
@@ -178,7 +179,23 @@ fun AppNavHostContent(
             }
             
             composable<StorylineRoute> { 
-                StorylineScreen() 
+                StorylineScreen(
+                    onTaskClick = { taskId ->
+                        navController.navigate(TaskDetailRoute(taskId))
+                    },
+                    onCheckInTask = { taskId, placeId ->
+                        navController.navigate(CameraRoute(taskId = taskId, placeId = placeId))
+                    }
+                )
+            }
+
+            composable<TaskDetailRoute> {
+                TaskDetailScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onCheckInTask = { taskId, placeId ->
+                        navController.navigate(CameraRoute(taskId = taskId, placeId = placeId))
+                    }
+                )
             }
 
 

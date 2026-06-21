@@ -6,6 +6,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,10 +18,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -39,8 +49,11 @@ import coil3.request.crossfade
 import com.bevietnam.R
 import com.bevietnam.core.model.User
 import com.bevietnam.ui.theme.BeVietnamTheme
+import com.bevietnam.ui.components.CulturalBackground
+import com.bevietnam.ui.components.CulturalLoadingIndicator
 import com.bevietnam.ui.components.ErrorView
 import com.bevietnam.ui.components.LoadingIndicator
+import androidx.compose.foundation.lazy.items
 import com.bevietnam.ui.navigation.BottomNavBar
 import com.bevietnam.ui.components.PrimaryLoadingButton
 import java.time.format.DateTimeFormatter
@@ -90,7 +103,7 @@ fun ProfileScreen(
         val user = uiState.user
 
         when {
-            uiState.isLoading -> com.bevietnam.ui.components.CulturalLoadingIndicator(
+            uiState.isLoading -> CulturalLoadingIndicator(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
@@ -99,18 +112,22 @@ fun ProfileScreen(
                 message = errorMessage,
                 modifier = Modifier.padding(paddingValues)
             )
-            user != null -> ProfileContent(
-                uiState = uiState,
-                onNameChange = viewModel::onNameChange,
-                onEditClick = viewModel::toggleEditMode,
-                onSaveClick = viewModel::saveProfile,
-                onCancelClick = viewModel::toggleEditMode,
-                onShareClick = {
-                    Toast.makeText(context, context.getString(R.string.share_coming_soon), Toast.LENGTH_SHORT).show()
-                },
-                onLogoutClick = viewModel::logout,
-                modifier = Modifier.padding(paddingValues)
-            )
+            user != null -> {
+                CulturalBackground {
+                    ProfileContent(
+                        uiState = uiState,
+                        onNameChange = viewModel::onNameChange,
+                        onEditClick = viewModel::toggleEditMode,
+                        onSaveClick = viewModel::saveProfile,
+                        onCancelClick = viewModel::toggleEditMode,
+                        onShareClick = {
+                            Toast.makeText(context, context.getString(R.string.share_coming_soon), Toast.LENGTH_SHORT).show()
+                        },
+                        onLogoutClick = viewModel::logout,
+                        modifier = Modifier.padding(paddingValues)
+                    )
+                }
+            }
         }
     }
 }
@@ -225,15 +242,19 @@ private fun ProfileContent(
             }
         }
 
-        // Thẻ thông tin địa lý và ngày tham gia
+        // Gamification Stats & Journey Diary (View Mode)
         if (!uiState.isEditMode) {
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                if (!user.createdAt.isNullOrBlank()) ProfileInfoCard(stringResource(R.string.profile_joined_date), user.createdAt, Icons.Default.CalendarToday)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
+            ProfileStatsSection(
+                completedTasks = uiState.completedTasks,
+                totalTasks = uiState.totalTasks,
+                photoCount = uiState.journeyImages.size
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+
+            JourneyDiarySection(images = uiState.journeyImages)
+            Spacer(modifier = Modifier.height(20.dp))
+
+            SettingsList(onLogoutClick = onLogoutClick)
         }
 
         // Form Chỉnh sửa thông tin hồ sơ (Edit Mode)
@@ -258,7 +279,6 @@ private fun ProfileContent(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
 
-
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         OutlinedButton(onClick = onCancelClick, modifier = Modifier.weight(1f), enabled = !uiState.isSaving) {
                             Text(stringResource(R.string.cancel))
@@ -273,18 +293,6 @@ private fun ProfileContent(
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        // Nút Đăng xuất (Logout Button)
-        OutlinedButton(
-            onClick = onLogoutClick,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
-        ) {
-            Icon(Icons.AutoMirrored.Filled.Logout, null, Modifier.size(18.dp))
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.logout))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -324,6 +332,268 @@ private fun ProfileInfoCard(title: String, content: String, icon: ImageVector) {
                 Text(content, fontSize = 14.sp, fontWeight = FontWeight.Medium)
             }
         }
+    }
+}
+
+@Composable
+private fun ProfileStatsSection(completedTasks: Int, totalTasks: Int, photoCount: Int) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 2.dp
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(stringResource(R.string.profile_gamification_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                ProfileStatItem(
+                    label = stringResource(R.string.profile_stat_tasks),
+                    value = "$completedTasks/$totalTasks",
+                    icon = Icons.Default.Flag
+                )
+                ProfileStatItem(
+                    label = stringResource(R.string.profile_stat_photos),
+                    value = "$photoCount",
+                    icon = Icons.Default.PhotoCamera
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun JourneyDiarySection(images: List<JourneyImage>) {
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedImage by remember { mutableStateOf<JourneyImage?>(null) }
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clickable { showDialog = true },
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 2.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(Icons.Default.PhotoAlbum, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = stringResource(R.string.profile_journey_diary),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = if (images.isEmpty()) stringResource(R.string.profile_journey_empty) else "${images.size} ảnh check-in",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+
+    if (showDialog) {
+        Dialog(onDismissRequest = { showDialog = false }) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 200.dp, max = 500.dp),
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = stringResource(R.string.profile_journey_diary),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    if (images.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.profile_journey_empty),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp),
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.weight(1f, fill = false)
+                        ) {
+                            items(images.size) { index ->
+                                val journeyImage = images[index]
+                                Box(
+                                    modifier = Modifier
+                                        .aspectRatio(1f)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .clickable { selectedImage = journeyImage }
+                                ) {
+                                    AsyncImage(
+                                        model = coil3.request.ImageRequest.Builder(LocalContext.current)
+                                            .data(journeyImage.url)
+                                            .crossfade(true)
+                                            .build(),
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    
+                                    if (!journeyImage.note.isNullOrBlank()) {
+                                        // Overlay gradient
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(40.dp)
+                                                .align(Alignment.BottomCenter)
+                                                .background(
+                                                    Brush.verticalGradient(
+                                                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
+                                                    )
+                                                )
+                                        )
+                                        // Note text
+                                        Text(
+                                            text = journeyImage.note,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color.White,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier
+                                                .align(Alignment.BottomStart)
+                                                .padding(6.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    TextButton(
+                        onClick = { showDialog = false },
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text(stringResource(R.string.task_detail_back))
+                    }
+                }
+            }
+        }
+    }
+
+    if (selectedImage != null) {
+        Dialog(
+            onDismissRequest = { selectedImage = null },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+            ) {
+                AsyncImage(
+                    model = coil3.request.ImageRequest.Builder(LocalContext.current)
+                        .data(selectedImage!!.url)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+
+                // Close Button
+                IconButton(
+                    onClick = { selectedImage = null },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
+                        .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingsList(onLogoutClick: () -> Unit) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 2.dp
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(R.string.profile_settings),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
+            )
+            
+            SettingsItem(
+                icon = Icons.Default.Language,
+                title = stringResource(R.string.profile_settings_language),
+                onClick = { /* TODO */ }
+            )
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.surfaceVariant)
+            SettingsItem(
+                icon = Icons.Default.Security,
+                title = stringResource(R.string.profile_settings_terms),
+                onClick = { /* TODO */ }
+            )
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.surfaceVariant)
+            // Logout
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onLogoutClick() }
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.AutoMirrored.Filled.Logout, null, tint = MaterialTheme.colorScheme.error)
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(stringResource(R.string.logout), color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Medium)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingsItem(icon: ImageVector, title: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(icon, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(title, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 

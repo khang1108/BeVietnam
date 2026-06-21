@@ -4,8 +4,8 @@ import com.bevietnam.core.data.mock.MockAuthRepository
 import com.bevietnam.core.data.mock.MockUserRepository
 import com.bevietnam.core.data.mock.MockPlaceRepository
 import com.bevietnam.core.data.mock.MockFeedRepository
-import com.bevietnam.core.data.repository.TaskRepository
-import com.bevietnam.core.data.repository.CaptureRepository
+import com.bevietnam.core.data.mock.MockTaskRepository
+import com.bevietnam.core.data.mock.MockCaptureRepository
 import com.bevietnam.core.data.repository.HealthRepository
 import com.bevietnam.core.domain.repository.IAuthRepository
 import com.bevietnam.core.domain.repository.IPlaceRepository
@@ -33,7 +33,7 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindTaskRepository(
-        taskRepository: TaskRepository
+        taskRepository: MockTaskRepository
     ): ITaskRepository
 
     
@@ -58,7 +58,7 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindCaptureRepository(
-        captureRepository: CaptureRepository
+        captureRepository: MockCaptureRepository
     ): ICaptureRepository
 
     @Binds

@@ -55,4 +55,18 @@ object FeedRoute
  * Cho phép người dùng chụp ảnh và đăng bài viết cảm nghĩ kèm tọa độ định vị GPS thực tế.
  */
 @Serializable
-object CameraRoute
+data class CameraRoute(
+    val placeId: String? = null,
+    val taskId: String? = null
+)
+
+/**
+ * Tuyến đường điều hướng đến màn hình Chi tiết Nhiệm vụ (Task Detail Screen).
+ *
+ * Hiển thị đầy đủ thông tin nhiệm vụ bao gồm ảnh đã chụp, giải thích văn hóa và nút check-in.
+ *
+ * @property taskId Định danh duy nhất của nhiệm vụ cần xem chi tiết.
+ */
+@Serializable
+data class TaskDetailRoute(val taskId: String)
+

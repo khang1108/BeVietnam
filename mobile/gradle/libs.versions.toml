@@ -22,6 +22,7 @@ espresso = "3.6.1"
 mockk = "1.13.13"
 turbine = "1.2.0"
 desugar = "2.1.5"
+camerax = "1.4.1"
 
 [libraries]
 # AndroidX Core
@@ -88,6 +89,12 @@ turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine
 
 # Desugar
 desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar" }
+
+# CameraX
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "camerax" }
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -44,7 +44,14 @@
     <string name="gender_male_desc">Nam</string>
     <string name="gender_female_desc">Nữ</string>
     <string name="share_coming_soon">Tính năng chia sẻ đang phát triển!</string>
-
+    <string name="profile_gamification_title">Tiến độ khám phá</string>
+    <string name="profile_stat_tasks">Di tích khám phá</string>
+    <string name="profile_stat_photos">Ảnh Check-in</string>
+    <string name="profile_journey_diary">Nhật ký hành trình</string>
+    <string name="profile_settings">Tiện ích &amp; Cài đặt</string>
+    <string name="profile_settings_language">Ngôn ngữ &amp; Giao diện</string>
+    <string name="profile_settings_terms">Bảo mật &amp; Điều khoản</string>
+    <string name="profile_journey_empty">Hãy hoàn thành nhiệm vụ để lưu lại khoảnh khắc</string>
     <!-- Search Bar -->
     <string name="search_heritage">Tìm kiếm địa điểm...</string>
     <string name="search_content_description">Tìm kiếm</string>
@@ -82,4 +89,56 @@
 
     <!-- App Top Bar -->
     <string name="logo_desc">Logo BeVietnam</string>
+
+    <!-- Storyline Screen -->
+    <string name="storyline_journey">Hành trình</string>
+    <string name="storyline_progress">%1$d/%2$d di tích khám phá</string>
+    <string name="storyline_checkin_button">Chụp ảnh check-in</string>
+    <string name="storyline_checkin_success">Check-in thành công</string>
+    <string name="storyline_locked">Chưa mở khóa</string>
+    <string name="storyline_completed">Hoàn thành</string>
+    <string name="storyline_locked_status">Khóa</string>
+    <string name="storyline_empty_title">Chưa có nhiệm vụ nào</string>
+    <string name="storyline_empty_subtitle">Hành trình của bạn sắp bắt đầu. Hãy thử lại sau!</string>
+    <string name="storyline_retry">Thử lại</string>
+    <string name="storyline_unknown_error">Đã xảy ra lỗi không xác định</string>
+
+    <!-- Task Detail Screen -->
+    <string name="task_detail_title">Chi tiết nhiệm vụ</string>
+    <string name="task_detail_back">Quay lại</string>
+    <string name="task_detail_description">Mô tả nhiệm vụ</string>
+    <string name="task_detail_cultural">Giải thích văn hóa</string>
+    <string name="task_detail_requirement">Yêu cầu hoàn thành</string>
+    <string name="task_detail_completed_msg">Nhiệm vụ đã hoàn thành!</string>
+    <string name="task_detail_locked_msg">Hoàn thành nhiệm vụ trước để mở khóa</string>
+    <string name="task_detail_status_completed">Đã hoàn thành</string>
+    <string name="task_detail_status_active">Đang thực hiện</string>
+    <string name="task_detail_capture_hint">Chụp ảnh để hoàn thành nhiệm vụ</string>
+    <string name="task_detail_capture_locked">Ảnh sẽ hiện sau khi hoàn thành</string>
+    <string name="task_detail_error_no_id">Không tìm thấy mã nhiệm vụ</string>
+    <string name="task_detail_error_not_found">Không tìm thấy nhiệm vụ</string>
+    <string name="task_detail_error_generic">Đã xảy ra lỗi</string>
+    <string name="task_detail_image_desc">Ảnh đã chụp</string>
+    <string name="task_detail_placeholder_desc">Chưa chụp ảnh</string>
+
+    <!-- Capture Screen -->
+    <string name="capture_title">Check-in nhiệm vụ</string>
+    <string name="capture_cancel">Hủy</string>
+    <string name="capture_gallery">Thư viện</string>
+    <string name="capture_camera">Máy ảnh</string>
+    <string name="capture_select_hint">Chạm để chọn hoặc chụp ảnh</string>
+    <string name="capture_preview_desc">Xem trước ảnh đã chọn</string>
+    <string name="capture_permission_camera">Quyền máy ảnh</string>
+    <string name="capture_permission_location">Quyền vị trí địa lý</string>
+    <string name="capture_note_label">Ghi chú nhật ký hành trình</string>
+    <string name="capture_note_hint">Ghi lại cảm nhận của bạn về địa điểm này...</string>
+    <string name="capture_note_title">Ghi chú của bạn</string>
+    <string name="capture_submit">Xác nhận Check-in</string>
+    <string name="capture_success">Hoàn thành Check-in!</string>
+    <string name="capture_grant_permission">Cấp quyền</string>
+    <string name="capture_settings">Cài đặt</string>
+    <string name="capture_granted">Đã cấp</string>
+    <string name="capture_error_empty_image">Vui lòng chọn hoặc chụp ảnh</string>
+    <string name="capture_error_login">Vui lòng đăng nhập lại</string>
+    <string name="capture_error_place">Thiếu thông tin địa điểm</string>
 </resources>

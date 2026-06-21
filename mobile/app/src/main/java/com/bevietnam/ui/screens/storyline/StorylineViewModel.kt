@@ -2,16 +2,14 @@ package com.bevietnam.ui.screens.storyline
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bevietnam.core.domain.usecase.GetTasksUseCase
+import com.bevietnam.core.domain.usecase.GetQuestChainUseCase
 import com.bevietnam.core.domain.usecase.CompleteTaskUseCase
-import com.bevietnam.core.domain.usecase.GetNextTaskUseCase
-import com.bevietnam.core.model.Task
+import com.bevietnam.core.model.QuestChain
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,24 +19,22 @@ import javax.inject.Inject
 sealed class StorylineUiState {
     /** Trạng thái đang tải dữ liệu */
     object Loading : StorylineUiState()
-    
-    /** 
+
+    /**
      * Trạng thái tải dữ liệu thành công.
-     * 
-     * @property tasks Danh sách tất cả thử thách/nhiệm vụ du lịch.
-     * @property nextTask Nhiệm vụ tiếp theo người dùng cần hoàn thành.
+     *
+     * @property questChain Chuỗi nhiệm vụ hành trình đầy đủ.
      */
     data class Success(
-        val tasks: List<Task>,
-        val nextTask: Task?
+        val questChain: QuestChain
     ) : StorylineUiState()
-    
+
     /** Trạng thái danh sách nhiệm vụ trống */
     object Empty : StorylineUiState()
-    
-    /** 
+
+    /**
      * Trạng thái gặp lỗi khi tải dữ liệu.
-     * 
+     *
      * @property message Thông tin chi tiết về lỗi xảy ra.
      */
     data class Error(val message: String) : StorylineUiState()
@@ -50,44 +46,39 @@ sealed class StorylineUiState {
  * Lớp này tuân thủ Clean Architecture bằng cách chỉ giao tiếp với Domain qua các UseCases,
  * không gọi trực tiếp xuống Repository ở tầng Data.
  *
- * @property getTasksUseCase UseCase lấy danh sách tất cả nhiệm vụ ([GetTasksUseCase]).
+ * @property getQuestChainUseCase UseCase lấy chuỗi nhiệm vụ hành trình ([GetQuestChainUseCase]).
  * @property completeTaskUseCase UseCase đánh dấu hoàn thành nhiệm vụ ([CompleteTaskUseCase]).
- * @property getNextTaskUseCase UseCase lấy nhiệm vụ tiếp theo cần hoàn thành ([GetNextTaskUseCase]).
  */
 @HiltViewModel
 class StorylineViewModel @Inject constructor(
-    private val getTasksUseCase: GetTasksUseCase,
-    private val completeTaskUseCase: CompleteTaskUseCase,
-    private val getNextTaskUseCase: GetNextTaskUseCase
+    private val getQuestChainUseCase: GetQuestChainUseCase,
+    private val completeTaskUseCase: CompleteTaskUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<StorylineUiState>(StorylineUiState.Loading)
     val uiState: StateFlow<StorylineUiState> = _uiState.asStateFlow()
 
     init {
-        loadTasks()
+        loadQuestChain()
     }
 
     /**
-     * Tải danh sách nhiệm vụ khám phá văn hóa từ UseCase
+     * Tải chuỗi nhiệm vụ hành trình từ UseCase
      * và cập nhật trạng thái UI tương ứng.
      */
-    fun loadTasks() {
+    fun loadQuestChain() {
         viewModelScope.launch {
             _uiState.value = StorylineUiState.Loading
             try {
-                getTasksUseCase().collect { tasks ->
-                    if (tasks.isEmpty()) {
+                getQuestChainUseCase().collect { questChain ->
+                    if (questChain.tasks.isEmpty()) {
                         _uiState.value = StorylineUiState.Empty
                     } else {
-                        _uiState.value = StorylineUiState.Success(
-                            tasks = tasks,
-                            nextTask = getNextTaskUseCase().first()
-                        )
+                        _uiState.value = StorylineUiState.Success(questChain = questChain)
                     }
                 }
             } catch (e: CancellationException) {
-                throw e // Không nuốt CancellationException — để coroutine hủy đúng cách
+                throw e
             } catch (e: Exception) {
                 _uiState.value = StorylineUiState.Error(e.message ?: "Đã xảy ra lỗi không xác định")
             }
@@ -102,7 +93,7 @@ class StorylineViewModel @Inject constructor(
     fun onTaskCompleted(taskId: String) {
         viewModelScope.launch {
             completeTaskUseCase(taskId)
-            loadTasks()
+            loadQuestChain()
         }
     }
 }

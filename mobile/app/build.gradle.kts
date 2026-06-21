@@ -106,11 +106,20 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
-    // Maps (MapLibre / Goong)
+    // Maps & Location
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.location)
+    // MapLibre / Goong
     implementation("org.maplibre.gl:android-sdk:11.5.0")
 
     // Desugar (Sửa lỗi Unresolved reference ở đây)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    // CameraX
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
 
     // Testing
     testImplementation(libs.junit)
