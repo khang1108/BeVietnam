@@ -34,6 +34,14 @@ POSTGRES_PASSWORD=""
 POSTGRES_HOST="127.0.0.1"
 POSTGRES_PORT="5432"
 
+# MinIO capture storage. Blank ACCESS/SECRET keys = use existing .env or generate.
+AUTO_MINIO="1"
+MINIO_ENDPOINT="http://127.0.0.1:9000"
+MINIO_ACCESS_KEY=""
+MINIO_SECRET_KEY=""
+MINIO_BUCKET="bevietnam-captures"
+MINIO_CONSOLE_PORT="9001"
+
 # AI/vLLM. vLLM uses port 8010 to avoid Backend port 8000.
 HF_TOKEN=""
 VLLM_API_KEY=""
@@ -131,15 +139,23 @@ install_cloudflared() {
 write_root_env() {
   local env_file="$PROJECT_ROOT/.env"
   local existing_secret existing_pg_password quoted_user quoted_password quoted_db database_url
+  local existing_minio_access existing_minio_secret
 
   existing_secret="$(existing_env_value "$env_file" SECRET_KEY)"
   existing_pg_password="$(existing_env_value "$env_file" POSTGRES_PASSWORD)"
+  existing_minio_access="$(existing_env_value "$env_file" MINIO_ACCESS_KEY)"
+  existing_minio_secret="$(existing_env_value "$env_file" MINIO_SECRET_KEY)"
 
   [[ -n "$SECRET_KEY" ]] || SECRET_KEY="$existing_secret"
   [[ -n "$SECRET_KEY" && "$SECRET_KEY" != "dev-only-change-me-in-production-32-bytes-minimum" ]] || SECRET_KEY="$(random_hex 32)"
 
   [[ -n "$POSTGRES_PASSWORD" ]] || POSTGRES_PASSWORD="$existing_pg_password"
   [[ -n "$POSTGRES_PASSWORD" && "$POSTGRES_PASSWORD" != "change-me" ]] || POSTGRES_PASSWORD="$(random_hex 18)"
+
+  [[ -n "$MINIO_ACCESS_KEY" ]] || MINIO_ACCESS_KEY="$existing_minio_access"
+  [[ -n "$MINIO_ACCESS_KEY" ]] || MINIO_ACCESS_KEY="$(random_hex 12)"
+  [[ -n "$MINIO_SECRET_KEY" ]] || MINIO_SECRET_KEY="$existing_minio_secret"
+  [[ -n "$MINIO_SECRET_KEY" ]] || MINIO_SECRET_KEY="$(random_hex 24)"
 
   quoted_user="$(url_quote "$POSTGRES_USER")"
   quoted_password="$(url_quote "$POSTGRES_PASSWORD")"
@@ -174,6 +190,13 @@ POSTGRES_PORT=${POSTGRES_PORT}
 SECRET_KEY=${SECRET_KEY}
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=10080
+
+AUTO_MINIO=${AUTO_MINIO}
+MINIO_ENDPOINT=${MINIO_ENDPOINT}
+MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+MINIO_BUCKET=${MINIO_BUCKET}
+MINIO_CONSOLE_PORT=${MINIO_CONSOLE_PORT}
 
 LLM_PROVIDER=vllm
 VLLM_BASE_URL=http://127.0.0.1:${VLLM_PORT}/v1

@@ -97,6 +97,8 @@ root_vllm_base_url = get(values, "ROOT_VLLM_BASE_URL", f"http://127.0.0.1:{vllm_
 vllm_served_name = get(values, "VLLM_SERVED_MODEL_NAME", "qwen2.5-14b-instruct")
 
 secret_key = generated(values, "SECRET_KEY", 32)
+minio_access_key = generated(values, "MINIO_ACCESS_KEY", 12)
+minio_secret_key = generated(values, "MINIO_SECRET_KEY", 24)
 hf_token = get(values, "HF_TOKEN")
 
 root_env = [
@@ -126,6 +128,13 @@ root_env = [
     ("SECRET_KEY", secret_key),
     ("ALGORITHM", get(values, "ALGORITHM", "HS256")),
     ("ACCESS_TOKEN_EXPIRE_MINUTES", get(values, "ACCESS_TOKEN_EXPIRE_MINUTES", "10080")),
+    "",
+    ("AUTO_MINIO", get(values, "AUTO_MINIO", "1")),
+    ("MINIO_ENDPOINT", get(values, "MINIO_ENDPOINT", "http://127.0.0.1:9000")),
+    ("MINIO_ACCESS_KEY", minio_access_key),
+    ("MINIO_SECRET_KEY", minio_secret_key),
+    ("MINIO_BUCKET", get(values, "MINIO_BUCKET", "bevietnam-captures")),
+    ("MINIO_CONSOLE_PORT", get(values, "MINIO_CONSOLE_PORT", "9001")),
     "",
     ("GEMINI_API_KEY", get(values, "GEMINI_API_KEY")),
     ("LLM_PROVIDER", get(values, "LLM_PROVIDER", "vllm")),

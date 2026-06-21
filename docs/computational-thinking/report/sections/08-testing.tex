@@ -1,0 +1,22 @@
+\section{Testing}
+
+\subsection{Testing Features, Test Cases, and Results}
+\noindent\textbf{Author/Reviewer:} Nguyễn Việt Thái (ID: 24120441)
+
+Hệ thống được kiểm thử qua hai tầng chính: kiểm thử hộp đen tính năng người dùng và kiểm thử độ ổn định khi tích hợp AI:
+\begin{itemize}
+    \item \textbf{Feed \& Recommendation}: Đã test các tổ hợp thời tiết (mưa, nắng) và khoảng cách, đảm bảo điểm số thay đổi tuyến tính và hợp lý.
+    \item \textbf{Capture Judge}: Test ảnh chụp không liên quan (ví dụ ảnh chụp phong cảnh ngoài trời khi quest yêu cầu chụp chi tiết kiến trúc cụ thể) để xác minh VLM từ chối duyệt một cách chính xác.
+    \item \textbf{Cơ chế Fallback}: Giả lập Qdrant và Gemini lỗi để kiểm tra hệ thống có trả về dữ liệu dự phòng hay không.
+\end{itemize}
+
+
+
+\subsection{Improvements}
+\noindent\textbf{Author/Reviewer:} Nguyễn Việt Thái (ID: 24120441)
+
+Các cải tiến sau kiểm thử:
+\begin{itemize}
+    \item Tối ưu hóa thời gian sinh quest bằng cách caching các câu hỏi đã được tạo trước offline.
+    \item Bổ sung missing\_factors vào response để frontend hiển thị đúng lý do khi thiếu dữ liệu thời tiết/giao thông.
+\end{itemize}

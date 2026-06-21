@@ -1,0 +1,13 @@
+\section{Deployment}
+
+\subsection{Deployment Details}
+\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
+
+Hệ thống BeVietnam được đóng gói hoàn toàn bằng Docker Compose để chạy trên môi trường VM. Các services gồm:
+\begin{itemize}
+    \item \textbf{Frontend Next.js}: Chạy trên cổng 3000.
+    \item \textbf{Backend FastAPI}: Cổng 8000.
+    \item \textbf{AI Core (LangGraph / Python)}: Cổng 8080.
+    \item \textbf{Qdrant (Vector Database)}: Cổng 6333 (gRPC 6334).
+    \item \textbf{PostgreSQL}: Lưu trữ dữ liệu quan hệ trên cổng 5432.
+\end{itemize}

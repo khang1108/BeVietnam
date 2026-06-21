@@ -8,7 +8,7 @@ import React, {
     useState,
 } from 'react';
 import type { Map, Marker } from '@goongmaps/goong-js';
-import { MagnifyingGlass, MapTrifold, X, Star, Compass, Crosshair } from '@phosphor-icons/react';
+import { Crosshair, List, MagnifyingGlass, Star, X } from '@phosphor-icons/react';
 import styles from '../styles/explore.module.css';
 import { weatherApi, type WeatherCondition as ApiWeatherCondition } from '@/lib/api';
 
@@ -30,20 +30,45 @@ interface Place {
     region: string;
 }
 
+interface CityHub {
+    id: string;
+    name: string;
+    lat: number;
+    lng: number;
+    count: number;
+}
+
+type GeoJsonSourceLike = {
+    setData: (data: unknown) => void;
+};
+
+type ExploreLayerSpec = {
+    id: string;
+    [key: string]: unknown;
+};
+
+type ExploreMap = Map & {
+    getSource?: (sourceId: string) => GeoJsonSourceLike | undefined;
+    addSource?: (sourceId: string, source: unknown) => void;
+    getLayer?: (layerId: string) => unknown;
+    addLayer?: (layer: ExploreLayerSpec) => void;
+    getCanvas?: () => HTMLCanvasElement;
+};
+
+type ExploreInteractiveMap = ExploreMap & {
+    on: (eventName: string, layerId: string, handler: (event: ExploreLayerClickEvent) => void) => unknown;
+    off: (eventName: string, layerId: string, handler: (event: ExploreLayerClickEvent) => void) => unknown;
+};
+
+type ExploreLayerClickEvent = {
+    features?: Array<{
+        properties?: {
+            id?: string;
+        };
+    }>;
+};
+
 // ─── Constants ────────────────────────────────────────────────────────────────
-
-// Bubble diameter (px) by weather — clear tiers so it's obvious at a glance.
-const BUBBLE_SIZE: Record<WeatherCondition, number> = {
-    sunny: 78,   // Nắng đẹp → đông khách
-    cloudy: 52,  // Có mây → bình thường
-    rainy: 34,   // Mưa → vắng khách
-};
-
-const WEATHER_COLORS: Record<WeatherCondition, { fill: string; ring: string }> = {
-    sunny:  { fill: 'rgba(251,191,36,0.55)',  ring: '#fbbf24' },
-    cloudy: { fill: 'rgba(96,165,250,0.5)',   ring: '#60a5fa' },
-    rainy:  { fill: 'rgba(167,139,250,0.5)',  ring: '#a78bfa' },
-};
 
 // Pin colour per category (the teardrop fill — Google-style)
 const CATEGORY_COLORS: Record<Category, string> = {
@@ -55,19 +80,13 @@ const CATEGORY_COLORS: Record<Category, string> = {
     amusement:'#3b82f6',
 };
 
-const CATEGORY_ICONS: Record<Category, string> = {
-    history:  '🏛️',
-    culture:  '🏮',
-    food:     '🍜',
-    nature:   '🌿',
-    festival: '🎆',
-    amusement:'🎡',
-};
-
-const WEATHER_ICONS: Record<WeatherCondition, string> = {
-    sunny:  '☀️',
-    cloudy: '⛅',
-    rainy:  '🌧️',
+const CATEGORY_SHORT: Record<Category, string> = {
+    history:  'D',
+    culture:  'V',
+    food:     'A',
+    nature:   'T',
+    festival: 'L',
+    amusement:'G',
 };
 
 const WEATHER_LABELS: Record<WeatherCondition, string> = {
@@ -86,13 +105,13 @@ const CATEGORY_LABEL: Record<Category, string> = {
 };
 
 const FILTER_CHIPS = [
-    { key: 'all',       label: 'Tất cả', icon: '🗺️' },
-    { key: 'history',   label: 'Di tích', icon: '🏛️' },
-    { key: 'culture',   label: 'Văn hóa', icon: '🏮' },
-    { key: 'food',      label: 'Ẩm thực', icon: '🍜' },
-    { key: 'nature',    label: 'Thiên nhiên', icon: '🌿' },
-    { key: 'amusement', label: 'Vui chơi', icon: '🎡' },
-    { key: 'festival',  label: 'Lễ hội', icon: '🎆' },
+    { key: 'all',       label: 'Tất cả' },
+    { key: 'history',   label: 'Di tích' },
+    { key: 'culture',   label: 'Văn hóa' },
+    { key: 'food',      label: 'Ẩm thực' },
+    { key: 'nature',    label: 'Thiên nhiên' },
+    { key: 'amusement', label: 'Vui chơi' },
+    { key: 'festival',  label: 'Lễ hội' },
 ];
 
 const MOCK_PLACES: Place[] = [
@@ -169,14 +188,39 @@ const MOCK_PLACES: Place[] = [
         category: 'history', lat: 15.7625, lng: 108.1292, weather: 'rainy', rating: 4.5, region: 'Quảng Nam' },
 ];
 
+const CITY_HUBS: CityHub[] = [
+    { id: 'hue', name: 'Huế', lat: 16.4637, lng: 107.5909, count: 7 },
+    { id: 'danang', name: 'Đà Nẵng', lat: 16.0544, lng: 108.2022, count: 7 },
+    { id: 'hoian', name: 'Hội An', lat: 15.8794, lng: 108.3350, count: 6 },
+    { id: 'quangnam', name: 'Quảng Nam', lat: 15.7625, lng: 108.1292, count: 2 },
+];
+
 const GOONG_API_KEY = process.env.NEXT_PUBLIC_GOONG_API_KEY ?? '';
 
-// Build a Google-style teardrop pin SVG (tip exactly at bottom-center).
-function pinSvg(fill: string): string {
-    return `<svg class="bv-marker-pin" width="36" height="46" viewBox="0 0 36 46" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 45 C8 31 4 24 4 15.5 A14 14 0 1 1 32 15.5 C32 24 28 31 18 45 Z"
-              fill="${fill}" stroke="#ffffff" stroke-width="2.5"/>
-    </svg>`;
+async function loadGoongSdk() {
+    try {
+        // The package entry can fail under Next dev bundlers; the browser dist
+        // bundle is closer to how Goong expects to run in a client-only map.
+        const mod = await import('@goongmaps/goong-js/dist/goong-js');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return ((mod as any).default ?? mod) as any;
+    } catch {
+        const mod = await import('@goongmaps/goong-js');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return ((mod as any).default ?? mod) as any;
+    }
+}
+
+function canUseWebGL(): boolean {
+    if (typeof window === 'undefined') return false;
+
+    try {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('webgl2') ?? canvas.getContext('webgl') ?? canvas.getContext('experimental-webgl');
+        return Boolean(context);
+    } catch {
+        return false;
+    }
 }
 
 function getPlaceWeather(
@@ -195,6 +239,252 @@ function hasLiveWeather(
 ): boolean {
     const liveWeather = weatherByPlace[place.id];
     return Boolean(liveWeather && liveWeather !== 'any');
+}
+
+function isFeaturedPlace(place: Place): boolean {
+    return place.rating >= 4.7 || place.category === 'history' || place.category === 'culture';
+}
+
+function cityFeatureCollection() {
+    return {
+        type: 'FeatureCollection',
+        features: CITY_HUBS.map((city) => ({
+            type: 'Feature',
+            properties: {
+                id: city.id,
+                title: city.name,
+                count: city.count,
+            },
+            geometry: {
+                type: 'Point',
+                coordinates: [city.lng, city.lat],
+            },
+        })),
+    };
+}
+
+function placeFeatureCollection(
+    places: Place[],
+    selectedPlace: Place | null,
+    weatherByPlace: Record<string, ApiWeatherCondition>,
+) {
+    return {
+        type: 'FeatureCollection',
+        features: places.map((place) => {
+            const weather = getPlaceWeather(place, weatherByPlace);
+            return {
+                type: 'Feature',
+                properties: {
+                    id: place.id,
+                    title: place.title,
+                    subtitle: place.subtitle,
+                    category: place.category,
+                    categoryLabel: CATEGORY_LABEL[place.category],
+                    categoryShort: CATEGORY_SHORT[place.category],
+                    region: place.region,
+                    rating: place.rating,
+                    weather,
+                    selected: selectedPlace?.id === place.id,
+                },
+                geometry: {
+                    type: 'Point',
+                    coordinates: [place.lng, place.lat],
+                },
+            };
+        }),
+    };
+}
+
+function setSourceData(map: ExploreMap, sourceId: string, data: unknown) {
+    const source = map.getSource?.(sourceId);
+    source?.setData?.(data);
+}
+
+function upsertMapSource(map: ExploreMap, sourceId: string, data: unknown) {
+    if (map.getSource?.(sourceId)) {
+        setSourceData(map, sourceId, data);
+        return;
+    }
+    map.addSource?.(sourceId, {
+        type: 'geojson',
+        data,
+    });
+}
+
+function addLayerOnce(map: ExploreMap, layer: ExploreLayerSpec) {
+    if (!map.getLayer?.(layer.id)) {
+        map.addLayer?.(layer);
+    }
+}
+
+function addExploreLayers(map: ExploreMap) {
+    upsertMapSource(map, 'bv-cities', cityFeatureCollection());
+    upsertMapSource(map, 'bv-featured-places', placeFeatureCollection([], null, {}));
+    upsertMapSource(map, 'bv-detail-places', placeFeatureCollection([], null, {}));
+
+    addLayerOnce(map, {
+        id: 'bv-city-hub-glow',
+        type: 'circle',
+        source: 'bv-cities',
+        maxzoom: 8.7,
+        paint: {
+            'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 18, 8.7, 36],
+            'circle-color': 'rgba(198, 154, 63, 0.18)',
+            'circle-stroke-color': '#c69a3f',
+            'circle-stroke-width': 1.5,
+            'circle-blur': 0.2,
+        },
+    });
+
+    addLayerOnce(map, {
+        id: 'bv-city-hub-dot',
+        type: 'circle',
+        source: 'bv-cities',
+        maxzoom: 8.7,
+        paint: {
+            'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 5, 8.7, 9],
+            'circle-color': '#c69a3f',
+            'circle-stroke-color': '#1a120b',
+            'circle-stroke-width': 2,
+        },
+    });
+
+    addLayerOnce(map, {
+        id: 'bv-city-hub-label',
+        type: 'symbol',
+        source: 'bv-cities',
+        maxzoom: 8.7,
+        layout: {
+            'text-field': ['format', ['get', 'title'], { 'font-scale': 1.1 }, '\n', {}, ['concat', ['to-string', ['get', 'count']], ' điểm'], { 'font-scale': 0.72 }],
+            'text-size': ['interpolate', ['linear'], ['zoom'], 5, 13, 8.7, 18],
+            'text-offset': [0, 1.6],
+            'text-anchor': 'top',
+            'text-allow-overlap': false,
+            'text-ignore-placement': false,
+        },
+        paint: {
+            'text-color': '#efe6d2',
+            'text-halo-color': '#1a120b',
+            'text-halo-width': 1.6,
+        },
+    });
+
+    const categoryColor = [
+        'match',
+        ['get', 'category'],
+        'history', CATEGORY_COLORS.history,
+        'culture', CATEGORY_COLORS.culture,
+        'food', CATEGORY_COLORS.food,
+        'nature', CATEGORY_COLORS.nature,
+        'festival', CATEGORY_COLORS.festival,
+        'amusement', CATEGORY_COLORS.amusement,
+        '#c69a3f',
+    ];
+
+    const weatherBubbleRadius = [
+        'match',
+        ['get', 'weather'],
+        'sunny', 34,
+        'cloudy', 25,
+        'rainy', 17,
+        22,
+    ];
+
+    const placeSources = [
+        { source: 'bv-featured-places', prefix: 'featured', minzoom: 8.4, maxzoom: 11.5, labelSize: 12 },
+        { source: 'bv-detail-places', prefix: 'detail', minzoom: 11, labelSize: 12 },
+    ];
+
+    placeSources.forEach(({ source, prefix, minzoom, maxzoom, labelSize }) => {
+        addLayerOnce(map, {
+            id: `bv-${prefix}-place-bubble`,
+            type: 'circle',
+            source,
+            minzoom,
+            ...(maxzoom ? { maxzoom } : {}),
+            paint: {
+                'circle-radius': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    minzoom,
+                    ['*', weatherBubbleRadius, 0.55],
+                    14,
+                    weatherBubbleRadius,
+                ],
+                'circle-color': [
+                    'match',
+                    ['get', 'weather'],
+                    'sunny', 'rgba(251, 191, 36, 0.22)',
+                    'cloudy', 'rgba(96, 165, 250, 0.18)',
+                    'rainy', 'rgba(167, 139, 250, 0.18)',
+                    'rgba(198, 154, 63, 0.18)',
+                ],
+                'circle-stroke-color': [
+                    'match',
+                    ['get', 'weather'],
+                    'sunny', '#fbbf24',
+                    'cloudy', '#60a5fa',
+                    'rainy', '#a78bfa',
+                    '#c69a3f',
+                ],
+                'circle-stroke-width': ['case', ['get', 'selected'], 2.5, 1.2],
+                'circle-blur': 0.15,
+            },
+        });
+
+        addLayerOnce(map, {
+            id: `bv-${prefix}-place-pin`,
+            type: 'circle',
+            source,
+            minzoom,
+            ...(maxzoom ? { maxzoom } : {}),
+            paint: {
+                'circle-radius': ['case', ['get', 'selected'], 9, 7],
+                'circle-color': categoryColor,
+                'circle-stroke-color': '#fffaf0',
+                'circle-stroke-width': ['case', ['get', 'selected'], 3, 2],
+            },
+        });
+
+        addLayerOnce(map, {
+            id: `bv-${prefix}-place-short`,
+            type: 'symbol',
+            source,
+            minzoom,
+            ...(maxzoom ? { maxzoom } : {}),
+            layout: {
+                'text-field': ['get', 'categoryShort'],
+                'text-size': 9,
+                'text-allow-overlap': true,
+                'text-ignore-placement': true,
+            },
+            paint: {
+                'text-color': '#ffffff',
+            },
+        });
+
+        addLayerOnce(map, {
+            id: `bv-${prefix}-place-label`,
+            type: 'symbol',
+            source,
+            minzoom: minzoom + 0.4,
+            ...(maxzoom ? { maxzoom } : {}),
+            layout: {
+                'text-field': ['get', 'title'],
+                'text-size': ['interpolate', ['linear'], ['zoom'], minzoom, labelSize, 14, labelSize + 2],
+                'text-offset': [0, 1.35],
+                'text-anchor': 'top',
+                'text-allow-overlap': false,
+                'text-ignore-placement': false,
+            },
+            paint: {
+                'text-color': '#efe6d2',
+                'text-halo-color': '#1a120b',
+                'text-halo-width': 1.4,
+            },
+        });
+    });
 }
 
 // Frame the map to show every POI on first load.
@@ -236,7 +526,6 @@ function hideBasePoiIcons(map: any) {
 export function ExplorePage() {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<Map | null>(null);
-    const markersRef = useRef<Marker[]>([]);
     const currentMarkerRef = useRef<Marker | null>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const goongRef = useRef<any>(null);
@@ -247,12 +536,27 @@ export function ExplorePage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [locating, setLocating] = useState(false);
+    const [locationError, setLocationError] = useState('');
+    const [mapError, setMapError] = useState('');
     const [weatherByPlace, setWeatherByPlace] = useState<Record<string, ApiWeatherCondition>>({});
 
     // Lock body scroll for full-screen map
     useEffect(() => {
+        const previousHtmlOverflow = document.documentElement.style.overflow;
+        const previousBodyOverflow = document.body.style.overflow;
+        document.documentElement.style.overflow = 'hidden';
         document.body.style.overflow = 'hidden';
-        return () => { document.body.style.overflow = ''; };
+        return () => {
+            document.documentElement.style.overflow = previousHtmlOverflow;
+            document.body.style.overflow = previousBodyOverflow;
+        };
+    }, []);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.innerWidth > 768) {
+            const frame = window.requestAnimationFrame(() => setSidebarOpen(true));
+            return () => window.cancelAnimationFrame(frame);
+        }
     }, []);
 
     // Initialize Goong map — loaded dynamically to avoid SSR issues
@@ -260,40 +564,73 @@ export function ExplorePage() {
         const container = mapContainerRef.current;
         if (!container || !GOONG_API_KEY || mapRef.current) return;
 
-        let map: Map;
+        let map: Map | null = null;
+        let cancelled = false;
+        let hasLoaded = false;
 
         const initMap = async () => {
-            // goong-js is CJS/UMD — dynamic import wraps it under .default
-            const mod = await import('@goongmaps/goong-js');
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const G = ((mod as any).default ?? mod) as any;
+            try {
+                setMapError('');
+                const G = await loadGoongSdk();
+                if (cancelled) return;
 
-            // Goong JS requires accessToken to be set before creating Map
-            G.accessToken = GOONG_API_KEY;
-            goongRef.current = G;
+                if (!G?.Map || !G?.Marker) {
+                    throw new Error('Goong JS SDK did not expose Map/Marker constructors.');
+                }
 
-            map = new G.Map({
-                container,
-                style: `https://tiles.goong.io/assets/goong_map_dark.json?api_key=${GOONG_API_KEY}`,
-                center: [107.95, 16.15],
-                zoom: 8,
-            }) as Map;
+                if (!canUseWebGL() || (typeof G.supported === 'function' && !G.supported())) {
+                    throw new Error('WEBGL_UNSUPPORTED');
+                }
 
-            if (G.NavigationControl) {
-                map.addControl(new G.NavigationControl({ showCompass: false }), 'bottom-right');
+                // Goong JS requires accessToken to be set before creating Map
+                G.accessToken = GOONG_API_KEY;
+                goongRef.current = G;
+
+                map = new G.Map({
+                    container,
+                    style: `https://tiles.goong.io/assets/goong_map_dark.json?api_key=${GOONG_API_KEY}`,
+                    center: [107.95, 16.15],
+                    zoom: 8,
+                }) as Map;
+
+                map.on('error', () => {
+                    if (!cancelled && !hasLoaded) {
+                        setMapError('Không thể tải bản đồ Goong lúc này. Danh sách địa điểm vẫn có thể dùng được.');
+                    }
+                });
+
+                if (G.NavigationControl) {
+                    map.addControl(new G.NavigationControl({ showCompass: false }), 'bottom-right');
+                }
+                mapRef.current = map;
+
+                map.on('load', () => {
+                    if (cancelled) return;
+                    hasLoaded = true;
+                    hideBasePoiIcons(map);
+                    addExploreLayers(map as ExploreMap);
+                    fitToPlaces(map);
+                    setMapLoaded(true);
+                    setMapError('');
+                });
+            } catch (error) {
+                if (cancelled) return;
+                setMapLoaded(false);
+                const message = error instanceof Error && error.message === 'WEBGL_UNSUPPORTED'
+                    ? 'Trình duyệt hoặc máy hiện tại chưa hỗ trợ WebGL ổn định. Danh sách địa điểm vẫn có thể dùng được.'
+                    : 'Không thể khởi tạo bản đồ Goong. Danh sách địa điểm vẫn có thể dùng được.';
+                setMapError(message);
+                mapRef.current = null;
+                goongRef.current = null;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (map as any)?.remove?.();
             }
-            mapRef.current = map;
-
-            map.on('load', () => {
-                hideBasePoiIcons(map);
-                fitToPlaces(map);
-                setMapLoaded(true);
-            });
         };
 
         initMap();
 
         return () => {
+            cancelled = true;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (map as any)?.remove();
             mapRef.current = null;
@@ -316,7 +653,6 @@ export function ExplorePage() {
 
     const handleSelectPlace = useCallback((place: Place) => {
         setSelectedPlace(place);
-        setSidebarOpen(false);
         mapRef.current?.flyTo({ center: [place.lng, place.lat], zoom: 13, speed: 1.4 });
     }, []);
 
@@ -350,6 +686,7 @@ export function ExplorePage() {
     const handleLocate = useCallback(() => {
         if (!navigator.geolocation || !mapRef.current || !goongRef.current) return;
         setLocating(true);
+        setLocationError('');
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 const { longitude, latitude } = pos.coords;
@@ -366,74 +703,67 @@ export function ExplorePage() {
             },
             () => {
                 setLocating(false);
-                alert('Không thể lấy vị trí của bạn. Hãy kiểm tra quyền truy cập vị trí trong trình duyệt.');
+                setLocationError('Không thể lấy vị trí. Kiểm tra quyền truy cập vị trí trong trình duyệt.');
             },
             { enableHighAccuracy: true, timeout: 8000 },
         );
     }, []);
 
-    // Recreate markers whenever filtered places or selection changes
+    // Update map-engine layers whenever filtered places or selection changes.
     useEffect(() => {
-        if (!mapLoaded || !mapRef.current || !goongRef.current) return;
+        if (!mapLoaded || !mapRef.current) return;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const G = goongRef.current as any;
+        const featuredPlaces = filteredPlaces.filter(isFeaturedPlace);
+        setSourceData(mapRef.current, 'bv-featured-places', placeFeatureCollection(featuredPlaces, selectedPlace, weatherByPlace));
+        setSourceData(mapRef.current, 'bv-detail-places', placeFeatureCollection(filteredPlaces, selectedPlace, weatherByPlace));
+    }, [mapLoaded, filteredPlaces, selectedPlace, weatherByPlace]);
 
-        markersRef.current.forEach((m) => (m as Marker).remove());
-        markersRef.current = [];
+    useEffect(() => {
+        if (!mapLoaded || !mapRef.current) return;
 
-        filteredPlaces.forEach((place) => {
-            const isSelected = place.id === selectedPlace?.id;
-            const placeWeather = getPlaceWeather(place, weatherByPlace);
-            const wc = WEATHER_COLORS[placeWeather];
-            const bubble = Math.round(BUBBLE_SIZE[placeWeather] * (isSelected ? 1.15 : 1));
-            const pinFill = CATEGORY_COLORS[place.category];
-            const icon = CATEGORY_ICONS[place.category];
+        const map = mapRef.current as ExploreInteractiveMap;
+        const layerIds = [
+            'bv-featured-place-bubble',
+            'bv-featured-place-pin',
+            'bv-featured-place-short',
+            'bv-featured-place-label',
+            'bv-detail-place-bubble',
+            'bv-detail-place-pin',
+            'bv-detail-place-short',
+            'bv-detail-place-label',
+        ];
 
-            const wrap = document.createElement('div');
-            wrap.className = `bv-marker${isSelected ? ' bv-marker-selected' : ''}`;
+        const handleClick = (event: ExploreLayerClickEvent) => {
+            const id = event.features?.[0]?.properties?.id;
+            const place = MOCK_PLACES.find((item) => item.id === id);
+            if (place) handleSelectPlace(place);
+        };
 
-            // Weather bubble (crowd indicator) — soft glow sized by weather
-            const bub = document.createElement('div');
-            bub.className = 'bv-marker-bubble';
-            bub.style.width = `${bubble}px`;
-            bub.style.height = `${bubble}px`;
-            bub.style.background = `radial-gradient(circle at 50% 50%, ${wc.fill}, transparent 72%)`;
-            bub.style.border = `1.5px solid ${wc.ring}`;
+        const setPointer = () => {
+            const canvas = map.getCanvas?.();
+            if (canvas) canvas.style.cursor = 'pointer';
+        };
+        const unsetPointer = () => {
+            const canvas = map.getCanvas?.();
+            if (canvas) canvas.style.cursor = '';
+        };
 
-            // Pulsing ring
-            const pulse = document.createElement('div');
-            pulse.className = 'bv-marker-pulse';
-            pulse.style.width = `${bubble}px`;
-            pulse.style.height = `${bubble}px`;
-            pulse.style.borderColor = wc.ring;
-
-            // Google-style pin + category icon
-            const pinWrap = document.createElement('div');
-            pinWrap.innerHTML = pinSvg(pinFill);
-            const pin = pinWrap.firstElementChild as HTMLElement;
-
-            const iconEl = document.createElement('div');
-            iconEl.className = 'bv-marker-icon';
-            iconEl.textContent = icon;
-
-            wrap.appendChild(pulse);
-            wrap.appendChild(bub);
-            if (pin) wrap.appendChild(pin);
-            wrap.appendChild(iconEl);
-
-            wrap.addEventListener('click', (e) => {
-                e.stopPropagation();
-                handleSelectPlace(place);
-            });
-
-            const marker: Marker = new G.Marker({ element: wrap, anchor: 'bottom' })
-                .setLngLat([place.lng, place.lat])
-                .addTo(mapRef.current!);
-
-            markersRef.current.push(marker);
+        layerIds.forEach((layerId) => {
+            if (!map.getLayer?.(layerId)) return;
+            map.on('click', layerId, handleClick);
+            map.on('mouseenter', layerId, setPointer);
+            map.on('mouseleave', layerId, unsetPointer);
         });
-    }, [mapLoaded, filteredPlaces, selectedPlace, handleSelectPlace, weatherByPlace]);
+
+        return () => {
+            layerIds.forEach((layerId) => {
+                if (!map.getLayer?.(layerId)) return;
+                map.off('click', layerId, handleClick);
+                map.off('mouseenter', layerId, setPointer);
+                map.off('mouseleave', layerId, unsetPointer);
+            });
+        };
+    }, [mapLoaded, handleSelectPlace]);
 
     const selectedWeather = selectedPlace ? getPlaceWeather(selectedPlace, weatherByPlace) : null;
     const selectedHasLiveWeather = selectedPlace ? hasLiveWeather(selectedPlace, weatherByPlace) : false;
@@ -443,15 +773,24 @@ export function ExplorePage() {
 
     return (
         <div className={styles.mapPage}>
-
-            {/* Mobile sidebar toggle */}
-            <button
-                className={styles.sidebarToggle}
-                onClick={() => setSidebarOpen(true)}
-                aria-label="Mở thanh bên"
-            >
-                ☰
-            </button>
+            <nav className={styles.mapRail} aria-label="Explore map controls">
+                <button
+                    className={styles.railButton}
+                    onClick={() => setSidebarOpen((open) => !open)}
+                    aria-label={sidebarOpen ? 'Ẩn danh sách địa điểm' : 'Mở danh sách địa điểm'}
+                    aria-pressed={sidebarOpen}
+                >
+                    <List weight="bold" />
+                </button>
+                <div className={styles.railDivider} />
+                <button
+                    className={`${styles.railTextButton} ${sidebarOpen ? styles.railTextButtonActive : ''}`}
+                    onClick={() => setSidebarOpen(true)}
+                >
+                    Explore
+                </button>
+                <button className={styles.railTextButton}>Saved</button>
+            </nav>
 
             {/* Mobile overlay */}
             {sidebarOpen && (
@@ -462,16 +801,20 @@ export function ExplorePage() {
             )}
 
             {/* ── Sidebar ── */}
-            <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
+            <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarCollapsed}`}>
                 <div className={styles.sidebarHeader}>
                     <div className={styles.sidebarBrand}>
-                        <div className={styles.sidebarBrandIcon}><MapTrifold weight="duotone" /></div>
-                        <span className={styles.sidebarTitle}>
-                            Be<span className={styles.sidebarTitleAccent}>Vietnam</span> Map
-                        </span>
+                        <span className={styles.sidebarTitle}>Khám phá gần bạn</span>
+                        <button
+                            className={styles.panelClose}
+                            onClick={() => setSidebarOpen(false)}
+                            aria-label="Ẩn danh sách địa điểm"
+                        >
+                            <X />
+                        </button>
                     </div>
                     <div className={styles.sidebarSubtitle}>
-                        Khám phá di sản & văn hoá Việt Nam
+                        {filteredPlaces.length} địa điểm văn hóa, ăn uống và trải nghiệm.
                     </div>
                 </div>
 
@@ -507,16 +850,10 @@ export function ExplorePage() {
                                 className={`${styles.filterChip} ${activeCategory === chip.key ? styles.filterChipActive : ''}`}
                                 onClick={() => setActiveCategory(chip.key)}
                             >
-                                <span>{chip.icon}</span>
                                 {chip.label}
                             </button>
                         ))}
                     </div>
-                </div>
-
-                {/* Results count */}
-                <div className={styles.resultsMeta}>
-                    {filteredPlaces.length} địa điểm
                 </div>
 
                 {/* Places list */}
@@ -525,55 +862,38 @@ export function ExplorePage() {
                         const placeWeather = getPlaceWeather(place, weatherByPlace);
                         const placeHasLiveWeather = hasLiveWeather(place, weatherByPlace);
                         return (
-                            <div
+                            <button
                                 key={place.id}
                                 className={`${styles.placeItem} ${selectedPlace?.id === place.id ? styles.placeItemSelected : ''}`}
                                 onClick={() => handleSelectPlace(place)}
                             >
-                                <div className={styles.placeIcon}>
-                                    {CATEGORY_ICONS[place.category]}
-                                </div>
                                 <div className={styles.placeInfo}>
                                     <div className={styles.placeName}>{place.title}</div>
                                     <div className={styles.placeRegion}>{place.region} · {CATEGORY_LABEL[place.category]}</div>
+                                    <div className={styles.placeHint}>{place.subtitle}</div>
                                 </div>
                                 <div className={styles.placeRightMeta}>
                                     <span className={styles.placeRating}><Star weight="fill" /> {place.rating}</span>
-                                    <span className={styles.placeWeatherIcon}>{WEATHER_ICONS[placeWeather]}</span>
-                                    {placeHasLiveWeather && (
-                                        <span className={styles.placeWeatherLive}>live</span>
-                                    )}
+                                    <span className={styles.placeWeatherText}>
+                                        {WEATHER_LABELS[placeWeather]}{placeHasLiveWeather ? ' · live' : ''}
+                                    </span>
                                 </div>
-                            </div>
+                            </button>
                         );
                     })}
                 </div>
 
                 {/* Weather legend */}
                 <div className={styles.weatherLegend}>
-                    <div className={styles.weatherLegendTitle}>Kích thước bong bóng theo thời tiết</div>
-                    <div className={styles.weatherLegendItems}>
-                        <div className={styles.weatherLegendItem}>
-                            <div className={`${styles.weatherBubble} ${styles.weatherBubbleSunny}`} />
-                            <div className={styles.weatherLegendLabel}>
-                                <span className={styles.weatherLegendName}>☀️ Nắng</span>
-                                <span className={styles.weatherLegendHint}>Đông khách</span>
-                            </div>
+                    <div className={styles.weatherLegendTitle}>Bubble size</div>
+                    <div className={styles.weatherScale}>
+                        <span>Vắng</span>
+                        <div className={styles.weatherScaleTrack}>
+                            <i />
+                            <i />
+                            <i />
                         </div>
-                        <div className={styles.weatherLegendItem}>
-                            <div className={`${styles.weatherBubble} ${styles.weatherBubbleCloudy}`} />
-                            <div className={styles.weatherLegendLabel}>
-                                <span className={styles.weatherLegendName}>⛅ Mây</span>
-                                <span className={styles.weatherLegendHint}>Bình thường</span>
-                            </div>
-                        </div>
-                        <div className={styles.weatherLegendItem}>
-                            <div className={`${styles.weatherBubble} ${styles.weatherBubbleRainy}`} />
-                            <div className={styles.weatherLegendLabel}>
-                                <span className={styles.weatherLegendName}>🌧️ Mưa</span>
-                                <span className={styles.weatherLegendHint}>Vắng khách</span>
-                            </div>
-                        </div>
+                        <span>Đông</span>
                     </div>
                 </div>
             </aside>
@@ -597,10 +917,28 @@ export function ExplorePage() {
                     </button>
                 )}
 
+                {!sidebarOpen && (
+                    <button
+                        className={styles.closedSearch}
+                        onClick={() => setSidebarOpen(true)}
+                    >
+                        <MagnifyingGlass />
+                        <span>Tìm địa điểm, vùng...</span>
+                    </button>
+                )}
+
+                {locationError && (
+                    <div className={styles.mapNotice}>
+                        {locationError}
+                        <button onClick={() => setLocationError('')} aria-label="Đóng thông báo">
+                            <X />
+                        </button>
+                    </div>
+                )}
+
                 {/* Overlay: API key missing */}
                 {!GOONG_API_KEY && (
                     <div className={styles.mapStatus}>
-                        <div className={styles.mapStatusIcon}><MapTrifold weight="duotone" /></div>
                         <div className={styles.mapStatusTitle}>Goong Maps chưa được cấu hình</div>
                         <div className={styles.mapStatusDesc}>
                             Thêm Goong API key vào file <code>.env</code> để hiển thị bản đồ tương tác.
@@ -614,8 +952,16 @@ export function ExplorePage() {
                     </div>
                 )}
 
+                {/* Overlay: Map fallback */}
+                {GOONG_API_KEY && mapError && (
+                    <div className={styles.mapStatus}>
+                        <div className={styles.mapStatusTitle}>Bản đồ chưa sẵn sàng</div>
+                        <div className={styles.mapStatusDesc}>{mapError}</div>
+                    </div>
+                )}
+
                 {/* Overlay: Map loading */}
-                {GOONG_API_KEY && !mapLoaded && (
+                {GOONG_API_KEY && !mapLoaded && !mapError && (
                     <div className={styles.mapStatus}>
                         <div className={styles.mapLoadingSpinner} />
                         <div className={styles.mapStatusDesc}>Đang tải bản đồ...</div>
@@ -627,9 +973,6 @@ export function ExplorePage() {
                     {selectedPlace && (
                         <>
                             <div className={styles.detailCardTop}>
-                                <div className={styles.detailCardIcon}>
-                                    {CATEGORY_ICONS[selectedPlace.category]}
-                                </div>
                                 <div className={styles.detailCardMeta}>
                                     <div className={styles.detailCardTitle}>{selectedPlace.title}</div>
                                     <div className={styles.detailCardSubtitle}>{selectedPlace.subtitle}</div>
@@ -649,7 +992,7 @@ export function ExplorePage() {
                                 </span>
                                 {selectedWeather && (
                                     <span className={`${styles.badge} ${weatherBadgeClass}`}>
-                                        {WEATHER_ICONS[selectedWeather]} {WEATHER_LABELS[selectedWeather]}
+                                        {WEATHER_LABELS[selectedWeather]}
                                     </span>
                                 )}
                                 {selectedHasLiveWeather && (
@@ -666,7 +1009,7 @@ export function ExplorePage() {
 
                             <div className={styles.detailCardActions}>
                                 <button className={styles.detailCardBtnPrimary}>
-                                    <Compass weight="bold" /> Bắt đầu Quest
+                                    Bắt đầu quest
                                 </button>
                                 <button
                                     className={styles.detailCardBtnSecondary}

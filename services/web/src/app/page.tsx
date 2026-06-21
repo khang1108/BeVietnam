@@ -141,7 +141,7 @@ export default function HomePage() {
         </ul>
       </section>
 
-      {/* ───────── Gate band (Three.js/Sketchfab) ───────── */}
+      {/* ───────── Gate band ───────── */}
       <section className={styles.band}>
         <div className={styles.bandPattern} aria-hidden="true" />
         <div className={styles.gateStage} data-reveal>

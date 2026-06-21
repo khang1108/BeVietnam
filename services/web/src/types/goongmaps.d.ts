@@ -38,3 +38,7 @@ declare module '@goongmaps/goong-js' {
 
     export { Map, Marker, NavigationControl, accessToken };
 }
+
+declare module '@goongmaps/goong-js/dist/goong-js' {
+    export * from '@goongmaps/goong-js';
+}

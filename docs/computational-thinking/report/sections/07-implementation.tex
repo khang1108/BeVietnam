@@ -1,0 +1,11 @@
+\section{Implementation}
+
+\subsection{Implementation Challenges and Solutions}
+\noindent\textbf{Author/Reviewer:} Trần Hồng Thiên (ID: 22120345)
+
+Trong quá trình xây dựng hệ thống BeVietnam, nhóm đã gặp một số thách thức kỹ thuật lớn sau:
+\begin{enumerate}
+    \item \textbf{Hallucination của LLM trong tri thức văn hóa}: Cách giải quyết là áp dụng quy trình Retrieval-Augmented Generation (RAG) qua Culture Scout truy xuất vector DB Qdrant trước khi đưa vào LLM.
+    \item \textbf{Định dạng phản hồi có cấu trúc}: Đảm bảo LLM trả về đúng JSON Schema bằng thư viện Pydantic và node Safety Keeper để validate trước khi trả về backend.
+    \item \textbf{Vision Model API Latency}: Giải quyết bằng cơ chế fallback bất đồng bộ và ghi nhận trạng thái chờ xử lý (pending review) để không làm nghẽn luồng người dùng.
+\end{enumerate}

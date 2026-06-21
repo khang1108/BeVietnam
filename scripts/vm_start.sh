@@ -43,6 +43,11 @@ POSTGRES_HOST="${POSTGRES_HOST:-127.0.0.1}"
 POSTGRES_PORT="${POSTGRES_PORT:-5432}"
 START_VLLM="${START_VLLM:-0}"
 START_VLLM_TUNNEL="${START_VLLM_TUNNEL:-0}"
+AUTO_MINIO="${AUTO_MINIO:-1}"
+MINIO_ENDPOINT="${MINIO_ENDPOINT:-http://127.0.0.1:9000}"
+MINIO_CONSOLE_PORT="${MINIO_CONSOLE_PORT:-9001}"
+MINIO_DATA_DIR="${MINIO_DATA_DIR:-$PID_DIR/minio-data}"
+MINIO_BINARY="${MINIO_BINARY:-$HOME/.local/bin/minio}"
 
 mkdir -p "$LOG_DIR" "$PID_DIR"
 
@@ -411,6 +416,42 @@ ensure_local_postgres() {
   log "DATABASE_URL written to $ENV_FILE"
 }
 
+ensure_minio_binary() {
+  if command_exists minio; then
+    MINIO_BINARY="$(command -v minio)"
+    return
+  fi
+  if [[ -x "$MINIO_BINARY" ]]; then
+    return
+  fi
+  log "Downloading MinIO server binary -> $MINIO_BINARY"
+  mkdir -p "$(dirname "$MINIO_BINARY")"
+  curl -fsSL https://dl.min.io/server/minio/release/linux-amd64/minio -o "$MINIO_BINARY"
+  chmod +x "$MINIO_BINARY"
+}
+
+ensure_local_minio() {
+  if [[ "$AUTO_MINIO" != "1" ]]; then
+    log "Skipping local MinIO setup (AUTO_MINIO=$AUTO_MINIO)"
+    return
+  fi
+
+  ensure_minio_binary
+  mkdir -p "$MINIO_DATA_DIR"
+
+  # MinIO reads its root credentials from these env vars; map them from the
+  # MINIO_ACCESS_KEY/SECRET_KEY that vm_apply_secrets.sh generated into .env.
+  export MINIO_ROOT_USER="${MINIO_ACCESS_KEY:-minioadmin}"
+  export MINIO_ROOT_PASSWORD="${MINIO_SECRET_KEY:-minioadmin}"
+
+  local addr="${MINIO_ENDPOINT#http://}"
+  addr="${addr#https://}"
+
+  start_process "minio" "$MINIO_BINARY" server "$MINIO_DATA_DIR" \
+    --address "$addr" --console-address "127.0.0.1:${MINIO_CONSOLE_PORT}"
+  health_check "MinIO" "http://${addr}/minio/health/ready" 60
+}
+
 python_bin() {
   local venv="$1"
   printf '%s/bin/python' "$venv"
@@ -621,6 +662,7 @@ run_migrations() {
 start_all() {
   load_env
   ensure_local_postgres
+  ensure_local_minio
   guard_vllm_port
   ensure_venv "backend" "$BACKEND_VENV" "$ROOT/services/backend/requirements.txt"
   ensure_venv "ai" "$AI_VENV" "$ROOT/services/ai/requirements.txt"
@@ -655,6 +697,7 @@ stop_all() {
   stop_process "ai-core"
   stop_process "vllm-tunnel"
   stop_process "vllm"
+  stop_process "minio"
 }
 
 status_one() {
@@ -672,6 +715,7 @@ status_one() {
 status() {
   status_one "vllm"
   status_one "vllm-tunnel"
+  status_one "minio"
   status_one "ai-core"
   status_one "backend"
 }

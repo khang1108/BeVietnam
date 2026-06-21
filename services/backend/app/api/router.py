@@ -16,6 +16,7 @@ from services.backend.app.api.endpoints import (
     places,
     quest,
     question_pool,
+    uploads,
     weather,
 )
 
@@ -30,4 +31,5 @@ api_router.include_router(captures.router)
 api_router.include_router(logs.router)
 api_router.include_router(quest.router)
 api_router.include_router(question_pool.router)
+api_router.include_router(uploads.router)
 api_router.include_router(weather.router)
