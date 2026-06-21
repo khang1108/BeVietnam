@@ -1,10 +1,9 @@
 package com.bevietnam.ui.screens.profile
 
-import android.app.DatePickerDialog
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -21,9 +20,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,23 +39,18 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.bevietnam.R
 import com.bevietnam.core.model.User
-import com.bevietnam.ui.theme.BeVietnamTheme
 import com.bevietnam.ui.components.ErrorView
-import com.bevietnam.ui.components.LoadingIndicator
-import com.bevietnam.ui.navigation.BottomNavBar
 import com.bevietnam.ui.components.PrimaryLoadingButton
-import java.time.format.DateTimeFormatter
-import java.util.Calendar
+import com.bevietnam.ui.theme.BeVietnamTheme
 
 /**
  * Màn hình Hồ sơ cá nhân (Profile Screen) của ứng dụng BeVietnam.
  *
- * Cho phép người dùng theo dõi cấp độ, điểm số hành trình, chỉnh sửa thông tin cá nhân (Họ tên, Bio, Giới tính, Ngày sinh, Vị trí)
- * và thực hiện đăng xuất khỏi hệ thống.
- * Kết nối luồng dữ liệu từ [ProfileViewModel] và phát ra các sự kiện một lần an toàn thông qua LaunchedEffect.
+ * Hiển thị banner văn hóa (hoa văn trống đồng), thông tin cá nhân, và lưới bài viết
+ * check-in của người dùng. Cho phép chỉnh sửa hồ sơ và đăng xuất.
  *
- * @param onNavigateToLogin Callback điều hướng người dùng sang màn hình Đăng nhập khi đăng xuất tài khoản.
- * @param viewModel ViewModel quản lý thông tin hồ sơ người dùng ([ProfileViewModel]). Mặc định là [hiltViewModel].
+ * @param onNavigateToLogin Callback điều hướng sang màn hình Đăng nhập khi đăng xuất.
+ * @param viewModel ViewModel quản lý thông tin hồ sơ ([ProfileViewModel]).
  * @param modifier [Modifier] dùng để định hình bố cục bên ngoài truyền vào.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,7 +64,6 @@ fun ProfileScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
-    // Lắng nghe và xử lý các sự kiện giao diện diễn ra một lần (One-off Events)
     LaunchedEffect(viewModel.uiEvent) {
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -116,9 +111,7 @@ fun ProfileScreen(
 }
 
 /**
- * Bố cục nội dung hiển thị chính (Content Layout) của màn hình Hồ sơ cá nhân.
- *
- * Chứa thẻ Avatar và các chỉ số cấp độ/điểm số, cùng form chỉnh sửa thông tin cá nhân khi được chuyển sang Chế độ chỉnh sửa (Edit Mode).
+ * Bố cục nội dung chính của màn hình Hồ sơ: banner văn hóa, avatar, thông tin, và lưới bài viết.
  */
 @Composable
 private fun ProfileContent(
@@ -137,107 +130,100 @@ private fun ProfileContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .verticalScroll(rememberScrollState())
     ) {
-        // Thẻ thông tin cá nhân cốt lõi (Core Card)
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            shape = RoundedCornerShape(16.dp),
-            color = MaterialTheme.colorScheme.surface,
-            shadowElevation = 4.dp
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+        // Banner văn hóa (hoa văn trống đồng) + avatar nổi lên trên
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .background(MaterialTheme.colorScheme.primary)
             ) {
-                // Tải ảnh đại diện mượt mà với Coil AsyncImage và crossfade
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(user.avatarUrl ?: R.drawable.default_avt)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = stringResource(R.string.avatar),
-                    modifier = Modifier
-                        .size(88.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
+                Image(
+                    painter = painterResource(R.drawable.dong_son_pattern),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    alpha = 0.12f,
+                    modifier = Modifier.fillMaxSize()
                 )
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = user.name,
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = user.email,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(18.dp))
-
-
-
-                // Nút chỉnh sửa và chia sẻ (ở View Mode)
-                if (!uiState.isEditMode) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Button(
-                            onClick = onEditClick,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(44.dp),
-                            shape = RoundedCornerShape(10.dp)
-                        ) {
-                            Text(stringResource(R.string.edit_profile))
-                        }
-                        OutlinedButton(
-                            onClick = onShareClick,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(44.dp),
-                            shape = RoundedCornerShape(10.dp)
-                        ) {
-                            Icon(Icons.Default.Share, null, Modifier.size(16.dp))
-                            Spacer(Modifier.width(4.dp))
-                            Text(stringResource(R.string.share))
-                        }
-                    }
-                }
             }
+
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(user.avatarUrl ?: R.drawable.default_avt)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = stringResource(R.string.avatar),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 76.dp)
+                    .size(92.dp)
+                    .clip(CircleShape)
+                    .border(4.dp, MaterialTheme.colorScheme.background, CircleShape)
+            )
         }
 
-        // Thẻ thông tin địa lý và ngày tham gia
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(
+            text = user.name,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = user.email,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         if (!uiState.isEditMode) {
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            // Nút Chỉnh sửa + Chia sẻ
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                if (!user.createdAt.isNullOrBlank()) ProfileInfoCard(stringResource(R.string.profile_joined_date), user.createdAt, Icons.Default.CalendarToday)
+                Button(
+                    onClick = onEditClick,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(44.dp),
+                    shape = RoundedCornerShape(11.dp)
+                ) {
+                    Icon(Icons.Default.Edit, null, Modifier.size(16.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(stringResource(R.string.edit_profile))
+                }
+                OutlinedButton(
+                    onClick = onShareClick,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(44.dp),
+                    shape = RoundedCornerShape(11.dp)
+                ) {
+                    Icon(Icons.Default.Share, null, Modifier.size(16.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(stringResource(R.string.share))
+                }
             }
-            Spacer(modifier = Modifier.height(16.dp))
-        }
 
-        // Form Chỉnh sửa thông tin hồ sơ (Edit Mode)
-        if (uiState.isEditMode) {
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Lưới bài viết của người dùng (Instagram-style)
+            ProfilePostsSection()
+        } else {
+            // Form chỉnh sửa thông tin
             Surface(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 shape = RoundedCornerShape(16.dp),
@@ -245,7 +231,11 @@ private fun ProfileContent(
                 shadowElevation = 4.dp
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
-                    Text(stringResource(R.string.edit_profile_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        stringResource(R.string.edit_profile_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
 
                     OutlinedTextField(
@@ -257,7 +247,6 @@ private fun ProfileContent(
                         shape = RoundedCornerShape(10.dp)
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-
 
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         OutlinedButton(onClick = onCancelClick, modifier = Modifier.weight(1f), enabled = !uiState.isSaving) {
@@ -272,13 +261,15 @@ private fun ProfileContent(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // Nút Đăng xuất (Logout Button)
+        Spacer(modifier = Modifier.height(20.dp))
+
         OutlinedButton(
             onClick = onLogoutClick,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
         ) {
@@ -288,44 +279,169 @@ private fun ProfileContent(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        Text(stringResource(R.string.app_version), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f))
-        Spacer(modifier = Modifier.height(120.dp)) // Không gian bù trừ cho BottomNavBar
+        Text(
+            stringResource(R.string.app_version),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(120.dp)) // Chừa chỗ cho BottomNavBar
     }
 }
 
 /**
- * Chỉ số thành tựu riêng lẻ (Stat Item).
+ * Khu vực lưới bài viết check-in của người dùng.
+ *
+ * TODO(Backend): hiện dùng dữ liệu mẫu cố định để demo. Khi nối API "bài viết của tôi",
+ * thay [sampleProfilePosts] bằng danh sách thật từ ViewModel/UseCase.
  */
 @Composable
-private fun ProfileStatItem(label: String, value: String, icon: ImageVector) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
-        Text(value, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        Text(label, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
+private fun ProfilePostsSection() {
+    val posts = sampleProfilePosts
 
-/**
- * Thẻ hiển thị thông tin tĩnh (Info Card) như Vị trí địa lý hay Ngày tham gia.
- */
-@Composable
-private fun ProfileInfoCard(title: String, content: String, icon: ImageVector) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface,
-        shadowElevation = 2.dp
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(12.dp))
-            Column {
-                Text(title, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(content, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                Icons.Default.PhotoCamera,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = "Bài viết của tôi",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        Text(
+            text = "${posts.size} bài",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+
+    Spacer(modifier = Modifier.height(12.dp))
+
+    // Lưới 2 cột: chia danh sách thành từng cặp để tránh xung đột cuộn lồng nhau
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        posts.chunked(2).forEach { rowPosts ->
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                rowPosts.forEach { post ->
+                    PostCard(post = post, modifier = Modifier.weight(1f))
+                }
+                if (rowPosts.size == 1) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
             }
         }
     }
 }
+
+/**
+ * Thẻ hiển thị một bài viết check-in: ảnh (placeholder), địa danh, tiêu đề, lượt thích.
+ */
+@Composable
+private fun PostCard(post: ProfilePost, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column {
+            // Ảnh placeholder (sẽ thay bằng AsyncImage khi có URL thật)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(96.dp)
+                    .background(post.color),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    post.icon,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.5f),
+                    modifier = Modifier.size(30.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(6.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Color.Black.copy(alpha = 0.42f))
+                        .padding(horizontal = 8.dp, vertical = 3.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.LocationOn,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(11.dp)
+                    )
+                    Spacer(Modifier.width(3.dp))
+                    Text(post.placeName, color = Color.White, fontSize = 10.sp)
+                }
+            }
+
+            Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) {
+                Text(
+                    text = post.title,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.FavoriteBorder,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = "${post.likes} · ${post.timeAgo}",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Mô hình hiển thị một bài viết trên hồ sơ (chỉ dùng cho UI/demo).
+ */
+private data class ProfilePost(
+    val title: String,
+    val placeName: String,
+    val likes: Int,
+    val timeAgo: String,
+    val color: Color,
+    val icon: ImageVector
+)
+
+/** Dữ liệu mẫu cố định để demo lưới bài viết. */
+private val sampleProfilePosts = listOf(
+    ProfilePost("Một ngày ở Văn Miếu", "Văn Miếu", 24, "2 ngày trước", Color(0xFFA6471F), Icons.Default.AccountBalance),
+    ProfilePost("Đèn lồng phố cổ", "Hội An", 58, "5 ngày trước", Color(0xFFC9A227), Icons.Default.Lightbulb),
+    ProfilePost("Hang động Tràng An", "Tràng An", 41, "1 tuần trước", Color(0xFF6E7B3E), Icons.Default.Terrain),
+    ProfilePost("Hoàng thành Huế", "Huế", 37, "2 tuần trước", Color(0xFF8A5A2B), Icons.Default.AccountBalance)
+)
 
 @Preview(showBackground = true, name = "View Mode")
 @Composable
@@ -335,10 +451,10 @@ fun ProfileScreenViewModePreview() {
             uiState = ProfileUiState(
                 user = User(
                     id = "1",
-                    name = "Nguyễn Văn A",
-                    email = "nguyenvana@example.com",
+                    name = "Hoàng Phi",
+                    email = "hoangphipay@example.com",
                     avatarUrl = null,
-                    createdAt = "01/01/2023"
+                    createdAt = "01/01/2024"
                 )
             ),
             onNameChange = {},
@@ -360,12 +476,12 @@ fun ProfileScreenEditModePreview() {
                 isEditMode = true,
                 user = User(
                     id = "1",
-                    name = "Nguyễn Văn A",
-                    email = "nguyenvana@example.com",
+                    name = "Hoàng Phi",
+                    email = "hoangphipay@example.com",
                     avatarUrl = null,
-                    createdAt = "01/01/2023"
+                    createdAt = "01/01/2024"
                 ),
-                editName = "Nguyễn Văn A"
+                editName = "Hoàng Phi"
             ),
             onNameChange = {},
             onEditClick = {},
