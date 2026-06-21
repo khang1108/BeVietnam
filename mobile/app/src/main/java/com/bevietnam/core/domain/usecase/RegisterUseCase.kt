@@ -29,9 +29,7 @@ class RegisterUseCase @Inject constructor(
      */
     operator fun invoke(
         name: String,
-        gender: Gender?,
-        dateOfBirth: String?,
         email: String,
         password: String
-    ): Flow<Result<User>> = authRepository.register(name, gender, dateOfBirth, email, password)
+    ): Flow<Result<User>> = authRepository.register(name, email, password)
 }

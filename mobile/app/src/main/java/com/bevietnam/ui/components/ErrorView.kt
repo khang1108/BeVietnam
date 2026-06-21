@@ -7,8 +7,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.bevietnam.R
 
 /**
  * Thành phần hiển thị giao diện báo lỗi (Error View) của ứng dụng BeVietnam.
@@ -33,7 +35,7 @@ fun ErrorView(
     ) {
         Icon(
             imageVector = Icons.Outlined.ErrorOutline,
-            contentDescription = "Biểu tượng lỗi",
+            contentDescription = stringResource(R.string.error_icon_desc),
             tint = MaterialTheme.colorScheme.error,
             modifier = Modifier.size(48.dp)
         )
@@ -54,7 +56,7 @@ fun ErrorView(
                     contentColor = MaterialTheme.colorScheme.onErrorContainer
                 )
             ) {
-                Text(text = "Thử lại")
+                Text(text = stringResource(R.string.retry))
             }
         }
     }

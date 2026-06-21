@@ -11,7 +11,7 @@ import javax.inject.Singleton
 @Singleton
 class CaptureRepository @Inject constructor(
 ) : ICaptureRepository {
-    override fun uploadCapture(metadata: CaptureMetadata, userId: Int, placeId: Int, taskId: String?): Flow<Resource<Unit>> {
+    override fun uploadCapture(metadata: CaptureMetadata, userId: String, placeId: String, taskId: String?): Flow<Resource<Unit>> {
         TODO("Not yet implemented");
     }
 }

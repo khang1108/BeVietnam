@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -20,7 +23,16 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        manifestPlaceholders["MAPS_API_KEY"] = "PLACEHOLDER_KEY"
+        // Load local.properties
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(FileInputStream(localPropertiesFile))
+        }
+        val goongKey = localProperties.getProperty("GOONG_MAPTILES_KEY") ?: ""
+
+        // BuildConfig field for Goong MapTiles Key
+        buildConfigField("String", "GOONG_MAPTILES_KEY", "\"$goongKey\"")
     }
 
     buildTypes {
@@ -87,16 +99,15 @@ dependencies {
 
     // Networking
     implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.okhttp.logging)
 
     // Image Loading
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
-    // Maps
-    implementation(libs.maps.compose)
-    implementation(libs.play.services.location)
+    // Maps (MapLibre / Goong)
+    implementation("org.maplibre.gl:android-sdk:11.5.0")
 
     // Desugar (Sửa lỗi Unresolved reference ở đây)
     coreLibraryDesugaring(libs.desugar.jdk.libs)

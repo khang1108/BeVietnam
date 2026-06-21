@@ -18,7 +18,7 @@ object AuthRoute
  * @property userId Định danh duy nhất của người dùng (User ID) cần hiển thị hồ sơ. Mặc định là -1.
  */
 @Serializable
-data class ProfileRoute(val userId: Int = -1)
+data class ProfileRoute(val userId: String = "-1")
 
 /**
  * Tuyến đường điều hướng đến màn hình Khám phá (Explore Screen).
@@ -27,6 +27,9 @@ data class ProfileRoute(val userId: Int = -1)
  */
 @Serializable
 object ExploreRoute
+
+@Serializable
+data class PlaceDetailRoute(val placeId: String)
 
 /**
  * Tuyến đường điều hướng đến màn hình Cốt truyện & Nhiệm vụ (Storyline Screen).
@@ -53,3 +56,15 @@ object FeedRoute
  */
 @Serializable
 object CameraRoute
+
+/**
+ * Tuyến đường tới màn hình chi tiết món ăn (Food Detail), kèm danh sách quán tham khảo.
+ */
+@Serializable
+data class FoodDetailRoute(val foodId: String)
+
+/**
+ * Tuyến đường tới màn hình chi tiết câu chuyện văn hóa (Story Detail).
+ */
+@Serializable
+data class StoryDetailRoute(val storyId: String)

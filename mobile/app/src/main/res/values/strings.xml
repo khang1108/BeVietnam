@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">BeVietnam</string>
     <string name="app_tagline">Khám phá vẻ đẹp Việt Nam</string>
-    <string name="auth_brand_name">bevietnam</string>
+    <string name="auth_brand_name">BeVietnam</string>
     <string name="auth_tagline">Du lịch thông minh</string>
     <string name="tab_login">Đăng nhập</string>
     <string name="tab_register">Đăng ký</string>
@@ -27,6 +27,7 @@
     <!-- Profile Screen -->
     <string name="avatar">Ảnh đại diện</string>
     <string name="edit_profile">Chỉnh sửa hồ sơ</string>
+    <string name="edit_profile_title">Chỉnh sửa hồ sơ</string>
     <string name="share">Chia sẻ</string>
     <string name="display_name">Tên hiển thị</string>
     <string name="bio">Giới thiệu</string>
@@ -34,4 +35,51 @@
     <string name="save">Lưu</string>
     <string name="logout">Đăng xuất</string>
     <string name="app_version">Phiên bản 1.0.0</string>
+    <string name="map_view">Xem Bản đồ</string>
+    <string name="list_view">Xem Danh sách</string>
+    <string name="stat_level">Cấp độ</string>
+    <string name="stat_points">Điểm</string>
+    <string name="profile_location">Vị trí</string>
+    <string name="profile_joined_date">Ngày tham gia</string>
+    <string name="gender_male_desc">Nam</string>
+    <string name="gender_female_desc">Nữ</string>
+    <string name="share_coming_soon">Tính năng chia sẻ đang phát triển!</string>
+
+    <!-- Search Bar -->
+    <string name="search_heritage">Tìm kiếm địa điểm...</string>
+    <string name="search_content_description">Tìm kiếm</string>
+
+    <!-- Explore Screen -->
+    <string name="places_count">%1$d địa điểm</string>
+    <string name="empty_places">Chưa có địa điểm nào</string>
+    <string name="retry">Thử lại</string>
+    <string name="search_not_found">Không tìm thấy \"%1$s\"</string>
+    <string name="map_reset_view">Toàn cảnh</string>
+
+    <!-- Feed Screen -->
+    <string name="search_feed_hint">Tìm địa điểm gợi ý...</string>
+    <string name="feed_section_header">Gợi ý cho bạn</string>
+    <string name="feed_places_count">%1$d địa điểm</string>
+    <string name="feed_empty_title">Không tìm thấy gợi ý phù hợp</string>
+    <string name="feed_empty_subtitle">Thử thay đổi từ khóa hoặc danh mục</string>
+
+    <!-- Recommendation Card -->
+    <string name="recommendation_why_title">Tại sao gợi ý này?</string>
+    <string name="recommendation_score_unit">điểm</string>
+    <string name="recommendation_expand">Xem thêm</string>
+    <string name="recommendation_collapse">Thu gọn</string>
+    <string name="recommendation_expand_desc">Xem thêm giải thích</string>
+    <string name="recommendation_collapse_desc">Thu gọn giải thích</string>
+    <string name="recommendation_image_desc">Hình ảnh %1$s</string>
+
+    <!-- Place Card -->
+    <string name="place_image_desc">Hình ảnh của %1$s</string>
+    <string name="place_learn_more">Tìm hiểu thêm</string>
+    <string name="place_locate">Định vị trên bản đồ</string>
+
+    <!-- Error View -->
+    <string name="error_icon_desc">Biểu tượng lỗi</string>
+
+    <!-- App Top Bar -->
+    <string name="logo_desc">Logo BeVietnam</string>
 </resources>

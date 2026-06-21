@@ -18,5 +18,5 @@ interface ICaptureRepository {
      * @param metadata Chứa toàn bộ thông tin chi tiết của bài đăng bao gồm đường dẫn ảnh, vị trí tọa độ GPS và mô tả bài viết ([CaptureMetadata]).
      * @return Một [Flow] phát ra các trạng thái tải lên [Resource] (Loading, Success, Error) giúp UI cập nhật trạng thái tương ứng.
      */
-    fun uploadCapture(metadata: CaptureMetadata, userId: Int, placeId: Int, taskId: String?): Flow<Resource<Unit>>
+    fun uploadCapture(metadata: CaptureMetadata, userId: String, placeId: String, taskId: String?): Flow<Resource<Unit>>
 }

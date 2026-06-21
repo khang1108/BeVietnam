@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.bevietnam.core.domain.usecase.GetPlacesUseCase
 import com.bevietnam.core.model.Place
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,12 +29,17 @@ sealed class ExploreUiState {
      * @property filteredPlaces Danh sách địa điểm sau khi đã lọc theo từ khóa và danh mục.
      * @property selectedCategory Thẻ danh mục đang được lựa chọn để lọc (Mặc định là "Tất cả").
      * @property searchQuery Từ khóa tìm kiếm hiện tại do người dùng nhập.
+     * @property isMapView Trạng thái hiển thị giao diện Bản đồ hay Danh sách.
+     * @property focusedPlaceId ID của địa điểm đang được focus/chọn trên bản đồ.
+     * @property hasLocationPermission Trạng thái cấp quyền vị trí của người dùng.
      */
     data class Success(
         val places: List<Place>,
         val filteredPlaces: List<Place>,
         val selectedCategory: String = "Tất cả",
-        val searchQuery: String = ""
+        val searchQuery: String = "",
+        val isMapView: Boolean = true,
+        val focusedPlaceId: String? = null
     ) : ExploreUiState()
     
     /** Trạng thái danh sách địa điểm trống */
@@ -93,6 +99,8 @@ class ExploreViewModel @Inject constructor(
                         ExploreUiState.Success(places = places, filteredPlaces = places)
                     }
                 }
+            } catch (e: CancellationException) {
+                throw e // Không nuốt CancellationException — để coroutine hủy đúng cách
             } catch (e: Exception) {
                 _uiState.value = ExploreUiState.Error(e.message ?: "Đã xảy ra lỗi không xác định")
             }
@@ -141,6 +149,35 @@ class ExploreViewModel @Inject constructor(
         updateSuccessState(query = query, filtered = current.filteredPlaces)
         _searchQueryFlow.value = query
     }
+
+    /**
+     * Chuyển đổi qua lại giữa chế độ xem Bản đồ (Map View) và xem Danh sách (List View).
+     */
+    fun toggleViewMode() {
+        val current = _uiState.value as? ExploreUiState.Success ?: return
+        _uiState.update { currentState ->
+            if (currentState is ExploreUiState.Success) {
+                currentState.copy(isMapView = !currentState.isMapView)
+            } else currentState
+        }
+    }
+
+    /**
+     * Đặt ID của địa điểm đang được chọn hoặc lướt tới trên Carousel để highlight Marker trên bản đồ.
+     *
+     * @param id ID của địa điểm (hoặc null nếu bỏ chọn).
+     */
+    fun onPlaceFocused(id: String?) {
+        val current = _uiState.value as? ExploreUiState.Success ?: return
+        if (current.focusedPlaceId != id) {
+            _uiState.update { currentState ->
+                if (currentState is ExploreUiState.Success) {
+                    currentState.copy(focusedPlaceId = id)
+                } else currentState
+            }
+        }
+    }
+
 
     /**
      * Hàm phụ trợ thực hiện lọc danh sách địa điểm theo từ khóa và danh mục.

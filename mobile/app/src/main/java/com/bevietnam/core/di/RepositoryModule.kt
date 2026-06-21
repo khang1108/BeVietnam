@@ -1,11 +1,12 @@
 package com.bevietnam.core.di
 
-import com.bevietnam.core.data.repository.AuthRepository
-import com.bevietnam.core.data.repository.PlaceRepository
-import com.bevietnam.core.data.repository.TaskRepository
-import com.bevietnam.core.data.repository.UserRepository
-import com.bevietnam.core.data.repository.FeedRepository
-import com.bevietnam.core.data.repository.CaptureRepository
+import com.bevietnam.core.data.mock.MockAuthRepository
+import com.bevietnam.core.data.mock.MockUserRepository
+import com.bevietnam.core.data.mock.MockPlaceRepository
+import com.bevietnam.core.data.mock.MockFeedRepository
+import com.bevietnam.core.data.mock.MockTaskRepository
+import com.bevietnam.core.data.mock.MockCaptureRepository
+import com.bevietnam.core.data.repository.HealthRepository
 import com.bevietnam.core.domain.repository.IAuthRepository
 import com.bevietnam.core.domain.repository.IPlaceRepository
 import com.bevietnam.core.domain.repository.ITaskRepository
@@ -13,7 +14,6 @@ import com.bevietnam.core.domain.repository.IUserRepository
 import com.bevietnam.core.domain.repository.IFeedRepository
 import com.bevietnam.core.domain.repository.ICaptureRepository
 import com.bevietnam.core.domain.repository.IHealthRepository
-import com.bevietnam.core.data.repository.HealthRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -27,38 +27,38 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPlaceRepository(
-        placeRepository: PlaceRepository
+        placeRepository: MockPlaceRepository
     ): IPlaceRepository
 
     @Binds
     @Singleton
     abstract fun bindTaskRepository(
-        taskRepository: TaskRepository
+        taskRepository: MockTaskRepository
     ): ITaskRepository
 
     
     @Binds
     @Singleton
     abstract fun bindAuthRepository(
-        authRepository: AuthRepository
+        authRepository: MockAuthRepository
     ): IAuthRepository
 
     @Binds
     @Singleton
     abstract fun bindUserRepository(
-        userRepository: UserRepository
+        userRepository: MockUserRepository
     ): IUserRepository
 
     @Binds
     @Singleton
     abstract fun bindFeedRepository(
-        feedRepository: FeedRepository
+        feedRepository: MockFeedRepository
     ): IFeedRepository
 
     @Binds
     @Singleton
     abstract fun bindCaptureRepository(
-        captureRepository: CaptureRepository
+        captureRepository: MockCaptureRepository
     ): ICaptureRepository
 
     @Binds

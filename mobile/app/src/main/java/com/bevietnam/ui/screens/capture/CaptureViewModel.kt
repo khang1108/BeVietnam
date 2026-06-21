@@ -54,7 +54,7 @@ class CaptureViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val placeId: Int? = savedStateHandle.get<Int>("placeId")
+    private val placeId: String? = savedStateHandle.get<String>("placeId")
     private val taskId: String? = savedStateHandle.get<String>("taskId")
 
     private val _uiState = MutableStateFlow(CaptureUiState())
@@ -128,7 +128,7 @@ class CaptureViewModel @Inject constructor(
 
         viewModelScope.launch {
             val metadata = CaptureMetadata(
-                imageUrl = currentState.imageUri.toString(),
+                mediaUrl = currentState.imageUri.toString(),
                 latitude = currentState.latitude,
                 longitude = currentState.longitude,
                 note = description
