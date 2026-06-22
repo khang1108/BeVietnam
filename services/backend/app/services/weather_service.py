@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import logging
+import math
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from datetime import datetime, timezone
 from typing import Any
 
 import httpx
@@ -21,6 +23,27 @@ class WeatherResult:
     condition: str
     temp: float | None
     source: str
+    uvi: float | None = None  # estimated UV index (no paid One Call API)
+    rain_mm: float | None = None  # rain volume last 1h/3h, mm
+    clouds: int | None = None  # cloud cover %
+
+
+def _estimate_uvi(lat: float, lng: float, dt_unix: int | None, clouds_pct: float) -> float:
+    """Rough clear-sky UV index from solar elevation, reduced by cloud cover.
+    No paid UV API — this is an estimate, good enough for a 'high/low' cue."""
+    dt = datetime.fromtimestamp(dt_unix, tz=timezone.utc) if dt_unix else datetime.now(timezone.utc)
+    day = dt.timetuple().tm_yday
+    decl = math.radians(23.45) * math.sin(math.radians(360 / 365 * (284 + day)))
+    solar_hour = dt.hour + dt.minute / 60 + lng / 15.0
+    hour_angle = math.radians(15 * (solar_hour - 12))
+    lat_r = math.radians(lat)
+    sin_elev = math.sin(lat_r) * math.sin(decl) + math.cos(lat_r) * math.cos(decl) * math.cos(hour_angle)
+    elev = math.asin(max(-1.0, min(1.0, sin_elev)))
+    if elev <= 0:
+        return 0.0
+    clear_sky = 12.5 * (math.sin(elev) ** 1.5)
+    cloud_factor = 1 - 0.6 * (max(0.0, min(100.0, clouds_pct)) / 100.0)
+    return round(max(0.0, clear_sky * cloud_factor), 1)
 
 
 class OpenWeatherResolver:
@@ -39,11 +62,7 @@ class OpenWeatherResolver:
         if cached:
             result, cached_at = cached
             if time.monotonic() - cached_at < self._ttl_seconds:
-                return WeatherResult(
-                    condition=result.condition,
-                    temp=result.temp,
-                    source="cache",
-                )
+                return replace(result, source="cache")
 
         try:
             async with httpx.AsyncClient(timeout=settings.OPENWEATHER_TIMEOUT) as client:
@@ -86,7 +105,25 @@ class OpenWeatherResolver:
         main = payload.get("main") if isinstance(payload.get("main"), dict) else {}
         temp = _coerce_float(main.get("temp"))
         condition = _map_condition(weather_main, temp)
-        return WeatherResult(condition=condition, temp=temp, source="openweather")
+
+        clouds_obj = payload.get("clouds") if isinstance(payload.get("clouds"), dict) else {}
+        clouds = clouds_obj.get("all")
+        rain_obj = payload.get("rain") if isinstance(payload.get("rain"), dict) else {}
+        rain_mm = _coerce_float(rain_obj.get("1h") or rain_obj.get("3h"))
+        coord = payload.get("coord") if isinstance(payload.get("coord"), dict) else {}
+        lat = _coerce_float(coord.get("lat")) or 0.0
+        lng = _coerce_float(coord.get("lon")) or 0.0
+        dt_unix = payload.get("dt") if isinstance(payload.get("dt"), int) else None
+        uvi = _estimate_uvi(lat, lng, dt_unix, float(clouds or 0))
+
+        return WeatherResult(
+            condition=condition,
+            temp=temp,
+            source="openweather",
+            uvi=uvi,
+            rain_mm=rain_mm,
+            clouds=int(clouds) if isinstance(clouds, (int, float)) else None,
+        )
 
 
 def _coerce_float(value: Any) -> float | None:

@@ -24,6 +24,9 @@ async def get_weather(
         condition=result.condition,
         temp=result.temp,
         source=result.source,
+        uvi=result.uvi,
+        rain_mm=result.rain_mm,
+        clouds=result.clouds,
     )
 
 

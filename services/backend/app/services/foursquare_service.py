@@ -45,12 +45,15 @@ class FoursquareService:
         if not settings.FOURSQUARE_API_KEY:
             return NearbyResponse(total=0, items=[])
 
+        fields = "fsq_place_id,name,latitude,longitude,categories,location,distance"
+        if settings.FOURSQUARE_PREMIUM:
+            fields += ",rating,popularity"
         params = {
             "ll": f"{latitude},{longitude}",
             "radius": str(max(1, min(radius, 100_000))),
             "limit": str(max(1, min(limit, 50))),
             "sort": "DISTANCE",
-            "fields": "fsq_place_id,name,latitude,longitude,categories,location,distance",
+            "fields": fields,
         }
         headers = {
             "Authorization": f"Bearer {settings.FOURSQUARE_API_KEY}",
@@ -88,6 +91,8 @@ class FoursquareService:
                     category_label=label or "Place",
                     address=(raw.get("location") or {}).get("formatted_address"),
                     distance_meters=raw.get("distance"),
+                    rating=raw.get("rating"),
+                    popularity=raw.get("popularity"),
                 )
             )
 

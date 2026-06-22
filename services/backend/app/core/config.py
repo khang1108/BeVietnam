@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     FOURSQUARE_BASE_URL: str = "https://places-api.foursquare.com"
     FOURSQUARE_API_VERSION: str = "2025-06-17"
     FOURSQUARE_TIMEOUT: int = 10
+    # Premium fields (rating/popularity) need a production key with billing.
+    # Requesting them on a non-premium key 429s the whole call, so gate it.
+    FOURSQUARE_PREMIUM: bool = False
 
     # Auth / JWT — override SECRET_KEY in production via env.
     SECRET_KEY: str = "dev-only-change-me-in-production-32-bytes-minimum"

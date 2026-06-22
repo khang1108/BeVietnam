@@ -13,6 +13,8 @@ class NearbyPlace(BaseModel):
     category_label: str  # Foursquare's own category name, for display
     address: Optional[str] = None
     distance_meters: Optional[int] = None
+    rating: Optional[float] = None  # 0..10, Foursquare Premium only
+    popularity: Optional[float] = None  # 0..1, Foursquare Premium only
 
 
 class NearbyResponse(BaseModel):
