@@ -259,6 +259,37 @@ export const weatherApi = {
     }),
 };
 
+// Nearby live POIs (Foursquare proxy) — refreshed as the map viewport moves.
+export type NearbyCategory = 'food' | 'lodging' | 'culture' | 'history' | 'nature' | 'place';
+
+export interface NearbyPlace {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  category: NearbyCategory;
+  category_label: string;
+  address: string | null;
+  distance_meters: number | null;
+}
+
+export interface NearbyResponse {
+  total: number;
+  items: NearbyPlace[];
+}
+
+export const nearbyApi = {
+  search: (lat: number, lng: number, radius = 2000, limit = 30) =>
+    apiRequest<NearbyResponse>('/places/nearby', {
+      params: {
+        lat: String(lat),
+        lng: String(lng),
+        radius: String(radius),
+        limit: String(limit),
+      },
+    }),
+};
+
 // Storyline
 export const storylineApi = {
   getQuestChain: (userId = 'demo-user', questId = 'quest-hue-imperial') =>

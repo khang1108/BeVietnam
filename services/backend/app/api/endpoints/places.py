@@ -1,8 +1,28 @@
 from fastapi import APIRouter, Query
 from typing import Optional
 from services.backend.app.schemas import PlacesResponse, PlaceSchema
+from services.backend.app.schemas.nearby import NearbyResponse
+from services.backend.app.services.foursquare_service import foursquare_service
 
 router = APIRouter()
+
+
+@router.get("/places/nearby", response_model=NearbyResponse, tags=["Places"])
+async def get_nearby_places(
+    lat: float = Query(..., description="Latitude of the map center"),
+    lng: float = Query(..., description="Longitude of the map center"),
+    radius: int = Query(2000, ge=50, le=50000, description="Search radius in meters"),
+    limit: int = Query(30, ge=1, le=50),
+):
+    """
+    GET /places/nearby — Live POIs (cafe, homestay, restaurant, ...) quanh điểm hiện tại.
+
+    Proxy Foursquare Places (key giữ ở server). Frontend gọi lại mỗi khi map di chuyển
+    (moveend) để cập nhật marker theo viewport. Trả về rỗng nếu chưa cấu hình API key.
+    """
+    return await foursquare_service.search_nearby(
+        latitude=lat, longitude=lng, radius=radius, limit=limit
+    )
 
 # ── Mock / seed data ──────────────────────────────────────────────────────────
 _MOCK_PLACES = [

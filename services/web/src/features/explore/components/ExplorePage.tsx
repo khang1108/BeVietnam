@@ -10,12 +10,12 @@ import React, {
 import type { Map, Marker } from '@goongmaps/goong-js';
 import { Crosshair, List, MagnifyingGlass, Star, X } from '@phosphor-icons/react';
 import styles from '../styles/explore.module.css';
-import { weatherApi, type WeatherCondition as ApiWeatherCondition } from '@/lib/api';
+import { weatherApi, nearbyApi, type WeatherCondition as ApiWeatherCondition, type NearbyPlace } from '@/lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type WeatherCondition = 'sunny' | 'cloudy' | 'rainy';
-type Category = 'history' | 'culture' | 'food' | 'nature' | 'festival' | 'amusement';
+type Category = 'history' | 'culture' | 'food' | 'nature' | 'festival' | 'amusement' | 'lodging' | 'place';
 
 interface Place {
     id: string;
@@ -70,6 +70,9 @@ type ExploreLayerClickEvent = {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
+// Only fetch/show live POIs when zoomed in enough to bound the viewport sensibly.
+const NEARBY_MIN_ZOOM = 13;
+
 // Pin colour per category (the teardrop fill — Google-style)
 const CATEGORY_COLORS: Record<Category, string> = {
     history:  '#e6b422',
@@ -78,6 +81,8 @@ const CATEGORY_COLORS: Record<Category, string> = {
     nature:   '#2d9d6f',
     festival: '#d946ef',
     amusement:'#3b82f6',
+    lodging:  '#6366f1',
+    place:    '#9ca3af',
 };
 
 const CATEGORY_SHORT: Record<Category, string> = {
@@ -87,6 +92,8 @@ const CATEGORY_SHORT: Record<Category, string> = {
     nature:   'T',
     festival: 'L',
     amusement:'G',
+    lodging:  'N',
+    place:    'P',
 };
 
 const WEATHER_LABELS: Record<WeatherCondition, string> = {
@@ -102,6 +109,8 @@ const CATEGORY_LABEL: Record<Category, string> = {
     nature:   'Thiên nhiên',
     festival: 'Lễ hội',
     amusement:'Vui chơi',
+    lodging:  'Lưu trú',
+    place:    'Khác',
 };
 
 const FILTER_CHIPS = [
@@ -109,6 +118,7 @@ const FILTER_CHIPS = [
     { key: 'history',   label: 'Di tích' },
     { key: 'culture',   label: 'Văn hóa' },
     { key: 'food',      label: 'Ẩm thực' },
+    { key: 'lodging',   label: 'Lưu trú' },
     { key: 'nature',    label: 'Thiên nhiên' },
     { key: 'amusement', label: 'Vui chơi' },
     { key: 'festival',  label: 'Lễ hội' },
@@ -295,6 +305,36 @@ function placeFeatureCollection(
     };
 }
 
+function nearbyFeatureCollection(items: NearbyPlace[]) {
+    return {
+        type: 'FeatureCollection',
+        features: items.map((item) => ({
+            type: 'Feature',
+            properties: {
+                id: item.id,
+                name: item.name,
+                category: item.category,
+                color: CATEGORY_COLORS[item.category as Category] ?? CATEGORY_COLORS.place,
+                label: item.category_label,
+            },
+            geometry: {
+                type: 'Point',
+                coordinates: [item.longitude, item.latitude],
+            },
+        })),
+    };
+}
+
+function haversineMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6_371_000;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(a));
+}
+
 function setSourceData(map: ExploreMap, sourceId: string, data: unknown) {
     const source = map.getSource?.(sourceId);
     source?.setData?.(data);
@@ -321,6 +361,7 @@ function addExploreLayers(map: ExploreMap) {
     upsertMapSource(map, 'bv-cities', cityFeatureCollection());
     upsertMapSource(map, 'bv-featured-places', placeFeatureCollection([], null, {}));
     upsertMapSource(map, 'bv-detail-places', placeFeatureCollection([], null, {}));
+    upsertMapSource(map, 'bv-nearby', nearbyFeatureCollection([]));
 
     addLayerOnce(map, {
         id: 'bv-city-hub-glow',
@@ -485,6 +526,41 @@ function addExploreLayers(map: ExploreMap) {
             },
         });
     });
+
+    // Live Foursquare POIs (cafe / homestay / restaurant ...). Refreshed on moveend.
+    addLayerOnce(map, {
+        id: 'bv-nearby-pin',
+        type: 'circle',
+        source: 'bv-nearby',
+        minzoom: NEARBY_MIN_ZOOM,
+        paint: {
+            'circle-radius': ['interpolate', ['linear'], ['zoom'], NEARBY_MIN_ZOOM, 4, 17, 6.5],
+            'circle-color': ['get', 'color'],
+            'circle-stroke-color': '#1a120b',
+            'circle-stroke-width': 1.4,
+            'circle-opacity': 0.9,
+        },
+    });
+
+    addLayerOnce(map, {
+        id: 'bv-nearby-label',
+        type: 'symbol',
+        source: 'bv-nearby',
+        minzoom: NEARBY_MIN_ZOOM + 1,
+        layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 10,
+            'text-offset': [0, 1.1],
+            'text-anchor': 'top',
+            'text-allow-overlap': false,
+            'text-optional': true,
+        },
+        paint: {
+            'text-color': '#d9cdb4',
+            'text-halo-color': '#1a120b',
+            'text-halo-width': 1.2,
+        },
+    });
 }
 
 // Frame the map to show every POI on first load.
@@ -539,6 +615,7 @@ export function ExplorePage() {
     const [locationError, setLocationError] = useState('');
     const [mapError, setMapError] = useState('');
     const [weatherByPlace, setWeatherByPlace] = useState<Record<string, ApiWeatherCondition>>({});
+    const [nearbyItems, setNearbyItems] = useState<NearbyPlace[]>([]);
 
     // Lock body scroll for full-screen map
     useEffect(() => {
@@ -637,6 +714,71 @@ export function ExplorePage() {
             setMapLoaded(false);
         };
     }, []);
+
+    // Keep the GL canvas in sync with its container. The sidebar is an in-flow
+    // grid column, so opening/closing it changes the map width — without this
+    // the canvas keeps its old size and the map looks stretched/deformed.
+    useEffect(() => {
+        const container = mapContainerRef.current;
+        if (!container || typeof ResizeObserver === 'undefined') return;
+        const observer = new ResizeObserver(() => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (mapRef.current as any)?.resize?.();
+        });
+        observer.observe(container);
+        return () => observer.disconnect();
+    }, []);
+
+    // Live POIs (Foursquare via backend), fetched for the current viewport and
+    // refreshed whenever the map stops moving — the "real-time" marker feel.
+    useEffect(() => {
+        if (!mapLoaded || !mapRef.current) return;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const m = mapRef.current as any;
+        let cancelled = false;
+        let timer: ReturnType<typeof setTimeout> | undefined;
+
+        const fetchNearby = async () => {
+            if (cancelled) return;
+            if ((m.getZoom?.() ?? 0) < NEARBY_MIN_ZOOM) {
+                setNearbyItems([]);
+                return;
+            }
+            const center = m.getCenter?.();
+            const bounds = m.getBounds?.();
+            const ne = bounds?.getNorthEast?.();
+            if (!center) return;
+            const radius = ne
+                ? Math.min(50000, Math.max(300, Math.round(haversineMeters(center.lat, center.lng, ne.lat, ne.lng))))
+                : 2000;
+            const res = await nearbyApi.search(center.lat, center.lng, radius, 40);
+            if (cancelled || !res.data) return;
+            setNearbyItems(res.data.items);
+        };
+
+        const onMoveEnd = () => {
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(fetchNearby, 400);
+        };
+
+        m.on?.('moveend', onMoveEnd);
+        fetchNearby();
+
+        return () => {
+            cancelled = true;
+            if (timer) clearTimeout(timer);
+            m.off?.('moveend', onMoveEnd);
+        };
+    }, [mapLoaded]);
+
+    // Render nearby POIs, filtered by the active category chip.
+    useEffect(() => {
+        if (!mapLoaded || !mapRef.current) return;
+        const visible = activeCategory === 'all'
+            ? nearbyItems
+            : nearbyItems.filter((p) => p.category === activeCategory);
+        setSourceData(mapRef.current, 'bv-nearby', nearbyFeatureCollection(visible));
+    }, [nearbyItems, activeCategory, mapLoaded]);
 
     const filteredPlaces = useMemo(() =>
         MOCK_PLACES.filter((p) => {

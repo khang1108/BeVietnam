@@ -32,6 +32,12 @@ class Settings(BaseSettings):
     OPENWEATHER_BASE_URL: str = "https://api.openweathermap.org/data/2.5"
     OPENWEATHER_TIMEOUT: int = 10
 
+    # Foursquare Places — live nearby POIs (cafe / homestay / restaurant…).
+    # Leave key empty to disable the /places/nearby endpoint (returns empty).
+    FOURSQUARE_API_KEY: str = ""
+    FOURSQUARE_BASE_URL: str = "https://api.foursquare.com/v3"
+    FOURSQUARE_TIMEOUT: int = 10
+
     # Auth / JWT — override SECRET_KEY in production via env.
     SECRET_KEY: str = "dev-only-change-me-in-production-32-bytes-minimum"
     ALGORITHM: str = "HS256"
