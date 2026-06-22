@@ -3,18 +3,276 @@
 \subsection{Problem Analysis}
 \noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
+\subsubsection{Bối cảnh du lịch Việt Nam hiện tại}
+\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
+Trong những năm gần đây, ngành du lịch Việt Nam đang trải qua một giai đoạn chuyển mình và phát triển vô cùng mạnh mẽ. Theo các số liệu thống kê được công bố bởi Tổng cục Thống kê và VnEconomy, lượng khách du lịch quốc tế đến Việt Nam trong năm 2025 đã đạt mức tăng trưởng kỷ lục là $20.4\%$ so với cùng kỳ năm trước, đồng thời vượt mức đỉnh trước đại dịch COVID-19 năm 2019 tới $17.8\%$. Sự bùng nổ này không chỉ giới hạn ở lượng khách nước ngoài, mà còn được thúc đẩy mạnh mẽ từ thị trường du lịch nội địa khi người dân có xu hướng chuyển dịch từ tham quan thuần túy sang khám phá ẩm thực và chiều sâu văn hoá vùng miền.
 
-\medskip
+Tuy nhiên, sự gia tăng vượt bậc về mặt số lượng du khách lại vô tình làm bộc lộ những điểm nghẽn nghiêm trọng về mặt chất lượng trải nghiệm dịch vụ. Du khách hiện tại đang phải đối mặt với một nghịch lý thông tin: thông tin trên môi trường số tràn ngập nhưng lại vô cùng phân mảnh, thiếu chiều sâu tri thức bản địa, và phần lớn không phản ánh đúng trạng thái thực tế theo thời gian thực. Điều này đặt ra yêu cầu cấp thiết về việc xây dựng các công cụ hỗ trợ du lịch thông minh, có khả năng xử lý ngữ cảnh sâu sắc và tự động hóa cập nhật dữ liệu.
 
+Để minh họa cụ thể cho sự biến động và phát triển của thị trường du lịch, ta thống kê lượng khách quốc tế qua Bảng~\ref{tab:tourism_stats} và mô hình hóa biểu đồ tăng trưởng qua Hình~\ref{fig:tourism_growth}.
 
-\medskip
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{l X c c}
+\toprule
+\textbf{Năm} & \textbf{Lượng khách quốc tế (triệu lượt)} & \textbf{Tỷ lệ tăng trưởng} & \textbf{So với mốc 2019} \\
+\midrule
+2019 & 18.0 (Đỉnh trước đại dịch) & --- & $100.0\%$ \\
+2024 & 17.6 (Giai đoạn phục hồi) & --- & $97.8\%$ \\
+2025 & 21.2 (Thiết lập kỷ lục mới) & $+20.4\%$ & $117.8\%$ \\
+\bottomrule
+\end{tabularx}
+\caption{Số liệu thống kê lượng khách du lịch quốc tế đến Việt Nam qua các năm.}
+\label{tab:tourism_stats}
+\end{table}
 
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[xscale=1.5, yscale=0.8]
+    % Axes
+    \draw[->, thick] (-0.5,0) -- (6.5,0) node[right] {\textbf{Năm}};
+    \draw[->, thick] (-0.5,0) -- (-0.5,6.0) node[above] {\textbf{Khách quốc tế (triệu lượt)}};
+    
+    % Grid lines
+    \foreach \y in {5, 10, 15, 20} {
+        \draw[dashed, gray!30] (-0.5, \y*0.25) -- (6.0, \y*0.25);
+        \node[left, font=\scriptsize] at (-0.6, \y*0.25) {\y};
+    }
+    
+    % Bars
+    % 2019: 18.0 -> height = 18 * 0.25 = 4.5
+    \draw[fill=primaryblue!80, draw=primaryblue, bar width=0.8cm] (0.6,0) rectangle (1.4, 4.5);
+    \node[above, font=\small\bfseries] at (1.0, 4.5) {18.0};
+    \node[below, font=\small] at (1.0, 0) {2019};
+    
+    % 2024: 17.6 -> height = 17.6 * 0.25 = 4.4
+    \draw[fill=accentblue!80, draw=accentblue, bar width=0.8cm] (2.6,0) rectangle (3.4, 4.4);
+    \node[above, font=\small\bfseries] at (3.0, 4.4) {17.6};
+    \node[below, font=\small] at (3.0, 0) {2024};
+    
+    % 2025: 21.2 -> height = 21.2 * 0.25 = 5.3
+    \draw[fill=jade!80, draw=jade, bar width=0.8cm] (4.6,0) rectangle (5.4, 5.3);
+    \node[above, font=\small\bfseries] at (5.0, 5.3) {21.2};
+    \node[below, font=\small] at (5.0, 0) {2025};
+    
+    % Legend
+    \matrix [draw, fill=white, below left, font=\tiny] at (6.2, 5.5) {
+        \fill[primaryblue!80] (0,0) rectangle (0.2,0.2); & \node[right] {Năm 2019}; \\
+        \fill[accentblue!80] (0,0) rectangle (0.2,0.2); & \node[right] {Năm 2024}; \\
+        \fill[jade!80] (0,0) rectangle (0.2,0.2); & \node[right] {Năm 2025}; \\
+    };
+\end{tikzpicture}
+\caption{Biểu đồ tăng trưởng lượng khách du lịch quốc tế đến Việt Nam (2019--2025).}
+\label{fig:tourism_growth}
+\end{figure}
 
-\medskip
+\subsubsection{Đặt vấn đề}
+\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
+Mặc dù có lượng du khách tăng trưởng vô cùng lớn, chất lượng trải nghiệm du lịch thực tế tại Việt Nam lại gặp phải một bài toán nan giải. Du khách --- cả trong nước và quốc tế --- đang đối mặt với một nghịch lý lớn: thông tin du lịch tràn ngập trên các nền tảng Internet, nhưng lại vô cùng phân mảnh, thiếu chiều sâu văn hóa và không có độ tin cậy cao. Bài toán đặt ra cho ta không chỉ đơn thuần là cung cấp một bản đồ số hiển thị vị trí các địa điểm du lịch bản địa, mà là làm sao kết nối những thông tin ấy thành một câu chuyện văn hóa giàu ngữ cảnh, giúp người dùng thực sự hiểu được các giá trị lịch sử và nhân văn đằng sau mỗi di tích, món ăn.
+
+\subsubsection{Phân tích các điểm nghẽn (Pain Points)}
+\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
+
+Qua quá trình khảo sát thực địa và phân tích hành vi người dùng, ta nhận diện được bốn điểm nghẽn cốt lõi (\textbf{P1--P4}) trong trải nghiệm du lịch hiện tại:
+\begin{itemize}
+    \item \textbf{P1 --- Thông tin phân tán và thiếu chiều sâu văn hoá:} Thông tin du lịch hiện tại bị phân mảnh trên nhiều nền tảng khác nhau (Google Maps cung cấp toạ độ và đánh giá thô; TripAdvisor nghiêng về góc nhìn khách Tây; blog cá nhân có mô tả sinh động nhưng thiếu tính hệ thống). Không có nền tảng nào giải thích được chiều sâu câu chuyện của một địa danh hay một món ăn bản địa một cách tường minh.
+    \item \textbf{P2 --- Rào cản văn hóa sâu sắc vượt qua giới hạn ngôn ngữ:} Các công cụ dịch máy thông thường (ví dụ: Google Translate) chỉ có khả năng dịch chữ thô (ví dụ dịch "Bún bò Huế" thành "Hue beef noodle soup"), hoàn toàn thất bại trong việc truyền tải các giá trị văn hoá cốt lõi đằng sau đó như nguồn gốc ẩm thực miền Trung, cách phối trộn sả ớt xay đặc trưng, hay thói quen ăn uống của người bản xứ.
+    \item \textbf{P3 --- Tri thức hẻm phố và sự kiện bản địa bị ẩn khuất:} Những quán ẩm thực đặc sắc nhất của Việt Nam thường nằm sâu trong các hẻm nhỏ không có đăng ký trên Google Business, các sự kiện văn hóa dân gian địa phương hay chợ đêm ẩm thực chỉ truyền miệng hoặc nằm trong các group kín, khiến du khách, đặc biệt là khách quốc tế, hoàn toàn mất đi cơ hội tiếp cận.
+    \item \textbf{P4 --- Dữ liệu du lịch tĩnh và thiếu cập nhật động:} Thông tin về trạng thái đóng/mở cửa, giá vé, lịch trình sự kiện thường xuyên bị thay đổi nhưng không được cập nhật tự động trong cơ sở dữ liệu của các nền tảng hiện tại, gây ra những trải nghiệm thất vọng cho du khách.
+\end{itemize}
+
+\subsubsection{Các câu hỏi phân tích định hình giải pháp}
+\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
+
+Để định hình giải pháp kỹ thuật cụ thể dưới góc độ tư duy tính toán, ta đặt ra các câu hỏi socratic sau:
+\begin{enumerate}
+    \item \textit{Làm thế nào để tích hợp dữ liệu phi cấu trúc từ nhiều nguồn không đồng nhất (Maps API, web scraping HTML, Facebook API) về cùng một định dạng chuẩn hóa để làm đầu vào cho hệ thống AI?}
+    \item \textit{Bằng cách nào ta có thể tự động hóa việc làm giàu tri thức văn hóa cho mỗi POI (\textit{Point of Interest}), trong khi dữ liệu gốc thu thập được chỉ chứa thông tin tọa độ địa lý và đánh giá số?}
+    \item \textit{Làm thế nào để xây dựng cơ chế dịch thuật ngữ cảnh văn hóa, đảm bảo các thuật ngữ bản địa được giải nghĩa toàn diện thay vì chỉ dịch từ-sang-từ?}
+    \textit{Làm sao để tự động phát hiện sự thay đổi trạng thái của các địa điểm/sự kiện theo thời gian thực mà không phụ thuộc vào việc kiểm duyệt thủ công?}
+    \item \textit{Làm thế nào để mô hình hóa sở thích người dùng kết hợp với ngữ cảnh xung quanh (vị trí GPS, thời tiết, thời điểm trong ngày) thành một hàm scoring tối ưu hóa gợi ý?}
+    \item \textit{Với ràng buộc ngân sách vận hành bằng không, ta có thể thiết kế kiến trúc hệ thống hoạt động hoàn toàn trên các nền tảng free tier của dịch vụ đám mây thế nào?}
+\end{enumerate}
+
+\subsubsection{Xác định Input/Output của bài toán}
+\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
+
+Việc làm rõ các tham số đầu vào và đầu ra đóng vai trò định hình hợp đồng dữ liệu giữa các thành phần trong hệ thống. Chi tiết được trình bày qua Bảng~\ref{tab:inputs_definition} và Bảng~\ref{tab:outputs_definition}.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{l p{3.2cm} X}
+\toprule
+\textbf{Loại Input} & \textbf{Mô tả tham số} & \textbf{Ví dụ cụ thể} \\
+\midrule
+Dữ liệu thô ngoại vi & JSON/HTML từ nguồn cào quét & JSON từ Google Maps API; HTML thô của Foody; Facebook Events JSON \\
+Cấu hình hệ thống & Phạm vi địa lý, bộ lọc danh mục & Bounding box Huế: $\text{lat} \in [16.4, 16.5]$, $\text{lng} \in [107.5, 107.6]$; Danh mục: ẩm thực, lịch sử, nghệ thuật \\
+Ngữ cảnh người dùng & Trạng thái hiện tại của du khách & Vị trí GPS ($\text{lat}=16.46, \text{lng}=107.59$), locale="en", thời gian truy cập (8:00 AM) \\
+Nội dung cộng đồng & Bài đăng đóng góp từ người dùng & Tên quán, tọa độ, mô tả văn hóa bản xứ, ảnh chụp thực tế \\
+\bottomrule
+\end{tabularx}
+\caption{Xác định các tham số đầu vào (Input) của hệ thống.}
+\label{tab:inputs_definition}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{l p{3.2cm} X}
+\toprule
+\textbf{Loại Output} & \textbf{Mô tả dữ liệu đầu ra} & \textbf{Ví dụ cụ thể} \\
+\midrule
+Personalized Feed & Danh sách POI xếp hạng theo ngữ cảnh & JSON danh sách các quán ăn có điểm score tương ứng với mức độ phù hợp thời tiết và khoảng cách \\
+Cultural Metadata & Dữ liệu văn hóa song ngữ của địa điểm & Bản ghi POI chứa trường `cultural\_context\_vi` và `cultural\_context\_en` đã được làm giàu \\
+Live Event Status & Trạng thái cập nhật của sự kiện & Event với status: "active"/"cancelled", cập nhật tự động sau mỗi 6 giờ \\
+Capture Decision & Kết quả đánh giá ảnh chụp thực tế & Kết quả phân tích từ Vision-Language Model: APPROVED / REJECTED (kèm lý do) \\
+Dailylife Journal & Nhật ký hành trình du lịch bằng AI & Nhật ký tóm tắt hành trình tham quan Huế dưới dạng câu chuyện văn học \\
+\bottomrule
+\end{tabularx}
+\caption{Xác định các tham số đầu ra (Output) của hệ thống.}
+\label{tab:outputs_definition}
+\end{table}
+
+\subsubsection{Giải pháp đề xuất: Hệ thống Multi-Agent (MAS)}
+\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
+
+Để giải quyết bài toán lớn này một cách triệt để, ta đề xuất sử dụng kiến trúc hệ thống Multi-Agent (\textit{Multi-Agent System} - MAS) thay vì kiến trúc monolithic truyền thống. Sự lựa chọn này dựa trên ba luận điểm kỹ thuật cốt lõi:
+\begin{enumerate}
+    \item \textbf{Sự tách biệt trách nhiệm (Separation of Concerns):} Các tác vụ cào quét dữ liệu, làm sạch dữ liệu thô, làm giàu tri thức văn hóa bằng mô hình LLM và dịch thuật song ngữ có tính chất kỹ thuật hoàn toàn khác nhau. Sử dụng kiến trúc MAS cho phép ta đóng gói mỗi tác vụ thành một agent tự chủ, giao tiếp qua các API contract chuẩn hóa.
+    \item \textbf{Sự khác biệt về chu kỳ hoạt động (Scheduling Dynamics):} Crawler thu thập địa điểm tĩnh chỉ cần chạy một lần mỗi ngày vào lúc thấp tải (2:00 AM). Ngược lại, Event Monitor theo dõi sự kiện động cần hoạt động liên tục mỗi 6 giờ để bắt kịp các thay đổi nhanh chóng. Việc chia tách các agent giúp tối ưu hóa lập lịch.
+    \item \textbf{Ràng buộc về chi phí và tài nguyên (Rate Limiting Mitigation):} Các API LLM ở phiên bản free tier (như Gemini 2.0 Flash) bị giới hạn nghiêm ngặt về số lượng request mỗi phút. Việc phân rã thành các agent giúp ta xây dựng hàng đợi (\textit{queue}) và kiểm soát lưu lượng gọi API một cách độc lập, tránh hiện tượng nghẽn toàn hệ thống.
+\end{enumerate}
+
+Mục tiêu cụ thể và chỉ số đo lường thành công của giải pháp MAS được tổng hợp trong Bảng~\ref{tab:goals_success_criteria}.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{l X X}
+\toprule
+\textbf{Mục tiêu (Goal)} & \textbf{Chi tiết giải pháp kỹ thuật} & \textbf{Chỉ số thành công (Success Criteria)} \\
+\midrule
+G1: Tự động hóa Ingestion & Cào quét POI và Event từ Google Maps, Foody, Ticketbox & Thu thập tối thiểu 200 POI ẩm thực/lịch sử chất lượng và 50 sự kiện tại Huế trong MVP \\
+G2: Làm giàu tri thức & Sử dụng mô hình LLM phân tích, bổ sung văn hóa bản địa & Trên $80\%$ địa điểm có dữ liệu ngữ cảnh văn hóa sâu sắc \\
+G3: Dịch thuật ngữ cảnh & Triển khai dịch thuật song ngữ Vi-En hướng ngữ cảnh văn hóa & $100\%$ bản ghi POI được bổ sung nội dung tiếng Anh tương ứng \\
+G4: Cá nhân hóa gợi ý & Triển khai thuật toán ranking đa tiêu chí thời gian thực & Feed hiển thị các địa điểm được xếp hạng phù hợp nhất \\
+G5: Đồng bộ trạng thái & Cập nhật trạng thái sự kiện tự động theo chu kỳ & Chu kỳ quét định kỳ 6 giờ một lần đối với thực thể sự kiện \\
+G6: Kiểm duyệt cộng đồng & Tích hợp AI Moderator duyệt bài đăng đóng góp & Chặn lọc $95\%$ bài spam hoặc nội dung không hợp lệ ngay tại cổng vào \\
+G7: Tối ưu chi phí đám mây & Phối hợp các dịch vụ Serverless free tier & Chi phí vận hành cloud đạt mức $0$ USD/tháng \\
+\bottomrule
+\end{tabularx}
+\caption{Mục tiêu thiết kế và chỉ số đo lường hệ thống MAS.}
+\label{tab:goals_success_criteria}
+\end{table}
 
 \subsection{Decomposition: Phân rã bài toán}
 \noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
+\subsubsection{Các hệ thống con (Subsystems)}
+\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
+Để hiện thực hóa kiến trúc MAS, bài toán tổng thể của BeVietnam được phân rã thành bốn hệ thống con có chức năng chuyên biệt:
+\begin{itemize}
+    \item \textbf{S1 --- Data Acquisition (Hệ thống thu thập dữ liệu):} Chịu trách nhiệm tương tác trực tiếp với các nguồn thông tin thô bên ngoài. Hệ thống này đóng vai trò như một adapter, chuyển đổi các giao thức mạng phi cấu trúc thành dữ liệu dạng JSON.
+    \item \textbf{S2 --- Data Intelligence (Hệ thống tri thức hóa dữ liệu):} Đóng vai trò bộ não trung tâm của pipeline dữ liệu. S2 tiếp nhận dữ liệu thô, tiến hành lọc trùng lặp, chuẩn hóa định dạng, và sử dụng các mô hình ngôn ngữ lớn để làm giàu nội dung văn hóa và dịch thuật.
+    \item \textbf{S3 --- Content Delivery (Hệ thống phân phối nội dung):} Đảm nhiệm chức năng xử lý các request thời gian thực từ phía người dùng, thực hiện thuật toán ranking cá nhân hóa và quản lý luồng kiểm duyệt nội dung cộng đồng.
+    \item \textbf{S4 --- User Platform (Nền tảng giao diện người dùng):} Cung cấp các giao diện tương tác trực quan cho du khách trên thiết bị di động (React Native/Expo) và web dashboard cho quản trị viên.
+\end{itemize}
+
+Mối quan hệ đầu vào/đầu ra và vai trò giải quyết pain point của từng hệ thống con được chi tiết hóa trong Bảng~\ref{tab:subsystems_breakdown}.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{l p{2.8cm} X X}
+\toprule
+\textbf{Hệ thống con} & \textbf{Pain point giải quyết} & \textbf{Đầu vào (Input)} & \textbf{Đầu ra (Output)} \\
+\midrule
+S1. Data Acquisition & P1 (phân tán), P3 (ẩn khuất) & Cấu hình nguồn cào, địa lý, từ khóa & Dữ liệu thô JSON lưu bảng tạm \\
+S2. Data Intelligence & P1 (thiếu sâu), P2 (rào cản), P4 (lỗi thời) & Dữ liệu thô từ S1 & Bản ghi sạch, đã giàu tri thức và dịch thuật \\
+S3. Content Delivery & Cá nhân hóa thông tin & Danh sách bản ghi sạch + ngữ cảnh người dùng & Feed xếp hạng, kết quả duyệt community content \\
+S4. User Platform & P3 (đóng góp cộng đồng) & Thao tác click, vị trí GPS, ảnh chụp của người dùng & Phản hồi UI hiển thị, bài đóng góp của user \\
+\bottomrule
+\end{tabularx}
+\caption{Bảng phân rã cấu trúc các hệ thống con của BeVietnam.}
+\label{tab:subsystems_breakdown}
+\end{table}
+
+\subsubsection{Hệ thống Agent và Module}
+\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
+
+Từ bốn hệ thống con chính, ta tiến hành phân rã sâu hơn thành 7 agent tự chủ và 3 module phần mềm cơ sở. Sự phân rã này được thể hiện trực quan qua cây thư mục phân rã cấu trúc hệ thống (Hình~\ref{fig:system_decomposition_tree}).
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={draw=primaryblue!90!black, rounded corners=4pt, fill=primaryblue!10, align=center, minimum width=3.0cm, minimum height=0.8cm, font=\scriptsize\bfseries},
+    leaf/.style={draw=jade!90!black, rounded corners=4pt, fill=jade!10, align=center, minimum width=2.8cm, minimum height=0.7cm, font=\scriptsize},
+    arr/.style={-{Stealth[length=2.0mm]}, thick}
+]
+    % Level 0
+    \node[box, fill=lacquer!10, draw=lacquer, minimum width=3.5cm, minimum height=1.0cm, font=\small\bfseries] (root) at (0, 3) {Hệ thống BeVietnam};
+    
+    % Level 1 - Subsystems
+    \node[box] (s1) at (-4.8, 1) {S1. Data Acquisition};
+    \node[box] (s2) at (-1.6, 1) {S2. Data Intelligence};
+    \node[box] (s3) at (1.6, 1) {S3. Content Delivery};
+    \node[box] (s4) at (4.8, 1) {S4. User Platform};
+    
+    % Level 2 - Agents / Modules
+    % S1 branches
+    \node[leaf] (a1) at (-5.6, -1) {Agent 1: Crawler};
+    \node[leaf] (a2) at (-4.0, -2) {Agent 2: Event Monitor};
+    
+    % S2 branches
+    \node[leaf] (a3) at (-2.4, -1) {Agent 3: Cleaner};
+    \node[leaf] (a4) at (-1.6, -2) {Agent 4: Enricher};
+    \node[leaf] (a5) at (-0.8, -3) {Agent 5: Translator};
+    
+    % S3 branches
+    \node[leaf] (a6) at (0.8, -1) {Agent 6: Feed Curator};
+    \node[leaf] (a7) at (2.4, -2) {Agent 7: Moderator};
+    
+    % S4 branches
+    \node[leaf] (m1) at (4.0, -1) {Module: Auth};
+    \node[leaf] (m2) at (4.8, -2) {Module: Mobile App};
+    \node[leaf] (m3) at (5.6, -3) {Module: Web Dashboard};
+    
+    % Draw arrows
+    \draw[arr] (root.south) -- ++(0,-0.3) -| (s1.north);
+    \draw[arr] (root.south) -- ++(0,-0.3) -| (s2.north);
+    \draw[arr] (root.south) -- ++(0,-0.3) -| (s3.north);
+    \draw[arr] (root.south) -- ++(0,-0.3) -| (s4.north);
+    
+    \draw[arr] (s1.south) -- ++(0,-0.4) -| (a1.north);
+    \draw[arr] (s1.south) -- ++(0,-0.4) -| (a2.north);
+    
+    \draw[arr] (s2.south) -- ++(0,-0.4) -| (a3.north);
+    \draw[arr] (s2.south) -- ++(0,-0.4) -| (a4.north);
+    \draw[arr] (s2.south) -- ++(0,-0.4) -| (a5.north);
+    
+    \draw[arr] (s3.south) -- ++(0,-0.4) -| (a6.north);
+    \draw[arr] (s3.south) -- ++(0,-0.4) -| (a7.north);
+    
+    \draw[arr] (s4.south) -- ++(0,-0.4) -| (m1.north);
+    \draw[arr] (s4.south) -- ++(0,-0.4) -| (m2.north);
+    \draw[arr] (s4.south) -- ++(0,-0.4) -| (m3.north);
+\end{tikzpicture}
+\caption{Sơ đồ cây phân rã cấu trúc Agent và Module phần mềm của BeVietnam.}
+\label{fig:system_decomposition_tree}
+\end{figure}
+
+\subsubsection{Mô tả chi tiết các Agent và cơ chế vận hành}
+\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
+
+Dưới đây là thiết kế chi tiết về chức năng kỹ thuật và giải thuật vận hành của từng tác tử trong hệ thống:
+\begin{enumerate}
+    \item \textbf{Agent 1 --- Crawler Agent (Tác tử cào dữ liệu):} Thực hiện thu thập các thực thể tĩnh (địa điểm ẩm thực, di tích lịch sử). Agent tích hợp các adapter khác nhau để quét dữ liệu từ Google Places API, cào HTML của Foody.vn và parse các trang tin tức văn hóa địa phương. Giải thuật cào được định cấu hình chạy định kỳ vào lúc 2:00 AM hằng ngày để tránh quá tải server nguồn.
+    \item \textbf{Agent 2 --- Event Monitor Agent (Tác tử giám sát sự kiện):} Chuyên biệt hóa cho dữ liệu động (lịch diễn, lễ hội di sản, đêm nhạc). Agent áp dụng thuật toán so khớp trạng thái (\textit{change detection}) dựa trên so sánh hash nội dung để chỉ ghi nhận các cập nhật mới hoặc thay đổi lịch trình từ các trang mạng xã hội và Ticketbox.
+    \item \textbf{Agent 3 --- Cleaner Agent (Tác tử làm sạch):} Thực hiện ba chức năng tuần tự: lọc các bản ghi lỗi tọa độ (ngoài bounding box quy định); chuẩn hóa định dạng địa chỉ, số điện thoại; và thực hiện so khớp trùng lặp (\textit{deduplication}) bằng thuật toán khoảng cách Levenshtein kết hợp với khoảng cách địa lý Haversine dưới $50\text{m}$.
+    \item \textbf{Agent 4 --- Cultural Enricher Agent (Tác tử làm giàu tri thức):} Tiếp nhận các POI sạch từ Agent 3, xây dựng các cấu trúc prompt có chứa thông tin bối cảnh rồi gọi API Gemini 2.0 Flash để tạo ra đoạn văn bối cảnh văn hóa chi tiết dạng `cultural\_context\_vi`.
+    \item \textbf{Agent 5 --- Translator Agent (Tác tử dịch thuật ngữ cảnh):} Thực hiện nhiệm vụ dịch thuật ngữ nghĩa từ tiếng Việt sang tiếng Anh. Prompt được cấu hình đặc biệt để thực hiện dịch thoát ý bản địa, giải thích các thuật ngữ chuyên biệt cho du khách nước ngoài thay vì dịch máy thông thường.
+    \item \textbf{Agent 6 --- Feed Curator Agent (Tác tử cá nhân hóa bảng tin):} Tính toán điểm score thời gian thực dựa trên 6 yếu tố trọng số bao gồm: khoảng cách vật lý (proximity), thời tiết hiện tại (recency), độ sâu văn hóa (cultural depth), độ ưu tiên sự kiện (urgency), sở thích người dùng và độ đa dạng. Trọng số sẽ tự động điều chỉnh tùy theo ngôn ngữ thiết bị của người dùng (locale).
+    \item \textbf{Agent 7 --- Community Moderator Agent (Tác tử kiểm duyệt cộng đồng):} Áp dụng quy trình kiểm duyệt 3 bước: spam rule-based filter, duplicate check, và LLM text safety audit. Cơ chế phân tầng này giúp hệ thống chỉ sử dụng LLM cho các bài viết đã vượt qua 2 bước lọc đầu tiên, giúp tiết kiệm triệt để quota API miễn phí.
+\end{enumerate}
+
+Toàn bộ hoạt động phối hợp của các tác tử trên được điều phối bởi một module trung tâm mang tên \textbf{Orchestrator}, đảm bảo tính đồng bộ dữ liệu và cơ chế tự động thử lại (\textit{auto-retry}) khi có lỗi xảy ra ở bất kỳ mắt xích nào trong pipeline dữ liệu.
