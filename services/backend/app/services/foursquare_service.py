@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 # Coarse bucket -> keywords matched against the Foursquare category name.
 _BUCKET_KEYWORDS: list[tuple[str, tuple[str, ...]]] = [
-    ("food", ("café", "cafe", "coffee", "restaurant", "food", "noodle", "bar", "bakery", "tea", "dessert", "eatery")),
+    ("food", ("café", "cafe", "coffee", "restaurant", "food", "noodle", "bar", "bakery", "tea", "dessert", "eatery", "breakfast", "brunch", "bistro", "pub", "snack", "diner")),
     ("lodging", ("hotel", "hostel", "homestay", "guest", "lodg", "resort", "motel", "bed and breakfast", "inn")),
     ("culture", ("museum", "art", "gallery", "temple", "pagoda", "shrine", "theater", "theatre")),
     ("history", ("historic", "monument", "memorial", "palace", "citadel", "tomb", "heritage", "landmark")),
@@ -50,10 +50,11 @@ class FoursquareService:
             "radius": str(max(1, min(radius, 100_000))),
             "limit": str(max(1, min(limit, 50))),
             "sort": "DISTANCE",
-            "fields": "fsq_id,name,geocodes,categories,location,distance",
+            "fields": "fsq_place_id,name,latitude,longitude,categories,location,distance",
         }
         headers = {
-            "Authorization": settings.FOURSQUARE_API_KEY,
+            "Authorization": f"Bearer {settings.FOURSQUARE_API_KEY}",
+            "X-Places-Api-Version": settings.FOURSQUARE_API_VERSION,
             "Accept": "application/json",
         }
         try:
@@ -71,16 +72,15 @@ class FoursquareService:
 
         items: list[NearbyPlace] = []
         for raw in payload.get("results", []):
-            geo = (raw.get("geocodes") or {}).get("main") or {}
-            lat = geo.get("latitude")
-            lng = geo.get("longitude")
+            lat = raw.get("latitude")
+            lng = raw.get("longitude")
             if lat is None or lng is None:
                 continue
             categories = raw.get("categories") or []
             label = categories[0].get("name", "") if categories else ""
             items.append(
                 NearbyPlace(
-                    id=str(raw.get("fsq_id") or ""),
+                    id=str(raw.get("fsq_place_id") or ""),
                     name=str(raw.get("name") or ""),
                     latitude=float(lat),
                     longitude=float(lng),
