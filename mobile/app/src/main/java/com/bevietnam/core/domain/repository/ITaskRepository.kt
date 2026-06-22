@@ -1,5 +1,6 @@
 package com.bevietnam.core.domain.repository
 
+import com.bevietnam.core.model.QuestChain
 import com.bevietnam.core.model.Task
 import kotlinx.coroutines.flow.Flow
 
@@ -28,10 +29,27 @@ interface ITaskRepository {
     /**
      * Ghi nhận trạng thái hoàn thành đối với một nhiệm vụ cụ thể dựa trên mã định danh của nhiệm vụ đó.
      *
-     * Phương thức này được khai báo dưới dạng `suspend` để tối ưu hóa hiệu suất chạy nền
-     * và đồng bộ an toàn trạng thái hoàn thành của nhiệm vụ.
-     *
      * @param taskId Mã định danh duy nhất của nhiệm vụ cần ghi nhận hoàn thành.
      */
-    suspend fun completeTask(taskId: String)
+    suspend fun completeTask(taskId: String, captureImageUrl: String? = null, captureNote: String? = null)
+
+    /**
+     * Lấy toàn bộ chuỗi nhiệm vụ hành trình (Quest Chain) đã sắp xếp theo thứ tự.
+     *
+     * Dùng cho màn hình Storyline Duolingo-style path UI.
+     *
+     * @return Một [Flow] phát ra đối tượng [QuestChain] chứa danh sách nhiệm vụ có thứ tự.
+     */
+    fun getQuestChain(): Flow<QuestChain>
+
+    /**
+     * Lấy thông tin chi tiết của một nhiệm vụ cụ thể dựa trên mã định danh.
+     *
+     * Dùng cho màn hình TaskDetailScreen.
+     *
+     * @param taskId Mã định danh duy nhất của nhiệm vụ cần xem chi tiết.
+     * @return Một [Flow] phát ra đối tượng [Task] nếu tìm thấy, hoặc `null`.
+     */
+    fun getTaskById(taskId: String): Flow<Task?>
 }
+

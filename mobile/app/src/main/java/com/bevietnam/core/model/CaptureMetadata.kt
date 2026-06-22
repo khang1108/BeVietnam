@@ -12,7 +12,7 @@ package com.bevietnam.core.model
  * @property note Ghi chú, cảm nhận ngắn về địa điểm hoặc nội dung chụp (có thể null).
  */
 data class CaptureMetadata(
-    val imageUrl: String,
+    val mediaUrl: String,
     val latitude: Double?,
     val longitude: Double?,
     val note: String? = null

@@ -35,8 +35,6 @@ interface IAuthRepository {
      */
     fun register(
         name: String,
-        gender: Gender?,
-        dateOfBirth: String?,
         email: String,
         password: String
     ): Flow<Result<User>>

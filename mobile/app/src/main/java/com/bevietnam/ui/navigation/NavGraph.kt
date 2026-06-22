@@ -23,6 +23,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bevietnam.core.model.User
 import com.bevietnam.ui.components.AppTopBar
 import com.bevietnam.ui.screens.capture.CaptureScreen
+import com.bevietnam.ui.screens.explore.ExploreScreen
+import com.bevietnam.ui.screens.feed.FeedScreen
+import com.bevietnam.ui.screens.storyline.StorylineScreen
+import com.bevietnam.ui.screens.storyline.TaskDetailScreen
+import com.bevietnam.ui.screens.place.PlaceDetailScreen
+import com.bevietnam.ui.screens.place.PlaceDetailViewModel
+import androidx.compose.material3.CircularProgressIndicator
 
 /**
  * Điểm điều hướng chính (Main App Navigation Host) của ứng dụng BeVietnam.
@@ -75,6 +82,18 @@ fun AppNavHostContent(
         Screen.bottomNavItems.any { item -> dest.hasRoute(item.route::class) }
     } ?: false
 
+    // Auto-login / Auth navigation side effect
+    androidx.compose.runtime.LaunchedEffect(currentUser) {
+        if (currentUser != null) {
+            // Nếu có dữ liệu user nhưng đang ở AuthRoute (Login/Register), đẩy thẳng vào ProfileRoute
+            if (currentDestination?.hasRoute(AuthRoute::class) == true || currentDestination == null) {
+                navController.navigate(ProfileRoute(currentUser.id)) {
+                    popUpTo(AuthRoute) { inclusive = true }
+                }
+            }
+        }
+    }
+
     // Xác định KClass đại diện cho Route của màn hình đang hiển thị để làm nổi bật tab điều hướng tương ứng
     val currentRouteClass = Screen.bottomNavItems.find { item ->
         currentDestination?.hasRoute(item.route::class) == true
@@ -84,28 +103,7 @@ fun AppNavHostContent(
         modifier = modifier,
         topBar = {
             if (isBottomBarVisible) {
-                AppTopBar(
-                    avatarUrl = currentUser?.avatarUrl,
-                    onAvatarClick = {
-                        navController.navigate(ProfileRoute(currentUser?.id ?: -1)) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
-                    showCreatePost = true,
-                    onCreatePostClick = {
-                        navController.navigate(CameraRoute) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                )
+                AppTopBar()
             }
         },
         bottomBar = {
@@ -128,7 +126,7 @@ fun AppNavHostContent(
         NavHost(
             navController = navController,
             startDestination = AuthRoute,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
         ) {
             composable<AuthRoute> {
                 AuthScreen(
@@ -141,11 +139,35 @@ fun AppNavHostContent(
             }
 
             composable<ExploreRoute> { 
-                com.bevietnam.ui.screens.explore.ExploreScreen() 
+                ExploreScreen(
+                    onPlaceClick = { place ->
+                        navController.navigate(PlaceDetailRoute(place.id))
+                    }
+                ) 
+            }
+            
+            composable<PlaceDetailRoute> {
+                val viewModel: PlaceDetailViewModel = hiltViewModel()
+                val place by viewModel.place.collectAsStateWithLifecycle()
+                
+                place?.let { safePlace ->
+                    PlaceDetailScreen(
+                        place = safePlace,
+                        onBackClick = { navController.popBackStack() }
+                    )
+                } ?: run {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
             
             composable<FeedRoute> { 
-                com.bevietnam.ui.screens.feed.FeedScreen() 
+                FeedScreen(
+                    onPlaceClick = { placeId ->
+                        navController.navigate(PlaceDetailRoute(placeId))
+                    }
+                ) 
             }
 
             composable<CameraRoute> {
@@ -157,7 +179,23 @@ fun AppNavHostContent(
             }
             
             composable<StorylineRoute> { 
-                com.bevietnam.ui.screens.storyline.StorylineScreen() 
+                StorylineScreen(
+                    onTaskClick = { taskId ->
+                        navController.navigate(TaskDetailRoute(taskId))
+                    },
+                    onCheckInTask = { taskId, placeId ->
+                        navController.navigate(CameraRoute(taskId = taskId, placeId = placeId))
+                    }
+                )
+            }
+
+            composable<TaskDetailRoute> {
+                TaskDetailScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onCheckInTask = { taskId, placeId ->
+                        navController.navigate(CameraRoute(taskId = taskId, placeId = placeId))
+                    }
+                )
             }
 
 

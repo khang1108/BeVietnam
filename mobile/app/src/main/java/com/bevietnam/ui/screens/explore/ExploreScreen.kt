@@ -1,34 +1,71 @@
 package com.bevietnam.ui.screens.explore
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.bevietnam.BuildConfig
+import com.bevietnam.R
 import com.bevietnam.core.model.Place
+import com.bevietnam.ui.components.CulturalBackground
+import com.bevietnam.ui.components.CulturalLoadingIndicator
 import com.bevietnam.ui.components.ErrorView
 import com.bevietnam.ui.components.PlaceCard
 import com.bevietnam.ui.components.SearchBar
 import com.bevietnam.ui.theme.BeVietnamTheme
-import com.bevietnam.ui.theme.LocalCulturalColors
+import org.maplibre.android.MapLibre
+import org.maplibre.android.annotations.MarkerOptions
+import org.maplibre.android.camera.CameraPosition
+import org.maplibre.android.camera.CameraUpdateFactory
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapLibreMapOptions
+import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.Style
 
 /**
  * Màn hình Khám phá địa điểm du lịch văn hóa (Explore Screen) của ứng dụng BeVietnam.
@@ -42,11 +79,12 @@ import com.bevietnam.ui.theme.LocalCulturalColors
  */
 @Composable
 fun ExploreScreen(
+    modifier: Modifier = Modifier,
     viewModel: ExploreViewModel = hiltViewModel(),
-    onPlaceClick: (Place) -> Unit = {},
-    modifier: Modifier = Modifier
+    onPlaceClick: (Place) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     ExploreScreenContent(
         uiState = uiState,
@@ -54,6 +92,8 @@ fun ExploreScreen(
         onCategorySelected = viewModel::onCategorySelected,
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
         onPlaceClick = onPlaceClick,
+        onToggleViewMode = viewModel::toggleViewMode,
+        onPlaceFocused = viewModel::onPlaceFocused,
         modifier = modifier
     )
 }
@@ -78,27 +118,33 @@ fun ExploreScreenContent(
     onCategorySelected: (String) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     onPlaceClick: (Place) -> Unit,
+    onToggleViewMode: () -> Unit,
+    onPlaceFocused: (String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        when (uiState) {
-            is ExploreUiState.Loading -> ExploreLoadingState()
-            is ExploreUiState.Empty -> ExploreEmptyState(
-                onRetry = onRetry
-            )
-            is ExploreUiState.Error -> ErrorView(
-                message = uiState.message,
-                onRetry = onRetry
-            )
-            is ExploreUiState.Success -> ExploreSuccessContent(
-                state = uiState,
-                onCategorySelected = onCategorySelected,
-                onSearchQueryChanged = onSearchQueryChanged,
-                onPlaceClick = onPlaceClick
-            )
+        CulturalBackground {
+            when (uiState) {
+                is ExploreUiState.Loading -> ExploreLoadingState()
+                is ExploreUiState.Empty -> ExploreEmptyState(
+                    onRetry = onRetry
+                )
+                is ExploreUiState.Error -> ErrorView(
+                    message = uiState.message,
+                    onRetry = onRetry
+                )
+                is ExploreUiState.Success -> ExploreSuccessContent(
+                    state = uiState,
+                    onCategorySelected = onCategorySelected,
+                    onSearchQueryChanged = onSearchQueryChanged,
+                    onPlaceClick = onPlaceClick,
+                    onToggleViewMode = onToggleViewMode,
+                    onPlaceFocused = onPlaceFocused
+                )
+            }
         }
     }
 }
@@ -113,21 +159,245 @@ private fun ExploreSuccessContent(
     state: ExploreUiState.Success,
     onCategorySelected: (String) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
-    onPlaceClick: (Place) -> Unit
+    onPlaceClick: (Place) -> Unit,
+    onToggleViewMode: () -> Unit,
+    onPlaceFocused: (String?) -> Unit
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (state.isMapView) {
+            ExploreMapView(
+                state = state,
+                onCategorySelected = onCategorySelected,
+                onSearchQueryChanged = onSearchQueryChanged,
+                onPlaceClick = onPlaceClick,
+                onToggleViewMode = onToggleViewMode,
+                onPlaceFocused = onPlaceFocused
+            )
+        } else {
+            ExploreListView(
+                state = state,
+                onCategorySelected = onCategorySelected,
+                onSearchQueryChanged = onSearchQueryChanged,
+                onPlaceClick = onPlaceClick,
+                onToggleViewMode = onToggleViewMode
+            )
+        }
+    }
+}
+
+@Composable
+private fun ExploreMapView(
+    state: ExploreUiState.Success,
+    onCategorySelected: (String) -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
+    onPlaceClick: (Place) -> Unit,
+    onToggleViewMode: () -> Unit,
+    onPlaceFocused: (String?) -> Unit
+) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val listState = rememberLazyListState()
+    var mapState by remember { mutableStateOf<MapLibreMap?>(null) }
+
+    // Sync Carousel to Map selection
+    LaunchedEffect(state.focusedPlaceId) {
+        val index = state.filteredPlaces.indexOfFirst { it.id == state.focusedPlaceId }
+        if (index >= 0) {
+            listState.animateScrollToItem(index)
+        }
+    }
+
+    val mapView = remember {
+        MapLibre.getInstance(context)
+        val options = MapLibreMapOptions.createFromAttributes(context, null).textureMode(true)
+        MapView(context, options).apply {
+            onCreate(null)
+            getMapAsync { map ->
+                mapState = map
+                map.setStyle(Style.Builder().fromUri("https://tiles.goong.io/assets/goong_map_web.json?api_key=${BuildConfig.GOONG_MAPTILES_KEY}"))
+                
+                val daNangLocation = LatLng(16.047079, 108.206230)
+                map.cameraPosition = CameraPosition.Builder()
+                    .target(daNangLocation)
+                    .zoom(5.5)
+                    .build()
+                
+                map.uiSettings.isCompassEnabled = false
+                map.uiSettings.isLogoEnabled = false
+                map.uiSettings.isAttributionEnabled = false
+
+                map.addOnMapClickListener {
+                    onPlaceFocused(null)
+                    true
+                }
+
+                map.setOnMarkerClickListener { marker ->
+                    val placeId = marker.snippet
+                    if (placeId != null) {
+                        onPlaceFocused(placeId)
+                    }
+                    true
+                }
+            }
+        }
+    }
+
+
+    // Sync markers
+    LaunchedEffect(state.filteredPlaces) {
+        mapView.getMapAsync { map ->
+            map.clear()
+            state.filteredPlaces.forEach { place ->
+                map.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(place.latitude, place.longitude))
+                        .title(place.name)
+                        .snippet(place.id) // Use snippet to store the place ID
+                )
+            }
+        }
+    }
+
+    // Handle MapView Lifecycle
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> mapView.onStart()
+                Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                Lifecycle.Event.ON_STOP -> mapView.onStop()
+                Lifecycle.Event.ON_DESTROY -> mapView.onDestroy()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView(factory = { mapView }, modifier = Modifier.fillMaxSize())
+
+        // Map Reset Button
+        FloatingActionButton(
+            onClick = {
+                mapState?.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        LatLng(16.047079, 108.206230),
+                        5.5
+                    )
+                )
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 130.dp, end = 16.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.primary
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Map,
+                contentDescription = stringResource(R.string.map_reset_view)
+            )
+        }
+
+        // Overlay Search and Filters (Glassmorphism effect is on the components)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.TopCenter)
+                .padding(bottom = 12.dp)
+        ) {
+            SearchBar(
+                query = state.searchQuery,
+                onQueryChanged = onSearchQueryChanged,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                trailingIcon = {
+                    IconButton(onClick = onToggleViewMode) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.List,
+                            contentDescription = stringResource(R.string.list_view),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            )
+            CategoryFilterRow(
+                categories = categories,
+                selectedCategory = state.selectedCategory,
+                onCategorySelected = onCategorySelected
+            )
+        }
+
+        // Overlay PlaceCards (Carousel) at bottom
+        if (state.filteredPlaces.isNotEmpty()) {
+            LazyRow(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 120.dp), // padding to clear FAB and BottomNavBar
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                itemsIndexed(
+                    items = state.filteredPlaces,
+                    key = { _, place -> place.id }
+                ) { index, place ->
+                    PlaceCard(
+                        place = place,
+                        index = index + 1,
+                        onClick = { onPlaceClick(place) },
+                        onLocateClick = {
+                            mapState?.animateCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    LatLng(place.latitude, place.longitude),
+                                    14.0
+                                )
+                            )
+                        },
+                        modifier = Modifier
+                            .width(280.dp)
+                            .height(130.dp)
+                            .padding(vertical = 4.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExploreListView(
+    state: ExploreUiState.Success,
+    onCategorySelected: (String) -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
+    onPlaceClick: (Place) -> Unit,
+    onToggleViewMode: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 24.dp)
+        contentPadding = PaddingValues(bottom = 120.dp)
     ) {
         // Ô Tìm kiếm (Search Bar)
         item {
             SearchBar(
                 query = state.searchQuery,
                 onQueryChanged = onSearchQueryChanged,
-                placeholder = "Tìm kiếm địa điểm...",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                trailingIcon = {
+                    IconButton(onClick = onToggleViewMode) {
+                        Icon(
+                            imageVector = Icons.Default.Map,
+                            contentDescription = stringResource(R.string.map_view),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             )
         }
 
@@ -143,7 +413,7 @@ private fun ExploreSuccessContent(
         // Dòng hiển thị tổng số kết quả
         item {
             Text(
-                text = "${state.filteredPlaces.size} địa điểm",
+                text = stringResource(R.string.places_count, state.filteredPlaces.size),
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -194,21 +464,14 @@ private fun CategoryFilterRow(
             key = { it }
         ) { category ->
             val isSelected = category == selectedCategory
-            Surface(
-                onClick = { onCategorySelected(category) },
-                shape = RoundedCornerShape(20.dp),
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-                border = if (!isSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant) else null,
-                modifier = Modifier.animateContentSize()
-            ) {
-                Text(
-                    text = category,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    fontSize = 13.sp,
-                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
+            com.bevietnam.ui.components.CategoryChip(
+                category = category,
+                isSelected = isSelected,
+                onSelected = { onCategorySelected(category) },
+                modifier = Modifier.animateItem(
+                    fadeInSpec = androidx.compose.animation.core.tween(300)
                 )
-            }
+            )
         }
     }
 }
@@ -218,48 +481,18 @@ private fun CategoryFilterRow(
  */
 @Composable
 private fun ExploreLoadingState() {
-    val culturalColors = LocalCulturalColors.current
-    val shimmerColors = listOf(culturalColors.shimmerLight, culturalColors.shimmerDark, culturalColors.shimmerLight)
-    val transition = rememberInfiniteTransition(label = "shimmer")
-    val translateAnim by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "shimmer_translate"
-    )
-
-    val brush = Brush.linearGradient(
-        colors = shimmerColors,
-        start = Offset.Zero,
-        end = Offset(x = translateAnim, y = translateAnim)
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Box(modifier = Modifier.fillMaxWidth().height(52.dp).clip(RoundedCornerShape(16.dp)).background(brush))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            repeat(4) {
-                Box(modifier = Modifier.width(80.dp).height(34.dp).clip(RoundedCornerShape(20.dp)).background(brush))
-            }
-        }
-        repeat(4) {
-            Box(modifier = Modifier.fillMaxWidth().height(100.dp).clip(RoundedCornerShape(16.dp)).background(brush))
-        }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CulturalLoadingIndicator()
     }
 }
+
+
 
 /**
  * Trạng thái trống (Empty State) hiển thị khi chưa có bất kỳ địa điểm nào trên hệ thống.
  */
 @Composable
-private fun ExploreEmptyState(message: String = "Chưa có địa điểm nào", onRetry: () -> Unit) {
+private fun ExploreEmptyState(message: String = stringResource(R.string.empty_places), onRetry: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -272,7 +505,7 @@ private fun ExploreEmptyState(message: String = "Chưa có địa điểm nào",
         Text(text = message, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = onRetry, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
-            Text(text = "Thử lại", color = Color.White)
+            Text(text = stringResource(R.string.retry), color = Color.White)
         }
     }
 }
@@ -289,7 +522,7 @@ private fun SearchEmptyState(query: String) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "🔍", fontSize = 48.sp)
-        Text(text = "Không tìm thấy \"$query\"", fontWeight = FontWeight.SemiBold)
+        Text(text = stringResource(R.string.search_not_found, query), fontWeight = FontWeight.SemiBold)
     }
 }
 
@@ -302,25 +535,50 @@ fun ExploreScreenLoadingPreview() {
             onRetry = {},
             onCategorySelected = {},
             onSearchQueryChanged = {},
-            onPlaceClick = {}
+            onPlaceClick = {},
+            onToggleViewMode = {},
+            onPlaceFocused = {}
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Map View Mode")
 @Composable
-fun ExploreScreenSuccessPreview() {
+fun ExploreScreenMapViewPreview() {
+    // Trigger preview refresh for new colors
     val mockPlaces = listOf(
-        Place(id = 1, name = "Vịnh Hạ Long", category = "Thiên nhiên", description = "Di sản thiên nhiên thế giới", latitude = 20.9101, longitude = 107.1839, imageUrl = ""),
-        Place(id = 2, name = "Phố cổ Hội An", category = "Lịch sử", description = "Thành phố cổ kính bên sông Hoài", latitude = 15.8801, longitude = 108.3380, imageUrl = "")
+        Place(id = "1", name = "Vịnh Hạ Long", category = "Thiên nhiên", description = "Di sản thiên nhiên thế giới", latitude = 20.9101, longitude = 107.1839, imageUrl = "", referenceUrl = "https://example.com"),
+        Place(id = "2", name = "Phố cổ Hội An", category = "Lịch sử", description = "Thành phố cổ kính bên sông Hoài", latitude = 15.8801, longitude = 108.3380, imageUrl = "", referenceUrl = "https://example.com")
     )
     BeVietnamTheme {
         ExploreScreenContent(
-            uiState = ExploreUiState.Success(places = mockPlaces, filteredPlaces = mockPlaces),
+            uiState = ExploreUiState.Success(places = mockPlaces, filteredPlaces = mockPlaces, isMapView = true),
             onRetry = {},
             onCategorySelected = {},
             onSearchQueryChanged = {},
-            onPlaceClick = {}
+            onPlaceClick = {},
+            onToggleViewMode = {},
+            onPlaceFocused = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "List View Mode")
+@Composable
+fun ExploreScreenListViewPreview() {
+    val mockPlaces = listOf(
+        Place(id = "1", name = "Vịnh Hạ Long", category = "Thiên nhiên", description = "Di sản thiên nhiên thế giới", latitude = 20.9101, longitude = 107.1839, imageUrl = "", referenceUrl = "https://example.com"),
+        Place(id = "2", name = "Phố cổ Hội An", category = "Lịch sử", description = "Thành phố cổ kính bên sông Hoài", latitude = 15.8801, longitude = 108.3380, imageUrl = "", referenceUrl = "https://example.com")
+    )
+    BeVietnamTheme {
+        ExploreScreenContent(
+            uiState = ExploreUiState.Success(places = mockPlaces, filteredPlaces = mockPlaces, isMapView = false),
+            onRetry = {},
+            onCategorySelected = {},
+            onSearchQueryChanged = {},
+            onPlaceClick = {},
+            onToggleViewMode = {},
+            onPlaceFocused = {}
         )
     }
 }

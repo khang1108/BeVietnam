@@ -47,6 +47,7 @@ fun CategoryChip(
             borderColor = MaterialTheme.colorScheme.outlineVariant,
             selectedBorderColor = Color.Transparent
         ),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(50),
         modifier = modifier.padding(horizontal = 4.dp)
     )
 }

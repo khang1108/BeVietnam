@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.bevietnam.core.domain.usecase.GetRecommendationsUseCase
 import com.bevietnam.core.model.RecommendationItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -82,8 +83,10 @@ class FeedViewModel @Inject constructor(
                         )
                     }
                 }
+            } catch (e: CancellationException) {
+                throw e // Không nuốt CancellationException — để coroutine hủy đúng cách
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Đã xảy ra lỗi không xác định") }
             }
         }
     }

@@ -18,7 +18,7 @@ object AuthRoute
  * @property userId Định danh duy nhất của người dùng (User ID) cần hiển thị hồ sơ. Mặc định là -1.
  */
 @Serializable
-data class ProfileRoute(val userId: Int = -1)
+data class ProfileRoute(val userId: String = "-1")
 
 /**
  * Tuyến đường điều hướng đến màn hình Khám phá (Explore Screen).
@@ -27,6 +27,9 @@ data class ProfileRoute(val userId: Int = -1)
  */
 @Serializable
 object ExploreRoute
+
+@Serializable
+data class PlaceDetailRoute(val placeId: String)
 
 /**
  * Tuyến đường điều hướng đến màn hình Cốt truyện & Nhiệm vụ (Storyline Screen).
@@ -52,4 +55,18 @@ object FeedRoute
  * Cho phép người dùng chụp ảnh và đăng bài viết cảm nghĩ kèm tọa độ định vị GPS thực tế.
  */
 @Serializable
-object CameraRoute
+data class CameraRoute(
+    val placeId: String? = null,
+    val taskId: String? = null
+)
+
+/**
+ * Tuyến đường điều hướng đến màn hình Chi tiết Nhiệm vụ (Task Detail Screen).
+ *
+ * Hiển thị đầy đủ thông tin nhiệm vụ bao gồm ảnh đã chụp, giải thích văn hóa và nút check-in.
+ *
+ * @property taskId Định danh duy nhất của nhiệm vụ cần xem chi tiết.
+ */
+@Serializable
+data class TaskDetailRoute(val taskId: String)
+

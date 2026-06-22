@@ -9,9 +9,8 @@ import javax.inject.Singleton
 
 // TODO(Backend): Inject BeVietnamApi and implement actual API calls
 @Singleton
-class CaptureRepository @Inject constructor(
-) : ICaptureRepository {
-    override fun uploadCapture(metadata: CaptureMetadata, userId: Int, placeId: Int, taskId: String?): Flow<Resource<Unit>> {
-        TODO("Not yet implemented");
+class CaptureRepository @Inject constructor() : ICaptureRepository {
+    override fun uploadCapture(metadata: CaptureMetadata, userId: String, placeId: String, taskId: String?): Flow<Resource<Unit>> {
+        TODO("Not yet implemented")
     }
 }

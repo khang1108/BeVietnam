@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,7 +36,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.bevietnam.R
+import androidx.compose.ui.res.stringResource
 import com.bevietnam.ui.components.BeVietnamTextField
+import com.bevietnam.ui.components.CulturalBackground
 import com.bevietnam.ui.components.PrimaryLoadingButton
 import com.bevietnam.ui.theme.LocalCulturalColors
 
@@ -61,20 +65,58 @@ fun CaptureScreen(
     val context = LocalContext.current
     var description by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
+    var showCamera by remember { mutableStateOf(false) }
+
+    var launchCameraAfterPermission by remember { mutableStateOf(false) }
 
     // Bệ phóng yêu cầu Cấp quyền Máy ảnh
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         viewModel.onPermissionResult(Manifest.permission.CAMERA, isGranted)
+        if (isGranted && launchCameraAfterPermission) {
+            showCamera = true
+        }
+        launchCameraAfterPermission = false
     }
+
+    val fusedLocationClient = remember { com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(context) }
 
     // Bệ phóng yêu cầu Cấp quyền Truy cập Vị trí địa lý (GPS)
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        val granted = permissions.entries.all { it.value }
+        val granted = permissions.entries.any { it.value } // Only need one to be true (coarse or fine)
         viewModel.onPermissionResult(Manifest.permission.ACCESS_FINE_LOCATION, granted)
+    }
+
+    // Kiểm tra trạng thái cấp quyền ngay khi vào màn hình
+    LaunchedEffect(Unit) {
+        val hasCamera = androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        viewModel.onPermissionResult(Manifest.permission.CAMERA, hasCamera)
+
+        val hasFine = androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        val hasCoarse = androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        viewModel.onPermissionResult(Manifest.permission.ACCESS_FINE_LOCATION, hasFine || hasCoarse)
+    }
+
+    // Lắng nghe trạng thái quyền vị trí để lấy tọa độ thực
+    LaunchedEffect(uiState.locationPermissionGranted) {
+        if (uiState.locationPermissionGranted) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED ||
+                androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                try {
+                    fusedLocationClient.getCurrentLocation(com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY, null)
+                        .addOnSuccessListener { location ->
+                            if (location != null) {
+                                viewModel.onLocationUpdated(location.latitude, location.longitude)
+                            }
+                        }
+                } catch (e: SecurityException) {
+                    // Ignore
+                }
+            }
+        }
     }
 
     // Bệ phóng chọn tệp hình ảnh từ Thư viện (Gallery)
@@ -87,36 +129,50 @@ fun CaptureScreen(
     // Lắng nghe trạng thái đăng bài thành công để điều hướng quay lại
     LaunchedEffect(uiState.uploadSuccess) {
         if (uiState.uploadSuccess) {
-            Toast.makeText(context, "Đăng bài viết thành công!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.capture_success), Toast.LENGTH_SHORT).show()
             onNavigateBack()
             viewModel.resetState()
         }
+    }
+
+    if (showCamera) {
+        CameraPreview(
+            onPhotoCaptured = { uri ->
+                viewModel.onImageCaptured(uri)
+                showCamera = false
+            },
+            onCancel = {
+                showCamera = false
+            }
+        )
+        return
     }
 
     Scaffold(
         modifier = modifier,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Đăng bài mới", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.capture_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     TextButton(
                         onClick = onNavigateBack,
                         modifier = Modifier.minimumInteractiveComponentSize() // Đảm bảo Touch Target 48dp
                     ) {
-                        Text("Hủy")
+                        Text(stringResource(R.string.capture_cancel))
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
+                    containerColor = Color.Transparent
                 )
             )
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+        CulturalBackground {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
                 .padding(horizontal = 16.dp)
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -124,75 +180,83 @@ fun CaptureScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Khu vực xem trước hình ảnh (Image Preview Area)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White)
-                    .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
-                    .clickable(
-                        onClickLabel = "Chọn hình ảnh từ thư viện",
-                        onClick = { galleryLauncher.launch("image/*") }
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                if (uiState.imageUri != null) {
+            // Khu vực xem trước hình ảnh (Image Preview Area) hoặc Mời gọi chụp ảnh
+            if (uiState.imageUri != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+                ) {
                     // Tải ảnh mượt mà với Coil AsyncImage và crossfade
                     AsyncImage(
                         model = ImageRequest.Builder(context)
                             .data(uiState.imageUri)
                             .crossfade(true)
                             .build(),
-                        contentDescription = "Xem trước ảnh đã chọn",
+                        contentDescription = stringResource(R.string.capture_preview_desc),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
-                } else {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            imageVector = Icons.Default.AddPhotoAlternate,
-                            contentDescription = null,
-                            modifier = Modifier.size(48.dp),
-                            tint = Color.Gray
-                        )
-                        Text("Chạm để chọn hoặc chụp ảnh", color = Color.Gray)
+                    
+                    // Nút Xóa ảnh để chụp lại
+                    SmallFloatingActionButton(
+                        onClick = { viewModel.onImageCaptured(null) },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(12.dp),
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "Bỏ ảnh này")
                     }
                 }
-            }
-
-            // Dòng tùy chọn chọn nguồn ảnh (Thư viện / Máy ảnh)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                CaptureOptionButton(
-                    icon = Icons.Default.AddPhotoAlternate,
-                    label = "Thư viện",
-                    onClick = { galleryLauncher.launch("image/*") },
-                    modifier = Modifier.weight(1f)
-                )
-                CaptureOptionButton(
-                    icon = Icons.Default.CameraAlt,
-                    label = "Máy ảnh",
-                    onClick = {
-                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                        Toast.makeText(context, "Tính năng máy ảnh đang được tích hợp", Toast.LENGTH_SHORT).show()
-                    },
-                    modifier = Modifier.weight(1f)
-                )
+            } else {
+                // Dòng tùy chọn chọn nguồn ảnh (Thư viện / Máy ảnh) khi chưa có ảnh
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    CaptureOptionButton(
+                        icon = Icons.Default.AddPhotoAlternate,
+                        label = stringResource(R.string.capture_gallery),
+                        onClick = { galleryLauncher.launch("image/*") },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(140.dp) // Nổi bật hơn
+                    )
+                    CaptureOptionButton(
+                        icon = Icons.Default.CameraAlt,
+                        label = stringResource(R.string.capture_camera),
+                        onClick = {
+                            if (uiState.cameraPermissionGranted) {
+                                showCamera = true
+                            } else {
+                                launchCameraAfterPermission = true
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(140.dp)
+                    )
+                }
             }
 
             // Các mục trạng thái và yêu cầu cấp quyền hệ thống
             PermissionStatusItem(
-                label = "Quyền máy ảnh",
+                label = stringResource(R.string.capture_permission_camera),
                 isGranted = uiState.cameraPermissionGranted,
-                onRequest = { cameraPermissionLauncher.launch(Manifest.permission.CAMERA) }
+                onRequest = { 
+                    launchCameraAfterPermission = false
+                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA) 
+                }
             )
 
             PermissionStatusItem(
-                label = "Quyền vị trí địa lý",
+                label = stringResource(R.string.capture_permission_location),
                 isGranted = uiState.locationPermissionGranted,
                 onRequest = {
                     locationPermissionLauncher.launch(
@@ -206,10 +270,10 @@ fun CaptureScreen(
 
             // Trường nhập nội dung cảm nghĩ/mô tả bài viết
             BeVietnamTextField(
-                label = "Nội dung bài viết",
+                label = stringResource(R.string.capture_note_label),
                 value = description,
                 onValueChange = { description = it },
-                placeholder = "Cảm nghĩ của bạn về địa điểm này...",
+                placeholder = stringResource(R.string.capture_note_hint),
                 leadingIcon = Icons.Default.Create,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -226,13 +290,14 @@ fun CaptureScreen(
 
             // Nút đăng bài viết
             PrimaryLoadingButton(
-                text = "Đăng bài",
+                text = stringResource(R.string.capture_submit),
                 isLoading = uiState.isUploading,
                 onClick = { viewModel.uploadCapture(description) },
                 modifier = Modifier.fillMaxWidth()
             )
             
             Spacer(modifier = Modifier.height(24.dp))
+        }
         }
     }
 }
@@ -257,7 +322,7 @@ fun CaptureOptionButton(
     Card(
         onClick = onClick, // Ripple mượt mà ôm sát bo góc Card theo đúng chuẩn Material 3
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -316,14 +381,28 @@ fun PermissionStatusItem(
             )
         }
         if (!isGranted) {
-            TextButton(
-                onClick = onRequest,
-                modifier = Modifier.minimumInteractiveComponentSize()
-            ) {
-                Text("Cấp quyền", fontSize = 12.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TextButton(
+                    onClick = onRequest,
+                    modifier = Modifier.minimumInteractiveComponentSize()
+                ) {
+                    Text(stringResource(R.string.capture_grant_permission), fontSize = 12.sp)
+                }
+                val context = LocalContext.current
+                TextButton(
+                    onClick = {
+                        val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = android.net.Uri.fromParts("package", context.packageName, null)
+                        }
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.minimumInteractiveComponentSize()
+                ) {
+                    Text(stringResource(R.string.capture_settings), fontSize = 12.sp)
+                }
             }
         } else {
-            Text("Đã cấp", fontSize = 12.sp, color = culturalColors.permissionGreenText)
+            Text(stringResource(R.string.capture_granted), fontSize = 12.sp, color = culturalColors.permissionGreenText)
         }
     }
 }

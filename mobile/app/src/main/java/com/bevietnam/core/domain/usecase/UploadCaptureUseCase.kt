@@ -27,7 +27,7 @@ class UploadCaptureUseCase @Inject constructor(
      * @param metadata Chứa thông tin chi tiết bài viết đăng tải ([CaptureMetadata]).
      * @return Một [Flow] phát ra các trạng thái tải lên [Resource] (Loading, Success, Error).
      */
-    operator fun invoke(metadata: CaptureMetadata, userId: Int, placeId: Int, taskId: String?): Flow<Resource<Unit>> {
+    operator fun invoke(metadata: CaptureMetadata, userId: String, placeId: String, taskId: String?): Flow<Resource<Unit>> {
         return repository.uploadCapture(metadata, userId, placeId, taskId)
     }
 }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,10 +18,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,12 +47,14 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.bevietnam.R
-import com.bevietnam.core.model.Gender
+import com.bevietnam.core.model.User
+import com.bevietnam.ui.theme.BeVietnamTheme
+import com.bevietnam.ui.components.CulturalBackground
+import com.bevietnam.ui.components.CulturalLoadingIndicator
 import com.bevietnam.ui.components.ErrorView
 import com.bevietnam.ui.components.LoadingIndicator
+import androidx.compose.foundation.lazy.items
 import com.bevietnam.ui.navigation.BottomNavBar
-import com.bevietnam.ui.components.DatePickerField
-import com.bevietnam.ui.components.GenderSelector
 import com.bevietnam.ui.components.PrimaryLoadingButton
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -90,7 +103,7 @@ fun ProfileScreen(
         val user = uiState.user
 
         when {
-            uiState.isLoading -> LoadingIndicator(
+            uiState.isLoading -> CulturalLoadingIndicator(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
@@ -99,22 +112,22 @@ fun ProfileScreen(
                 message = errorMessage,
                 modifier = Modifier.padding(paddingValues)
             )
-            user != null -> ProfileContent(
-                uiState = uiState,
-                onNameChange = viewModel::onNameChange,
-                onBioChange = viewModel::onBioChange,
-                onGenderChange = viewModel::onGenderChange,
-                onDateOfBirthChange = viewModel::onDateOfBirthChange,
-                onLocationChange = viewModel::onLocationChange,
-                onEditClick = viewModel::toggleEditMode,
-                onSaveClick = viewModel::saveProfile,
-                onCancelClick = viewModel::toggleEditMode,
-                onShareClick = {
-                    Toast.makeText(context, "Tính năng chia sẻ đang phát triển!", Toast.LENGTH_SHORT).show()
-                },
-                onLogoutClick = viewModel::logout,
-                modifier = Modifier.padding(paddingValues)
-            )
+            user != null -> {
+                CulturalBackground {
+                    ProfileContent(
+                        uiState = uiState,
+                        onNameChange = viewModel::onNameChange,
+                        onEditClick = viewModel::toggleEditMode,
+                        onSaveClick = viewModel::saveProfile,
+                        onCancelClick = viewModel::toggleEditMode,
+                        onShareClick = {
+                            Toast.makeText(context, context.getString(R.string.share_coming_soon), Toast.LENGTH_SHORT).show()
+                        },
+                        onLogoutClick = viewModel::logout,
+                        modifier = Modifier.padding(paddingValues)
+                    )
+                }
+            }
         }
     }
 }
@@ -128,10 +141,6 @@ fun ProfileScreen(
 private fun ProfileContent(
     uiState: ProfileUiState,
     onNameChange: (String) -> Unit,
-    onBioChange: (String) -> Unit,
-    onGenderChange: (Gender) -> Unit,
-    onDateOfBirthChange: (String) -> Unit,
-    onLocationChange: (String) -> Unit,
     onEditClick: () -> Unit,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
@@ -164,7 +173,7 @@ private fun ProfileContent(
                 // Tải ảnh đại diện mượt mà với Coil AsyncImage và crossfade
                 AsyncImage(
                     model = ImageRequest.Builder(context)
-                        .data(user.avatarUrl)
+                        .data(user.avatarUrl ?: R.drawable.default_avt)
                         .crossfade(true)
                         .build(),
                     contentDescription = stringResource(R.string.avatar),
@@ -187,18 +196,6 @@ private fun ProfileContent(
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center
                     )
-                    if (user.gender != null) {
-                        Spacer(Modifier.width(6.dp))
-                        Icon(
-                            imageVector = if (user.gender == Gender.MALE)
-                                Icons.Default.Male else Icons.Default.Female,
-                            contentDescription = if (user.gender == Gender.MALE) "Nam" else "Nữ",
-                            tint = if (user.gender == Gender.MALE)
-                                MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -210,61 +207,9 @@ private fun ProfileContent(
                     textAlign = TextAlign.Center
                 )
 
-                if (user.dateOfBirth != null) {
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Cake,
-                            contentDescription = stringResource(R.string.date_of_birth),
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = user.dateOfBirth,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                if (user.bio.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = user.bio,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                        textAlign = TextAlign.Center,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
                 Spacer(modifier = Modifier.height(18.dp))
 
-                // Chỉ số thành tựu trong game (Gamified Stats)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    ProfileStatItem(
-                        label = "Cấp độ",
-                        value = user.level.toString(),
-                        icon = Icons.Default.Star
-                    )
-                    ProfileStatItem(
-                        label = "Điểm",
-                        value = user.points.toString(),
-                        icon = Icons.Default.EmojiEvents
-                    )
-                }
 
-                Spacer(modifier = Modifier.height(18.dp))
 
                 // Nút chỉnh sửa và chia sẻ (ở View Mode)
                 if (!uiState.isEditMode) {
@@ -297,16 +242,19 @@ private fun ProfileContent(
             }
         }
 
-        // Thẻ thông tin địa lý và ngày tham gia
+        // Gamification Stats & Journey Diary (View Mode)
         if (!uiState.isEditMode) {
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                if (!user.location.isNullOrBlank()) ProfileInfoCard("Vị trí", user.location, Icons.Default.LocationOn)
-                if (!user.joinedDate.isNullOrBlank()) ProfileInfoCard("Ngày tham gia", user.joinedDate, Icons.Default.CalendarToday)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
+            ProfileStatsSection(
+                completedTasks = uiState.completedTasks,
+                totalTasks = uiState.totalTasks,
+                photoCount = uiState.journeyImages.size
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+
+            JourneyDiarySection(images = uiState.journeyImages)
+            Spacer(modifier = Modifier.height(20.dp))
+
+            SettingsList(onLogoutClick = onLogoutClick)
         }
 
         // Form Chỉnh sửa thông tin hồ sơ (Edit Mode)
@@ -318,7 +266,7 @@ private fun ProfileContent(
                 shadowElevation = 4.dp
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
-                    Text("Chỉnh sửa hồ sơ", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.edit_profile_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.height(16.dp))
 
                     OutlinedTextField(
@@ -330,41 +278,6 @@ private fun ProfileContent(
                         shape = RoundedCornerShape(10.dp)
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = uiState.editBio,
-                        onValueChange = onBioChange,
-                        label = { Text(stringResource(R.string.bio)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        minLines = 3,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = uiState.editLocation,
-                        onValueChange = onLocationChange,
-                        label = { Text("Vị trí") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        leadingIcon = { Icon(Icons.Default.LocationOn, null, Modifier.size(18.dp)) },
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    Spacer(Modifier.height(12.dp))
-
-                    GenderSelector(
-                        selected = uiState.editGender,
-                        onSelect = onGenderChange
-                    )
-
-                    Spacer(Modifier.height(12.dp))
-                    DatePickerField(
-                        label = stringResource(R.string.date_of_birth),
-                        displayValue = uiState.editDateOfBirth,
-                        onDateSelected = { date -> 
-                            onDateOfBirthChange(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))) 
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
 
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         OutlinedButton(onClick = onCancelClick, modifier = Modifier.weight(1f), enabled = !uiState.isSaving) {
@@ -382,21 +295,9 @@ private fun ProfileContent(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // Nút Đăng xuất (Logout Button)
-        OutlinedButton(
-            onClick = onLogoutClick,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(48.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
-        ) {
-            Icon(Icons.AutoMirrored.Filled.Logout, null, Modifier.size(18.dp))
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.logout))
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
         Text(stringResource(R.string.app_version), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f))
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(120.dp)) // Không gian bù trừ cho BottomNavBar
     }
 }
 
@@ -431,5 +332,317 @@ private fun ProfileInfoCard(title: String, content: String, icon: ImageVector) {
                 Text(content, fontSize = 14.sp, fontWeight = FontWeight.Medium)
             }
         }
+    }
+}
+
+@Composable
+private fun ProfileStatsSection(completedTasks: Int, totalTasks: Int, photoCount: Int) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 2.dp
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(stringResource(R.string.profile_gamification_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                ProfileStatItem(
+                    label = stringResource(R.string.profile_stat_tasks),
+                    value = "$completedTasks/$totalTasks",
+                    icon = Icons.Default.Flag
+                )
+                ProfileStatItem(
+                    label = stringResource(R.string.profile_stat_photos),
+                    value = "$photoCount",
+                    icon = Icons.Default.PhotoCamera
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun JourneyDiarySection(images: List<JourneyImage>) {
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedImage by remember { mutableStateOf<JourneyImage?>(null) }
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clickable { showDialog = true },
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 2.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(Icons.Default.PhotoAlbum, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = stringResource(R.string.profile_journey_diary),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = if (images.isEmpty()) stringResource(R.string.profile_journey_empty) else "${images.size} ảnh check-in",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+
+    if (showDialog) {
+        Dialog(onDismissRequest = { showDialog = false }) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 200.dp, max = 500.dp),
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = stringResource(R.string.profile_journey_diary),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    if (images.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.profile_journey_empty),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp),
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.weight(1f, fill = false)
+                        ) {
+                            items(images.size) { index ->
+                                val journeyImage = images[index]
+                                Box(
+                                    modifier = Modifier
+                                        .aspectRatio(1f)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .clickable { selectedImage = journeyImage }
+                                ) {
+                                    AsyncImage(
+                                        model = coil3.request.ImageRequest.Builder(LocalContext.current)
+                                            .data(journeyImage.url)
+                                            .crossfade(true)
+                                            .build(),
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    
+                                    if (!journeyImage.note.isNullOrBlank()) {
+                                        // Overlay gradient
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(40.dp)
+                                                .align(Alignment.BottomCenter)
+                                                .background(
+                                                    Brush.verticalGradient(
+                                                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
+                                                    )
+                                                )
+                                        )
+                                        // Note text
+                                        Text(
+                                            text = journeyImage.note,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color.White,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier
+                                                .align(Alignment.BottomStart)
+                                                .padding(6.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    TextButton(
+                        onClick = { showDialog = false },
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text(stringResource(R.string.task_detail_back))
+                    }
+                }
+            }
+        }
+    }
+
+    if (selectedImage != null) {
+        Dialog(
+            onDismissRequest = { selectedImage = null },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+            ) {
+                AsyncImage(
+                    model = coil3.request.ImageRequest.Builder(LocalContext.current)
+                        .data(selectedImage!!.url)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+
+                // Close Button
+                IconButton(
+                    onClick = { selectedImage = null },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
+                        .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingsList(onLogoutClick: () -> Unit) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 2.dp
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(R.string.profile_settings),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
+            )
+            
+            SettingsItem(
+                icon = Icons.Default.Language,
+                title = stringResource(R.string.profile_settings_language),
+                onClick = { /* TODO */ }
+            )
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.surfaceVariant)
+            SettingsItem(
+                icon = Icons.Default.Security,
+                title = stringResource(R.string.profile_settings_terms),
+                onClick = { /* TODO */ }
+            )
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.surfaceVariant)
+            // Logout
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onLogoutClick() }
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.AutoMirrored.Filled.Logout, null, tint = MaterialTheme.colorScheme.error)
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(stringResource(R.string.logout), color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Medium)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingsItem(icon: ImageVector, title: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(icon, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(title, color = MaterialTheme.colorScheme.onSurface)
+    }
+}
+
+@Preview(showBackground = true, name = "View Mode")
+@Composable
+fun ProfileScreenViewModePreview() {
+    BeVietnamTheme {
+        ProfileContent(
+            uiState = ProfileUiState(
+                user = User(
+                    id = "1",
+                    name = "Nguyễn Văn A",
+                    email = "nguyenvana@example.com",
+                    avatarUrl = null,
+                    createdAt = "01/01/2023"
+                )
+            ),
+            onNameChange = {},
+            onEditClick = {},
+            onSaveClick = {},
+            onCancelClick = {},
+            onShareClick = {},
+            onLogoutClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Edit Mode")
+@Composable
+fun ProfileScreenEditModePreview() {
+    BeVietnamTheme {
+        ProfileContent(
+            uiState = ProfileUiState(
+                isEditMode = true,
+                user = User(
+                    id = "1",
+                    name = "Nguyễn Văn A",
+                    email = "nguyenvana@example.com",
+                    avatarUrl = null,
+                    createdAt = "01/01/2023"
+                ),
+                editName = "Nguyễn Văn A"
+            ),
+            onNameChange = {},
+            onEditClick = {},
+            onSaveClick = {},
+            onCancelClick = {},
+            onShareClick = {},
+            onLogoutClick = {}
+        )
     }
 }

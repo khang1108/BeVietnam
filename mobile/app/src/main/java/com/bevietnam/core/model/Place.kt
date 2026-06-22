@@ -15,7 +15,7 @@ package com.bevietnam.core.model
  * @property referenceUrl Đường dẫn URL tham chiếu bên ngoài về địa điểm (có thể null).
  */
 data class Place(
-    val id: Int,
+    val id: String,
     val name: String,
     val category: String,
     val description: String,
