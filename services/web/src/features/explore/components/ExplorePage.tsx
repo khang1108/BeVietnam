@@ -582,7 +582,10 @@ function fitToPlaces(map: any) {
 // Hide the base-map's built-in POI symbols (broken/cluttered in dark style).
 // We render our own clean markers instead.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function hideBasePoiIcons(map: any) {
+// Keep the base map's built-in POIs (cà phê, quán ăn, siêu thị, ...) visible so
+// the map feels dense like Google Maps, and make their labels legible on the
+// dark lacquer style. The icons come from the Goong tiles; we only restyle text.
+function enhanceBasePoiLabels(map: any) {
     try {
         const style = map.getStyle?.();
         if (!style?.layers) return;
@@ -590,9 +593,12 @@ function hideBasePoiIcons(map: any) {
         style.layers.forEach((layer: any) => {
             const id = (layer.id || '').toLowerCase();
             const srcLayer = (layer['source-layer'] || '').toLowerCase();
-            if (layer.type === 'symbol' && (id.includes('poi') || srcLayer.includes('poi'))) {
-                try { map.setLayoutProperty(layer.id, 'visibility', 'none'); } catch { /* ignore */ }
-            }
+            if (layer.type !== 'symbol' || !(id.includes('poi') || srcLayer.includes('poi'))) return;
+            const set = (fn: () => void) => { try { fn(); } catch { /* layer lacks this prop */ } };
+            set(() => map.setLayoutProperty(layer.id, 'visibility', 'visible'));
+            set(() => map.setPaintProperty(layer.id, 'text-color', '#ece0c6'));
+            set(() => map.setPaintProperty(layer.id, 'text-halo-color', '#15100a'));
+            set(() => map.setPaintProperty(layer.id, 'text-halo-width', 1.3));
         });
     } catch { /* ignore */ }
 }
@@ -684,7 +690,7 @@ export function ExplorePage() {
                 map.on('load', () => {
                     if (cancelled) return;
                     hasLoaded = true;
-                    hideBasePoiIcons(map);
+                    enhanceBasePoiLabels(map);
                     addExploreLayers(map as ExploreMap);
                     fitToPlaces(map);
                     setMapLoaded(true);
