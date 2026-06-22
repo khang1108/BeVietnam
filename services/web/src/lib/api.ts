@@ -231,6 +231,9 @@ export interface WeatherResponse {
   condition: WeatherCondition;
   temp: number | null;
   source: string;
+  uvi: number | null;       // estimated UV index
+  rain_mm: number | null;   // rain volume last 1h/3h
+  clouds: number | null;    // cloud cover %
 }
 
 export interface WeatherCoord {
@@ -271,6 +274,8 @@ export interface NearbyPlace {
   category_label: string;
   address: string | null;
   distance_meters: number | null;
+  rating: number | null;       // 0..10, Foursquare Premium only
+  popularity: number | null;   // 0..1, Foursquare Premium only
 }
 
 export interface NearbyResponse {
