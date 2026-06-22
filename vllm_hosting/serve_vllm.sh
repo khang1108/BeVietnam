@@ -43,6 +43,9 @@ args=(
   --max-model-len "${VLLM_MAX_MODEL_LEN:-16384}"
   --gpu-memory-utilization "${VLLM_GPU_MEMORY_UTILIZATION:-0.92}"
 )
+# Vision-language models: allow >1 image per request (the capture judge sends a
+# reference photo + the user photo). Harmless to omit for text-only models.
+[[ -n "${VLLM_MM_IMAGE_LIMIT:-}" ]] && args+=(--limit-mm-per-prompt "image=${VLLM_MM_IMAGE_LIMIT}")
 [[ "${VLLM_ENABLE_PREFIX_CACHING:-0}" == "1" ]] && args+=(--enable-prefix-caching)
 # Only enforce auth when a key is set; empty key = open endpoint.
 [[ -n "${VLLM_API_KEY:-}" ]] && args+=(--api-key "$VLLM_API_KEY")

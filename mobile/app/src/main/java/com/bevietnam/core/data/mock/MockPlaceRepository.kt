@@ -1,6 +1,11 @@
 package com.bevietnam.core.data.mock
 
+import com.bevietnam.core.data.remote.api.BeVietnamApi
+import com.bevietnam.core.data.remote.mapper.toAreaWeather
+import com.bevietnam.core.data.remote.mapper.toNearbyPlace
 import com.bevietnam.core.domain.repository.IPlaceRepository
+import com.bevietnam.core.model.AreaWeather
+import com.bevietnam.core.model.NearbyPlace
 import com.bevietnam.core.model.Place
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -9,7 +14,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MockPlaceRepository @Inject constructor() : IPlaceRepository {
+class MockPlaceRepository @Inject constructor(
+    private val api: BeVietnamApi
+) : IPlaceRepository {
 
     // Dữ liệu giả (Mock Data) chuyên dụng để test UI mà không gọi API
     private val mockPlaces = listOf(
@@ -45,4 +52,11 @@ class MockPlaceRepository @Inject constructor() : IPlaceRepository {
         val place = mockPlaces.find { it.id == id }
         emit(place)
     }
+
+    // Nearby POIs + weather are live (real backend) even though curated places are mocked.
+    override suspend fun getNearby(lat: Double, lng: Double, radius: Int, limit: Int): List<NearbyPlace> =
+        api.getNearby(lat = lat, lng = lng, radius = radius, limit = limit).items.map { it.toNearbyPlace() }
+
+    override suspend fun getAreaWeather(lat: Double, lng: Double): AreaWeather =
+        api.getWeather(lat = lat, lng = lng).toAreaWeather()
 }

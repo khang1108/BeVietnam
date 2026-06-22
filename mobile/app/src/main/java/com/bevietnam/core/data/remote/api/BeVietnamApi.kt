@@ -4,12 +4,15 @@ import com.bevietnam.core.data.remote.api.dto.AuthResponseDto
 import com.bevietnam.core.data.remote.api.dto.FeedResponseDto
 import com.bevietnam.core.data.remote.api.dto.HealthResponseDto
 import com.bevietnam.core.data.remote.api.dto.LoginRequestDto
+import com.bevietnam.core.data.remote.api.dto.NearbyResponseDto
 import com.bevietnam.core.data.remote.api.dto.PlacesResponseDto
 import com.bevietnam.core.data.remote.api.dto.RegisterRequestDto
 import com.bevietnam.core.data.remote.api.dto.UserDto
+import com.bevietnam.core.data.remote.api.dto.WeatherResponseDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 /**
  * Interface Retrofit chứa các khai báo gọi API backend.
@@ -43,6 +46,26 @@ interface BeVietnamApi {
         @retrofit2.http.Query("limit") limit: Int = 10,
         @retrofit2.http.Query("offset") offset: Int = 0
     ): PlacesResponseDto
+
+    /**
+     * Live POIs quanh vị trí người dùng (Foursquare proxy) cho bản đồ Khám phá.
+     */
+    @GET("places/nearby")
+    suspend fun getNearby(
+        @Query("lat") lat: Double,
+        @Query("lng") lng: Double,
+        @Query("radius") radius: Int = 3000,
+        @Query("limit") limit: Int = 40
+    ): NearbyResponseDto
+
+    /**
+     * Điều kiện thời tiết khu vực (UV, mưa, nhiệt độ) tại một tọa độ.
+     */
+    @GET("weather")
+    suspend fun getWeather(
+        @Query("lat") lat: Double,
+        @Query("lng") lng: Double
+    ): WeatherResponseDto
 
     /**
      * Lấy bảng tin gợi ý.

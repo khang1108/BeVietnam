@@ -79,3 +79,6 @@ PA_Decomposition.md
 # ─── 3D model bake sources (large; commit only baked .webp/.webm/.png) ──
 /services/web/public/models/*.zip
 /services/web/public/models/*/
+
+# Cached reference images downloaded for capture verification
+data/reference_images/

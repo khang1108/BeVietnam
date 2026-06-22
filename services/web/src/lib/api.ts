@@ -217,7 +217,15 @@ export interface QuestionPoolSelectRequest {
   limit?: number;
 }
 
+export interface QuestionPoolListResponse {
+  total: number;
+  items: QuestionPoolItem[];
+  source_path?: string;
+  fallback?: boolean;
+}
+
 export const questionPoolApi = {
+  list: () => apiRequest<QuestionPoolListResponse>('/question-pool'),
   select: (body: QuestionPoolSelectRequest) =>
     apiRequest<QuestionPoolSelectionResponse>('/question-pool/select', {
       method: 'POST',
@@ -295,6 +303,26 @@ export const nearbyApi = {
     }),
 };
 
+// Capture verification (AI Capture Judge via backend proxy)
+export interface VerifyCaptureBody {
+  user_id: string;
+  task: Record<string, unknown>;
+  capture: {
+    media_url: string; // data URL (base64) in demo, or a hosted image URL
+    note?: string;
+    place_id?: string;
+    latitude?: number;
+    longitude?: number;
+  };
+}
+
+export interface VerifyCaptureResponse {
+  approved: boolean;
+  status: string; // approved | rejected | needs_review | error
+  reason: string;
+  confidence: number;
+}
+
 // Storyline
 export const storylineApi = {
   getQuestChain: (userId = 'demo-user', questId = 'quest-hue-imperial') =>
@@ -308,6 +336,11 @@ export const storylineApi = {
     if (context.timeOfDay) params.time_of_day = context.timeOfDay;
     return apiRequest<StorylineNextTaskResponse>('/storyline/next-task', { params });
   },
+  verifyCapture: (body: VerifyCaptureBody) =>
+    apiRequest<VerifyCaptureResponse>('/storyline/verify-capture', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
 };
 
 export default apiRequest;

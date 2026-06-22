@@ -2,7 +2,10 @@ package com.bevietnam.ui.screens.explore
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bevietnam.core.domain.repository.IPlaceRepository
 import com.bevietnam.core.domain.usecase.GetPlacesUseCase
+import com.bevietnam.core.model.AreaWeather
+import com.bevietnam.core.model.NearbyPlace
 import com.bevietnam.core.model.Place
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -39,7 +42,12 @@ sealed class ExploreUiState {
         val selectedCategory: String = "Tất cả",
         val searchQuery: String = "",
         val isMapView: Boolean = true,
-        val focusedPlaceId: String? = null
+        val focusedPlaceId: String? = null,
+        // Live data quanh vị trí người dùng (Foursquare + thời tiết) cho bubble động.
+        val nearbyPlaces: List<NearbyPlace> = emptyList(),
+        val areaWeather: AreaWeather? = null,
+        val userLatitude: Double? = null,
+        val userLongitude: Double? = null
     ) : ExploreUiState()
     
     /** Trạng thái danh sách địa điểm trống */
@@ -69,7 +77,8 @@ val categories = listOf("Tất cả", "Hành trình", "Lịch sử", "Địa đi
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class ExploreViewModel @Inject constructor(
-    private val getPlacesUseCase: GetPlacesUseCase
+    private val getPlacesUseCase: GetPlacesUseCase,
+    private val placeRepository: IPlaceRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ExploreUiState>(ExploreUiState.Loading)
@@ -178,6 +187,48 @@ class ExploreViewModel @Inject constructor(
         }
     }
 
+
+    /** Tránh gọi lại API liên tục khi vị trí dịch chuyển không đáng kể. */
+    private var lastNearbyLat: Double? = null
+    private var lastNearbyLng: Double? = null
+
+    /**
+     * Lấy POI thực tế (Foursquare) và thời tiết trong bán kính 3km quanh vị trí người dùng,
+     * cập nhật vào state để bản đồ vẽ bubble động. Bỏ qua nếu vị trí gần như không đổi.
+     *
+     * @param lat Vĩ độ hiện tại của người dùng.
+     * @param lng Kinh độ hiện tại của người dùng.
+     */
+    fun loadNearby(lat: Double, lng: Double) {
+        val last = lastNearbyLat to lastNearbyLng
+        if (last.first != null && last.second != null &&
+            kotlin.math.abs(last.first!! - lat) < 0.0005 &&
+            kotlin.math.abs(last.second!! - lng) < 0.0005
+        ) return
+        lastNearbyLat = lat
+        lastNearbyLng = lng
+
+        viewModelScope.launch {
+            try {
+                val nearby = placeRepository.getNearby(lat = lat, lng = lng, radius = 3000, limit = 40)
+                val weather = runCatching { placeRepository.getAreaWeather(lat, lng) }.getOrNull()
+                _uiState.update { currentState ->
+                    if (currentState is ExploreUiState.Success) {
+                        currentState.copy(
+                            nearbyPlaces = nearby,
+                            areaWeather = weather ?: currentState.areaWeather,
+                            userLatitude = lat,
+                            userLongitude = lng
+                        )
+                    } else currentState
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                // Bubble động là phần phụ — lỗi mạng không nên phá vỡ màn hình.
+            }
+        }
+    }
 
     /**
      * Hàm phụ trợ thực hiện lọc danh sách địa điểm theo từ khóa và danh mục.

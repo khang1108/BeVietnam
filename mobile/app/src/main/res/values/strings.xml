@@ -62,6 +62,7 @@
     <string name="retry">Thử lại</string>
     <string name="search_not_found">Không tìm thấy \"%1$s\"</string>
     <string name="map_reset_view">Toàn cảnh</string>
+    <string name="map_my_location">Vị trí của tôi</string>
 
     <!-- Feed Screen -->
     <string name="search_feed_hint">Tìm địa điểm gợi ý...</string>

@@ -10,11 +10,11 @@ import { IconCalendar, IconExplore, IconFeed, IconSparkle, IconStoryline } from 
 import styles from './Navbar.module.css';
 
 const navItems = [
-  { key: 'feed', href: '/' },
-  { key: 'explore', href: '/explore' },
-  { key: 'storyline', href: '/storyline' },
-  { key: 'events', href: '/events' },
-  { key: 'contribute', href: '/contribute' },
+  { key: 'feed', href: '/' },           // Home
+  { key: 'explore', href: '/explore' }, // Khám phá
+  { key: 'storyline', href: '/storyline' }, // Storyline
+  { key: 'events', href: '/events' },   // Feed (recommended posts)
+  { key: 'contribute', href: '/contribute' }, // Donate
 ];
 
 export default function Navbar() {

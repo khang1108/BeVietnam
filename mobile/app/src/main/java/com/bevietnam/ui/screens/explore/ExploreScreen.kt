@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -50,6 +51,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.bevietnam.BuildConfig
 import com.bevietnam.R
+import com.bevietnam.core.model.AreaWeather
+import com.bevietnam.core.model.NearbyPlace
 import com.bevietnam.core.model.Place
 import com.bevietnam.ui.components.CulturalBackground
 import com.bevietnam.ui.components.CulturalLoadingIndicator
@@ -58,7 +61,6 @@ import com.bevietnam.ui.components.PlaceCard
 import com.bevietnam.ui.components.SearchBar
 import com.bevietnam.ui.theme.BeVietnamTheme
 import org.maplibre.android.MapLibre
-import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
@@ -66,6 +68,15 @@ import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapLibreMapOptions
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
+import org.maplibre.android.style.expressions.Expression
+import org.maplibre.android.style.layers.CircleLayer
+import org.maplibre.android.style.layers.Property
+import org.maplibre.android.style.layers.PropertyFactory
+import org.maplibre.android.style.layers.SymbolLayer
+import org.maplibre.android.style.sources.GeoJsonSource
+import org.maplibre.geojson.Feature
+import org.maplibre.geojson.FeatureCollection
+import org.maplibre.geojson.Point
 
 /**
  * Màn hình Khám phá địa điểm du lịch văn hóa (Explore Screen) của ứng dụng BeVietnam.
@@ -94,6 +105,7 @@ fun ExploreScreen(
         onPlaceClick = onPlaceClick,
         onToggleViewMode = viewModel::toggleViewMode,
         onPlaceFocused = viewModel::onPlaceFocused,
+        onUserLocated = viewModel::loadNearby,
         modifier = modifier
     )
 }
@@ -120,6 +132,7 @@ fun ExploreScreenContent(
     onPlaceClick: (Place) -> Unit,
     onToggleViewMode: () -> Unit,
     onPlaceFocused: (String?) -> Unit,
+    onUserLocated: (Double, Double) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -142,7 +155,8 @@ fun ExploreScreenContent(
                     onSearchQueryChanged = onSearchQueryChanged,
                     onPlaceClick = onPlaceClick,
                     onToggleViewMode = onToggleViewMode,
-                    onPlaceFocused = onPlaceFocused
+                    onPlaceFocused = onPlaceFocused,
+                    onUserLocated = onUserLocated
                 )
             }
         }
@@ -161,7 +175,8 @@ private fun ExploreSuccessContent(
     onSearchQueryChanged: (String) -> Unit,
     onPlaceClick: (Place) -> Unit,
     onToggleViewMode: () -> Unit,
-    onPlaceFocused: (String?) -> Unit
+    onPlaceFocused: (String?) -> Unit,
+    onUserLocated: (Double, Double) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         if (state.isMapView) {
@@ -171,7 +186,8 @@ private fun ExploreSuccessContent(
                 onSearchQueryChanged = onSearchQueryChanged,
                 onPlaceClick = onPlaceClick,
                 onToggleViewMode = onToggleViewMode,
-                onPlaceFocused = onPlaceFocused
+                onPlaceFocused = onPlaceFocused,
+                onUserLocated = onUserLocated
             )
         } else {
             ExploreListView(
@@ -185,6 +201,121 @@ private fun ExploreSuccessContent(
     }
 }
 
+// Dynamic markers — parity with the web Explore map. Three layers over one
+// GeoJSON source, fed by live Foursquare POIs:
+//   halo  – big translucent disc, size = distance-to-user (closer = bigger)
+//   pin   – small solid category-coloured dot (the actual marker)
+//   label – the POI's real name under the pin
+private const val PLACES_SOURCE_ID = "bv-places"
+private const val HALO_LAYER_ID = "bv-places-halo"
+private const val PIN_LAYER_ID = "bv-places-pin"
+private const val LABEL_LAYER_ID = "bv-places-label"
+
+// Colour per coarse bucket returned by the backend. Default = gold.
+private fun bubbleColorFor(bucket: String): String = when (bucket) {
+    "history" -> "#B23A2E"   // lacquer red
+    "culture" -> "#C69A3F"   // imperial gold
+    "nature" -> "#3E7C5A"    // jade green
+    "lodging" -> "#3B6EA5"   // blue
+    "food" -> "#E07A3F"      // terracotta
+    "place" -> "#8A6D3B"     // bronze
+    else -> "#C69A3F"
+}
+
+private fun distanceMeters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    val out = FloatArray(1)
+    android.location.Location.distanceBetween(lat1, lon1, lat2, lon2, out)
+    return out[0].toDouble()
+}
+
+private fun nearbyFeatureCollection(
+    places: List<NearbyPlace>,
+    userLat: Double?,
+    userLng: Double?,
+    focusedId: String?
+): FeatureCollection {
+    // Distance-to-user drives the halo radius. Without a fix, everything is mid-size.
+    val dists = if (userLat != null && userLng != null) {
+        places.associate { it.id to distanceMeters(userLat, userLng, it.latitude, it.longitude) }
+    } else emptyMap()
+    val maxDist = dists.values.maxOrNull() ?: 1.0
+
+    val features = places.map { place ->
+        val d = dists[place.id]
+        // weight 1 = closest/biggest, 0 = farthest/smallest.
+        val weight = if (d != null && maxDist > 0) (1.0 - d / maxDist) else 0.5
+        val haloRadius = (16f + (weight * 24f)).toFloat() + if (place.id == focusedId) 8f else 0f
+        Feature.fromGeometry(Point.fromLngLat(place.longitude, place.latitude)).apply {
+            addStringProperty("id", place.id)
+            addStringProperty("name", place.name)
+            addStringProperty("color", bubbleColorFor(place.category))
+            addNumberProperty("haloRadius", haloRadius)
+            addBooleanProperty("selected", place.id == focusedId)
+        }
+    }
+    return FeatureCollection.fromFeatures(features)
+}
+
+private fun addBubbleLayer(style: Style) {
+    if (style.getSource(PLACES_SOURCE_ID) != null) return
+    style.addSource(GeoJsonSource(PLACES_SOURCE_ID, FeatureCollection.fromFeatures(emptyList())))
+
+    // 1) Translucent gold halo sized by distance-to-user.
+    style.addLayer(
+        CircleLayer(HALO_LAYER_ID, PLACES_SOURCE_ID).withProperties(
+            PropertyFactory.circleRadius(Expression.get("haloRadius")),
+            PropertyFactory.circleColor("#C69A3F"),
+            PropertyFactory.circleOpacity(0.18f),
+            PropertyFactory.circleStrokeColor("#C69A3F"),
+            PropertyFactory.circleStrokeWidth(
+                Expression.switchCase(
+                    Expression.eq(Expression.get("selected"), Expression.literal(true)),
+                    Expression.literal(2.5f),
+                    Expression.literal(1.2f)
+                )
+            ),
+            PropertyFactory.circleBlur(0.15f)
+        )
+    )
+
+    // 2) Solid category-coloured pin dot (the marker itself).
+    style.addLayer(
+        CircleLayer(PIN_LAYER_ID, PLACES_SOURCE_ID).withProperties(
+            PropertyFactory.circleRadius(
+                Expression.switchCase(
+                    Expression.eq(Expression.get("selected"), Expression.literal(true)),
+                    Expression.literal(8f),
+                    Expression.literal(6f)
+                )
+            ),
+            PropertyFactory.circleColor(Expression.toColor(Expression.get("color"))),
+            PropertyFactory.circleStrokeColor("#FFFAF0"),
+            PropertyFactory.circleStrokeWidth(
+                Expression.switchCase(
+                    Expression.eq(Expression.get("selected"), Expression.literal(true)),
+                    Expression.literal(3f),
+                    Expression.literal(2f)
+                )
+            )
+        )
+    )
+
+    // 3) Real POI name label under the pin.
+    style.addLayer(
+        SymbolLayer(LABEL_LAYER_ID, PLACES_SOURCE_ID).withProperties(
+            PropertyFactory.textField(Expression.get("name")),
+            PropertyFactory.textSize(11f),
+            PropertyFactory.textOffset(arrayOf(0f, 1.3f)),
+            PropertyFactory.textAnchor(Property.TEXT_ANCHOR_TOP),
+            PropertyFactory.textAllowOverlap(false),
+            PropertyFactory.textOptional(true),
+            PropertyFactory.textColor("#2A2118"),
+            PropertyFactory.textHaloColor("#FFF8EC"),
+            PropertyFactory.textHaloWidth(1.4f)
+        )
+    )
+}
+
 @Composable
 private fun ExploreMapView(
     state: ExploreUiState.Success,
@@ -192,12 +323,69 @@ private fun ExploreMapView(
     onSearchQueryChanged: (String) -> Unit,
     onPlaceClick: (Place) -> Unit,
     onToggleViewMode: () -> Unit,
-    onPlaceFocused: (String?) -> Unit
+    onPlaceFocused: (String?) -> Unit,
+    onUserLocated: (Double, Double) -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val listState = rememberLazyListState()
     var mapState by remember { mutableStateOf<MapLibreMap?>(null) }
+
+    // Get the real user position, then pull live POIs + weather around it.
+    val fusedClient = remember {
+        com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(context)
+    }
+
+    fun deliverLocation(loc: android.location.Location?) {
+        if (loc == null) return
+        onUserLocated(loc.latitude, loc.longitude)
+        mapState?.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(LatLng(loc.latitude, loc.longitude), 14.0)
+        )
+    }
+
+    // Active fix (getCurrentLocation) is reliable even when no cached fix exists;
+    // fall back to lastLocation if the active request yields nothing.
+    fun requestFix() {
+        try {
+            val cts = com.google.android.gms.tasks.CancellationTokenSource()
+            fusedClient.getCurrentLocation(
+                com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY, cts.token
+            ).addOnSuccessListener { fresh ->
+                if (fresh != null) deliverLocation(fresh)
+                else fusedClient.lastLocation.addOnSuccessListener { deliverLocation(it) }
+            }.addOnFailureListener {
+                fusedClient.lastLocation.addOnSuccessListener { deliverLocation(it) }
+            }
+        } catch (_: SecurityException) {
+            // Permission revoked between check and call — leave map at default.
+        }
+    }
+
+    val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()
+    ) { result ->
+        if (result.values.any { it }) requestFix()
+    }
+
+    LaunchedEffect(Unit) {
+        val fineGranted = androidx.core.content.ContextCompat.checkSelfPermission(
+            context, android.Manifest.permission.ACCESS_FINE_LOCATION
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        val coarseGranted = androidx.core.content.ContextCompat.checkSelfPermission(
+            context, android.Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        if (fineGranted || coarseGranted) {
+            requestFix()
+        } else {
+            permissionLauncher.launch(
+                arrayOf(
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
 
     // Sync Carousel to Map selection
     LaunchedEffect(state.focusedPlaceId) {
@@ -214,28 +402,29 @@ private fun ExploreMapView(
             onCreate(null)
             getMapAsync { map ->
                 mapState = map
-                map.setStyle(Style.Builder().fromUri("https://tiles.goong.io/assets/goong_map_web.json?api_key=${BuildConfig.GOONG_MAPTILES_KEY}"))
-                
+                map.setStyle(
+                    Style.Builder().fromUri("https://tiles.goong.io/assets/goong_map_web.json?api_key=${BuildConfig.GOONG_MAPTILES_KEY}")
+                ) { style ->
+                    addBubbleLayer(style)
+                }
+
                 val daNangLocation = LatLng(16.047079, 108.206230)
                 map.cameraPosition = CameraPosition.Builder()
                     .target(daNangLocation)
                     .zoom(5.5)
                     .build()
-                
+
                 map.uiSettings.isCompassEnabled = false
                 map.uiSettings.isLogoEnabled = false
                 map.uiSettings.isAttributionEnabled = false
 
-                map.addOnMapClickListener {
-                    onPlaceFocused(null)
-                    true
-                }
-
-                map.setOnMarkerClickListener { marker ->
-                    val placeId = marker.snippet
-                    if (placeId != null) {
-                        onPlaceFocused(placeId)
-                    }
+                // Tap a bubble to focus it; tap empty map to clear selection.
+                map.addOnMapClickListener { latLng ->
+                    val screenPoint = map.projection.toScreenLocation(latLng)
+                    val hits = map.queryRenderedFeatures(screenPoint, PIN_LAYER_ID, HALO_LAYER_ID)
+                    val placeId = hits.firstOrNull()
+                        ?.getStringProperty("id")
+                    onPlaceFocused(placeId) // null when tapping empty space
                     true
                 }
             }
@@ -243,16 +432,19 @@ private fun ExploreMapView(
     }
 
 
-    // Sync markers
-    LaunchedEffect(state.filteredPlaces) {
+    // Sync bubbles: rebuild the GeoJSON source from the live nearby POIs whenever
+    // the data, the user position, or the selection changes.
+    LaunchedEffect(state.nearbyPlaces, state.userLatitude, state.userLongitude, state.focusedPlaceId) {
         mapView.getMapAsync { map ->
-            map.clear()
-            state.filteredPlaces.forEach { place ->
-                map.addMarker(
-                    MarkerOptions()
-                        .position(LatLng(place.latitude, place.longitude))
-                        .title(place.name)
-                        .snippet(place.id) // Use snippet to store the place ID
+            map.style?.let { style ->
+                addBubbleLayer(style) // no-op if already present
+                (style.getSource(PLACES_SOURCE_ID) as? GeoJsonSource)?.setGeoJson(
+                    nearbyFeatureCollection(
+                        state.nearbyPlaces,
+                        state.userLatitude,
+                        state.userLongitude,
+                        state.focusedPlaceId
+                    )
                 )
             }
         }
@@ -279,6 +471,16 @@ private fun ExploreMapView(
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(factory = { mapView }, modifier = Modifier.fillMaxSize())
 
+        // Live area weather (temp / UV / rain) around the user.
+        state.areaWeather?.let { weather ->
+            AreaWeatherChip(
+                weather = weather,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(top = 130.dp, start = 16.dp)
+            )
+        }
+
         // Map Reset Button
         FloatingActionButton(
             onClick = {
@@ -298,6 +500,21 @@ private fun ExploreMapView(
             Icon(
                 imageVector = Icons.Filled.Map,
                 contentDescription = stringResource(R.string.map_reset_view)
+            )
+        }
+
+        // My-location button: re-fetch GPS and recenter the camera on the user.
+        FloatingActionButton(
+            onClick = { requestFix() },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 196.dp, end = 16.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.primary
+        ) {
+            Icon(
+                imageVector = Icons.Filled.MyLocation,
+                contentDescription = stringResource(R.string.map_my_location)
             )
         }
 
@@ -366,6 +583,39 @@ private fun ExploreMapView(
                 }
             }
         }
+    }
+}
+
+/**
+ * Chip nổi hiển thị điều kiện thời tiết khu vực (nhiệt độ, UV, lượng mưa) quanh người dùng.
+ */
+@Composable
+private fun AreaWeatherChip(weather: AreaWeather, modifier: Modifier = Modifier) {
+    val emoji = when (weather.condition) {
+        "rainy" -> "🌧️"
+        "cloudy" -> "☁️"
+        "hot" -> "🔥"
+        "sunny" -> "☀️"
+        else -> "🌤️"
+    }
+    val parts = buildList {
+        weather.temp?.let { add("${it.toInt()}°C") }
+        weather.uvi?.let { add("UV ${it.toInt()}") }
+        weather.rainMm?.let { if (it > 0) add("☔ ${"%.1f".format(it)}mm") }
+    }
+    Surface(
+        modifier = modifier,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(999.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        tonalElevation = 2.dp
+    ) {
+        Text(
+            text = "$emoji  ${parts.joinToString(" · ")}",
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+        )
     }
 }
 
@@ -537,7 +787,8 @@ fun ExploreScreenLoadingPreview() {
             onSearchQueryChanged = {},
             onPlaceClick = {},
             onToggleViewMode = {},
-            onPlaceFocused = {}
+            onPlaceFocused = {},
+            onUserLocated = { _, _ -> }
         )
     }
 }
@@ -558,7 +809,8 @@ fun ExploreScreenMapViewPreview() {
             onSearchQueryChanged = {},
             onPlaceClick = {},
             onToggleViewMode = {},
-            onPlaceFocused = {}
+            onPlaceFocused = {},
+            onUserLocated = { _, _ -> }
         )
     }
 }
@@ -578,7 +830,8 @@ fun ExploreScreenListViewPreview() {
             onSearchQueryChanged = {},
             onPlaceClick = {},
             onToggleViewMode = {},
-            onPlaceFocused = {}
+            onPlaceFocused = {},
+            onUserLocated = { _, _ -> }
         )
     }
 }

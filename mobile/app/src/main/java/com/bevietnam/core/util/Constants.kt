@@ -7,7 +7,7 @@ object Constants {
     /**
      * Đường dẫn URL cơ sở (Base URL) cho các yêu cầu gọi API Backend.
      */
-    const val BASE_URL = "http://192.168.31.128:8000/api/v1/"
+    const val BASE_URL = "https://api.iamphuckhang.dev/api/v1/"
     
     /**
      * Thời gian chờ tối đa (timeout) mặc định cho các cuộc gọi mạng (tính bằng giây).

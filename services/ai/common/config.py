@@ -54,6 +54,13 @@ class Settings(BaseSettings):
     gemini_model: str = "gemini-2.0-flash"
     llm_provider: str = "gemini"  # "gemini" | "vllm" | "mock"
 
+    # ── Capture verification (reference-image grounding) ──────────────────────
+    # SerpAPI Google Images key — fetch a reference photo for a task when none
+    # is cached yet. Empty → fall back to text-only vision judging.
+    serpapi_api_key: str = ""
+    # Where downloaded reference images are cached (one per task, reused).
+    reference_cache_dir: str = "data/reference_images"
+
     # ── LLM (self-hosted vLLM — OpenAI-compatible, replaces quota-dead Gemini) ─
     # Served by vllm_hosting/ on a Thundercompute L40, exposed via cloudflared.
     vllm_base_url: str = "https://api.iamphuckhang.dev/v1"

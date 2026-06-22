@@ -61,6 +61,10 @@ type ExploreLayerClickEvent = {
 // Only fetch/show live POIs when zoomed in enough to bound the viewport sensibly.
 const NEARBY_MIN_ZOOM = 13;
 
+// Scan radius around the user's actual position. We only surface places within
+// walking/short-ride distance of where the user is, not the whole viewport.
+const NEARBY_RADIUS_METERS = 3000;
+
 // Pin colour per category (the teardrop fill — Google-style)
 const CATEGORY_COLORS: Record<Category, string> = {
     history:  '#e6b422',
@@ -553,13 +557,12 @@ export function ExplorePage() {
                 setNearbyItems([]);
                 return;
             }
-            const center = m.getCenter?.();
-            const bounds = m.getBounds?.();
-            const ne = bounds?.getNorthEast?.();
+            // Anchor the scan on the user's real GPS position when we have it;
+            // fall back to the map center only until geolocation resolves.
+            const mapCenter = m.getCenter?.();
+            const center = userLocation ?? (mapCenter ? { lat: mapCenter.lat, lng: mapCenter.lng } : null);
             if (!center) return;
-            const radius = ne
-                ? Math.min(50000, Math.max(300, Math.round(haversineMeters(center.lat, center.lng, ne.lat, ne.lng))))
-                : 2000;
+            const radius = NEARBY_RADIUS_METERS;
             const [places, weather] = await Promise.all([
                 nearbyApi.search(center.lat, center.lng, radius, 40),
                 weatherApi.getWeather(center.lat, center.lng),
@@ -589,7 +592,7 @@ export function ExplorePage() {
             if (timer) clearTimeout(timer);
             m.off?.('moveend', onMoveEnd);
         };
-    }, [mapLoaded]);
+    }, [mapLoaded, userLocation]);
 
     // Sidebar list = live POIs filtered by category chip + search query.
     const filteredPlaces = useMemo(() => {
@@ -646,6 +649,13 @@ export function ExplorePage() {
             { enableHighAccuracy: true, timeout: 8000 },
         );
     }, []);
+
+    // Auto-locate once the map is ready so the scan centers on the real user
+    // position instead of the default map view.
+    useEffect(() => {
+        if (!mapLoaded) return;
+        handleLocate();
+    }, [mapLoaded, handleLocate]);
 
     // Clicking a bubble/pin selects that POI.
     useEffect(() => {
