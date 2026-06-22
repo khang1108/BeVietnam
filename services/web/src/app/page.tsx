@@ -2,7 +2,6 @@
 
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
-import NonLaHero from '@/components/NonLaHero';
 import HoiAnHouse from '@/components/HoiAnHouse';
 import { useI18n } from '@/i18n';
 import { ArrowRight } from '@phosphor-icons/react';
@@ -82,9 +81,6 @@ export default function HomePage() {
           />
         </div>
         <div className={styles.heroScrim} aria-hidden="true" />
-        <div className={styles.heroCanvasContainer}>
-          <NonLaHero className={styles.heroCanvas} />
-        </div>
         <div className={styles.heroContent}>
           <h1 className={styles.heroTitle}>
             {L('Khám phá văn hoá Việt Nam', 'Explore the culture of Vietnam')}

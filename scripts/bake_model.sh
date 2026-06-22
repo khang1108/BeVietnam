@@ -29,24 +29,23 @@ blender --background --python "$ROOT/scripts/bake_turntable.py" -- "$MODEL" "$TM
 
 DELAY_MS=$((1000 / FPS))
 
-echo "[bake] encoding animated WebP -> $OUT_DIR/$NAME.webp"
+# Animated WebP only via img2webp — ffmpeg's libwebp writes frames without the
+# ANIM/ANMF container, producing a non-animated (broken) WebP. The WebM below is
+# the reliable transparent loop; WebP is an optional extra.
 if command -v img2webp >/dev/null; then
+  echo "[bake] encoding animated WebP -> $OUT_DIR/$NAME.webp"
   img2webp -loop 0 -d "$DELAY_MS" -q 75 "$TMP"/frame_*.png -o "$OUT_DIR/$NAME.webp"
-elif command -v ffmpeg >/dev/null; then
-  ffmpeg -y -framerate "$FPS" -i "$TMP/frame_%04d.png" \
-    -c:v libwebp -lossless 0 -q:v 75 -loop 0 -pix_fmt yuva420p "$OUT_DIR/$NAME.webp"
 else
-  echo "ERROR: need img2webp (Arch: libwebp) or ffmpeg to encode WebP"; exit 1
+  echo "[bake] skipping WebP (img2webp not found; Arch: 'libwebp'). Using WebM only."
 fi
 
-# Static poster (first frame) for the <img> while WebP loads / as alt.
+# Static poster (first frame) shown before the loop plays.
 cp "$TMP/frame_0001.png" "$OUT_DIR/$NAME.png"
 
-# Optional smaller VP9-alpha WebM if ffmpeg is available.
-if command -v ffmpeg >/dev/null; then
-  echo "[bake] encoding VP9-alpha WebM -> $OUT_DIR/$NAME.webm"
-  ffmpeg -y -framerate "$FPS" -i "$TMP/frame_%04d.png" \
-    -c:v libvpx-vp9 -pix_fmt yuva420p -b:v 0 -crf 30 "$OUT_DIR/$NAME.webm"
-fi
+# Primary transparent loop: VP9-alpha WebM (the <video> source).
+command -v ffmpeg >/dev/null || { echo "ERROR: ffmpeg required for the WebM loop"; exit 1; }
+echo "[bake] encoding VP9-alpha WebM -> $OUT_DIR/$NAME.webm"
+ffmpeg -y -framerate "$FPS" -i "$TMP/frame_%04d.png" \
+  -c:v libvpx-vp9 -pix_fmt yuva420p -b:v 0 -crf 30 "$OUT_DIR/$NAME.webm"
 
-echo "[bake] done: $OUT_DIR/$NAME.webp (+ .png, .webm if encoded)"
+echo "[bake] done: $OUT_DIR/$NAME.webm (+ .png poster, .webp if img2webp present)"
