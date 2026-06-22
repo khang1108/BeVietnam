@@ -90,50 +90,56 @@ private val DarkCulturalColors = CulturalColors(
     permissionOrangeText = PermissionOrangeText.copy(alpha = 0.9f)
 )
 
+// Dark theme — imperial lacquer (web signature): gold on warm brown-black.
 private val DarkColorScheme = darkColorScheme(
-    primary = PrimaryRedLight,
-    onPrimary = Color.Black,
-    primaryContainer = PrimaryRed,
-    onPrimaryContainer = Color.White,
-    secondary = PrimaryRedLight,
-    onSecondary = Color.Black,
-    background = Color(0xFF1E1B18), // Xám tối pha tông ấm đặc trưng Việt Nam
-    onBackground = Color(0xFFF8EFE5),
-    surface = Color(0xFF2A2624),
-    onSurface = Color(0xFFF8EFE5),
-    onSurfaceVariant = Color(0xFFDDC0BA)
+    primary = Color(0xFFC69A3F),            // imperial gold
+    onPrimary = Color(0xFF1A120B),          // lacquer ink on gold
+    primaryContainer = Color(0xFFA98034),   // gold-600
+    onPrimaryContainer = Color(0xFFF7EFDC),
+    secondary = Color(0xFF9E2B25),          // son red seal
+    onSecondary = Color(0xFFF7EFDC),
+    secondaryContainer = Color(0xFF511613),
+    onSecondaryContainer = Color(0xFFE9BDB9),
+    tertiary = Color(0xFF3F7A5E),           // jade
+    onTertiary = Color(0xFFF7EFDC),
+    background = Color(0xFF1A120B),          // lacquer
+    onBackground = Color(0xFFEFE6D2),
+    surface = Color(0xFF241910),
+    onSurface = Color(0xFFEFE6D2),
+    surfaceVariant = Color(0xFF2F2016),
+    onSurfaceVariant = Color(0xFFC9BBA2),
+    outline = Color(0xFF4A3826),
+    outlineVariant = Color(0xFF3A2C1C),
+    error = Color(0xFFC5605A),
+    onError = Color(0xFF1A120B)
 )
 
+// Light theme — warm rice-paper (web --paper): gold primary, ink text.
 private val LightColorScheme = lightColorScheme(
-    primary = PrimaryRed,
-    onPrimary = Color.White,
-    primaryContainer = PrimaryRedLight,
-    onPrimaryContainer = Color.White,
-    secondary = PrimaryRedLight,
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE3DFD5),
-    onSecondaryContainer = Color(0xFF64635A),
-    tertiary = md_theme_light_tertiary,
-    onTertiary = md_theme_light_onTertiary,
-    tertiaryContainer = md_theme_light_tertiaryContainer,
-    onTertiaryContainer = md_theme_light_onTertiaryContainer,
-    error = md_theme_light_error,
-    errorContainer = md_theme_light_errorContainer,
-    onError = md_theme_light_onError,
-    onErrorContainer = md_theme_light_onErrorContainer,
-    background = Background, // Màu vàng cát giấy dó ấm áp
-    onBackground = TextPrimary,
-    surface = CardBackground, // Màu trắng cho Card nổi bật
-    onSurface = TextPrimary,
-    surfaceVariant = md_theme_light_surfaceVariant,
-    onSurfaceVariant = TextSecondary,
-    outline = md_theme_light_outline,
-    outlineVariant = Color(0xFFE0D5C5), // Màu viền nhẹ
-    inverseOnSurface = md_theme_light_inverseOnSurface,
-    inverseSurface = md_theme_light_inverseSurface,
-    inversePrimary = md_theme_light_inversePrimary,
-    surfaceTint = md_theme_light_surfaceTint,
-    scrim = md_theme_light_scrim
+    primary = Color(0xFFC69A3F),            // imperial gold
+    onPrimary = Color(0xFF1A120B),          // ink on gold (gold is too light for white)
+    primaryContainer = Color(0xFFEFE1BF),
+    onPrimaryContainer = Color(0xFF443316),
+    secondary = Color(0xFF9E2B25),          // son red seal
+    onSecondary = Color(0xFFFAF5EA),
+    secondaryContainer = Color(0xFFE9BDB9),
+    onSecondaryContainer = Color(0xFF380F0D),
+    tertiary = Color(0xFF3F7A5E),           // jade
+    onTertiary = Color(0xFFFAF5EA),
+    error = Color(0xFF9E2B25),
+    errorContainer = Color(0xFFF6E3E1),
+    onError = Color(0xFFFAF5EA),
+    onErrorContainer = Color(0xFF380F0D),
+    background = Color(0xFFFAF5EA),          // cream paper
+    onBackground = Color(0xFF1F1810),        // ink
+    surface = Color(0xFFFDFAF2),
+    onSurface = Color(0xFF1F1810),
+    surfaceVariant = Color(0xFFE6D9BF),
+    onSurfaceVariant = Color(0xFF5A4D3A),
+    outline = Color(0xFFD6C4A3),
+    outlineVariant = Color(0xFFE3D6BD),
+    surfaceTint = Color(0xFFC69A3F),
+    scrim = Color(0xFF1A120B)
 )
 
 @Composable
@@ -156,7 +162,7 @@ fun BeVietnamTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
+            window.statusBarColor = colorScheme.background.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }

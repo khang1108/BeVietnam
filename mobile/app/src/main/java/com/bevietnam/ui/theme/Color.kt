@@ -2,23 +2,25 @@ package com.bevietnam.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val PrimaryRed = Color(0xFF842C1A)
-val PrimaryRedLight = Color(0xFFA3432F)
-val Background = Color(0xFFFFF8F3)
-val CardBackground = Color(0xFFFFFFFF)
-val TextPrimary = Color(0xFF1A1A1A)
-val TextSecondary = Color(0xFF6B6B6B)
+// Imperial Huế / Lacquer palette — synced with the web design system.
+// "Primary" is now Imperial Gold (web primary); son red is the sparing accent.
+val PrimaryRed = Color(0xFFC69A3F)       // imperial gold (web --gold)
+val PrimaryRedLight = Color(0xFFCBA759)  // gold-400
+val Background = Color(0xFFFAF5EA)       // warm rice-paper cream (web --paper)
+val CardBackground = Color(0xFFFDFAF2)   // elevated paper
+val TextPrimary = Color(0xFF1F1810)      // ink (web --ink)
+val TextSecondary = Color(0xFF5A4D3A)    // warm secondary text
 
-// Các màu sắc đặc trưng mang đậm bản sắc văn hóa Việt Nam
-val CulturalAmber = Color(0xFFF39C12)
-val CulturalGold = Color(0xFFFFD700)
-val CompletionBlue = Color(0xFF2980B9)
+// Cultural accents — desaturated, on-palette (no neon).
+val CulturalAmber = Color(0xFFCBA759)
+val CulturalGold = Color(0xFFC69A3F)     // was neon #FFD700
+val CompletionBlue = Color(0xFFC69A3F)   // web has no blue → gold
 
-// Các màu sắc hiển thị cấp độ khó của nhiệm vụ trong game (Gamification)
-val EasyGreen = Color(0xFF27AE60)
-val MediumOrange = Color(0xFFE67E22)
-val HardRed = Color(0xFFC0392B)
-val CompletedGray = Color(0xFFBDBDBD)
+// Difficulty colours mapped onto the lacquer palette (jade / gold / son red).
+val EasyGreen = Color(0xFF3F7A5E)        // jade (web success)
+val MediumOrange = Color(0xFFCBA759)     // gilt
+val HardRed = Color(0xFF9E2B25)          // son red (web --seal)
+val CompletedGray = Color(0xFF8F8068)    // warm neutral-500
 
 // Các màu sắc biểu thị trạng thái cấp quyền hệ thống
 val PermissionGreenBg = Color(0xFFE8F5E9)
