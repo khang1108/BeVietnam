@@ -75,3 +75,7 @@ PA_Decomposition.md
 !docs/computational-thinking/slides/**/*.tex
 !docs/computational-thinking/slides/**/*.pdf
 !docs/computational-thinking/slides/**/.gitignore
+
+# ─── 3D model bake sources (large; commit only baked .webp/.webm/.png) ──
+/services/web/public/models/*.zip
+/services/web/public/models/*/
