@@ -16,7 +16,9 @@ class Base(DeclarativeBase):
 
 
 def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    # Naive UTC: the DateTime columns are TIMESTAMP WITHOUT TIME ZONE, and asyncpg
+    # refuses to bind a tz-aware datetime into a without-tz column.
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class PlaceModel(Base):
