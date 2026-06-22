@@ -1,10 +1,8 @@
 \section{Problem Analysis and decomposition}
 
 \subsection{Problem Analysis}
-\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
 \subsubsection{Bối cảnh du lịch Việt Nam hiện tại}
-\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
 Trong những năm gần đây, ngành du lịch Việt Nam đang trải qua một giai đoạn chuyển mình và phát triển vô cùng mạnh mẽ. Theo các số liệu thống kê được công bố bởi Tổng cục Thống kê và VnEconomy, lượng khách du lịch quốc tế đến Việt Nam trong năm 2025 đã đạt mức tăng trưởng kỷ lục là $20.4\%$ so với cùng kỳ năm trước, đồng thời vượt mức đỉnh trước đại dịch COVID-19 năm 2019 tới $17.8\%$. Sự bùng nổ này không chỉ giới hạn ở lượng khách nước ngoài, mà còn được thúc đẩy mạnh mẽ từ thị trường du lịch nội địa khi người dân có xu hướng chuyển dịch từ tham quan thuần túy sang khám phá ẩm thực và chiều sâu văn hoá vùng miền.
 
@@ -68,12 +66,10 @@ Tuy nhiên, sự gia tăng vượt bậc về mặt số lượng du khách lạ
 \end{figure}
 
 \subsubsection{Đặt vấn đề}
-\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
 Mặc dù có lượng du khách tăng trưởng vô cùng lớn, chất lượng trải nghiệm du lịch thực tế tại Việt Nam lại gặp phải một bài toán nan giải. Du khách --- cả trong nước và quốc tế --- đang đối mặt với một nghịch lý lớn: thông tin du lịch tràn ngập trên các nền tảng Internet, nhưng lại vô cùng phân mảnh, thiếu chiều sâu văn hóa và không có độ tin cậy cao. Bài toán đặt ra cho ta không chỉ đơn thuần là cung cấp một bản đồ số hiển thị vị trí các địa điểm du lịch bản địa, mà là làm sao kết nối những thông tin ấy thành một câu chuyện văn hóa giàu ngữ cảnh, giúp người dùng thực sự hiểu được các giá trị lịch sử và nhân văn đằng sau mỗi di tích, món ăn.
 
 \subsubsection{Phân tích các điểm nghẽn (Pain Points)}
-\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
 Qua quá trình khảo sát thực địa và phân tích hành vi người dùng, ta nhận diện được bốn điểm nghẽn cốt lõi (\textbf{P1--P4}) trong trải nghiệm du lịch hiện tại:
 \begin{itemize}
@@ -84,7 +80,6 @@ Qua quá trình khảo sát thực địa và phân tích hành vi người dùn
 \end{itemize}
 
 \subsubsection{Các câu hỏi phân tích định hình giải pháp}
-\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
 Để định hình giải pháp kỹ thuật cụ thể dưới góc độ tư duy tính toán, ta đặt ra các câu hỏi socratic sau:
 \begin{enumerate}
@@ -97,7 +92,6 @@ Qua quá trình khảo sát thực địa và phân tích hành vi người dùn
 \end{enumerate}
 
 \subsubsection{Xác định Input/Output của bài toán}
-\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
 Việc làm rõ các tham số đầu vào và đầu ra đóng vai trò định hình hợp đồng dữ liệu giữa các thành phần trong hệ thống. Chi tiết được trình bày qua Bảng~\ref{tab:inputs_definition} và Bảng~\ref{tab:outputs_definition}.
 
@@ -135,7 +129,6 @@ Dailylife Journal & Nhật ký hành trình du lịch bằng AI & Nhật ký tó
 \end{table}
 
 \subsubsection{Giải pháp đề xuất: Hệ thống Multi-Agent (MAS)}
-\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
 Để giải quyết bài toán lớn này một cách triệt để, ta đề xuất sử dụng kiến trúc hệ thống Multi-Agent (\textit{Multi-Agent System} - MAS) thay vì kiến trúc monolithic truyền thống. Sự lựa chọn này dựa trên ba luận điểm kỹ thuật cốt lõi:
 \begin{enumerate}
@@ -166,10 +159,8 @@ G7: Tối ưu chi phí đám mây & Phối hợp các dịch vụ Serverless fre
 \end{table}
 
 \subsection{Decomposition: Phân rã bài toán}
-\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
 \subsubsection{Các hệ thống con (Subsystems)}
-\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
 Để hiện thực hóa kiến trúc MAS, bài toán tổng thể của BeVietnam được phân rã thành bốn hệ thống con có chức năng chuyên biệt:
 \begin{itemize}
@@ -198,7 +189,6 @@ S4. User Platform & P3 (đóng góp cộng đồng) & Thao tác click, vị trí
 \end{table}
 
 \subsubsection{Hệ thống Agent và Module}
-\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
 Từ bốn hệ thống con chính, ta tiến hành phân rã sâu hơn thành 7 agent tự chủ và 3 module phần mềm cơ sở. Sự phân rã này được thể hiện trực quan qua cây thư mục phân rã cấu trúc hệ thống (Hình~\ref{fig:system_decomposition_tree}).
 
@@ -262,7 +252,6 @@ Từ bốn hệ thống con chính, ta tiến hành phân rã sâu hơn thành 7
 \end{figure}
 
 \subsubsection{Mô tả chi tiết các Agent và cơ chế vận hành}
-\noindent\textbf{Author/Reviewer:} Nguyễn Hữu Nghĩa (ID: 24120103)
 
 Dưới đây là thiết kế chi tiết về chức năng kỹ thuật và giải thuật vận hành của từng tác tử trong hệ thống:
 \begin{enumerate}

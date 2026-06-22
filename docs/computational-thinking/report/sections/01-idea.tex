@@ -1,20 +1,39 @@
 \section{Idea}
 
 \subsection{Problem Statement}
-\noindent\textbf{Author/Reviewer:} Nguyễn Phúc Khang (ID: 22120155)
 
+Trong những năm gần đây, du lịch văn hoá tại Việt Nam ngày càng trở thành một nhu cầu rõ rệt hơn của cả du khách trong nước lẫn quốc tế. Khi đi đến một địa phương như Huế, người dùng không chỉ muốn biết một địa điểm nằm ở đâu, mở cửa lúc mấy giờ, hay được đánh giá bao nhiêu sao. Điều họ thật sự cần là một câu trả lời giàu ngữ cảnh hơn: địa điểm này có ý nghĩa gì, tại sao nên ghé thăm vào thời điểm hiện tại, và nếu đã đến đó thì nên quan sát hay trải nghiệm điều gì để hiểu hơn về văn hoá địa phương.
 
+Tuy nhiên, phần lớn công cụ du lịch hiện nay vẫn đang tiếp cận bài toán ở mức rất bề mặt. Bản đồ số cung cấp toạ độ và đánh giá; mạng xã hội cung cấp hình ảnh và cảm xúc cá nhân; các bài blog cung cấp câu chuyện nhưng thiếu cấu trúc; còn công cụ dịch máy có thể dịch từng từ nhưng không thể giải thích đầy đủ một ý niệm văn hoá. Chính khoảng trống này tạo nên động lực cho đề tài \textbf{BeVietnam}.
 
-\medskip
+Nếu nhìn dưới góc độ người dùng, BeVietnam là một ứng dụng hỗ trợ du lịch. Nhưng nếu nhìn dưới góc độ tư duy tính toán, BeVietnam là một bài toán ra quyết định dưới nhiều điều kiện thay đổi theo thời gian.
 
+\begin{mydef}{Bài toán BeVietnam tổng quát}{}
+Cho tập địa điểm văn hoá $\mathcal{P} = \{p_1,p_2,\ldots,p_n\}$, một người dùng $u$ với vị trí, ngôn ngữ, sở thích và lịch sử tương tác, cùng ngữ cảnh môi trường $c$ gồm thời tiết, khoảng cách, giao thông và mức độ đông đúc. Bài toán đặt ra là xây dựng một hàm:
+\[
+    F(u,c,\mathcal{P}) \rightarrow (R, M, Q)
+\]
+trong đó $R$ là danh sách gợi ý có giải thích, $M$ là biểu diễn bản đồ có mức ưu tiên trực quan, và $Q$ là nhiệm vụ văn hoá phù hợp để người dùng thực hiện tại hoặc gần vị trí hiện tại.
+\end{mydef}
+
+Với cách phát biểu này, bài toán không còn là ``làm một app du lịch'' chung chung. Nó trở thành một hệ thống có Input, Output, ràng buộc, tiêu chí đánh giá và các bước xử lý rõ ràng.
 
 \subsection{Product Vision}
-\noindent\textbf{Author/Reviewer:} Nguyễn Phúc Khang (ID: 22120155)
 
+BeVietnam được định hướng như một hệ thống du lịch văn hoá thông minh, trước mắt tập trung vào khu vực Huế. Hệ thống hướng đến việc giúp du khách trả lời ba câu hỏi liên tiếp:
 
+\begin{center}
+\textit{Nên đi đâu bây giờ? Vì sao nơi đó đáng đi? Và khi đến đó nên làm gì để hiểu văn hoá hơn?}
+\end{center}
+
+Từ ba câu hỏi trên, sản phẩm được cụ thể hoá thành ba trải nghiệm chính:
+\begin{enumerate}[leftmargin=1.2cm]
+    \item \textbf{Bảng tin gợi ý địa điểm} tương tự một feed mạng xã hội, trong đó mỗi địa điểm được gợi ý dựa trên vị trí, thời tiết, khoảng cách, mức độ phù hợp văn hoá và sở thích người dùng.
+    \item \textbf{Bản đồ động} trong đó các marker hoặc bubble không có kích thước cố định, mà thay đổi theo điểm phù hợp của địa điểm trong bối cảnh hiện tại.
+    \item \textbf{Tuyến nhiệm vụ văn hoá} theo phong cách GeoCatch, yêu cầu người dùng di chuyển đến địa điểm, check-in, chụp ảnh một chi tiết hoặc khung cảnh được mô tả, từ đó mở khoá thêm ngữ cảnh văn hoá.
+\end{enumerate}
 
 \subsection{Target Users}
-\noindent\textbf{Author/Reviewer:} Nguyễn Phúc Khang (ID: 22120155)
 
 Đối tượng người dùng mục tiêu của BeVietnam bao gồm:
 \begin{itemize}
