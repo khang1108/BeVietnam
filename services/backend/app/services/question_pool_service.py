@@ -12,6 +12,7 @@ from typing import Any
 import httpx
 
 from services.backend.app.core.config import settings
+from services.backend.app.core.rate_limit import goong_limiter
 from services.backend.app.schemas.question_pool import (
     QuestionPoolItem,
     QuestionPoolResponse,
@@ -124,6 +125,9 @@ class GoongContextResolver:
 
     async def reverse_geocode(self, latitude: float, longitude: float) -> dict[str, str]:
         if not settings.GOONG_API_KEY:
+            return {}
+
+        if not await goong_limiter.allow():
             return {}
 
         try:

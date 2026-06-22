@@ -42,6 +42,16 @@ class Settings(BaseSettings):
     # Requesting them on a non-premium key 429s the whole call, so gate it.
     FOURSQUARE_PREMIUM: bool = False
 
+    # Outbound rate limiting for shared third-party free tiers.
+    # GLOBAL (all users share one quota), per-process. Tune via env for demo.
+    RATE_LIMIT_ENABLED: bool = True
+    FOURSQUARE_RPM: int = 30      # requests/min
+    FOURSQUARE_DAILY: int = 2000  # hard cap/day (0 = unlimited)
+    OPENWEATHER_RPM: int = 40
+    OPENWEATHER_DAILY: int = 5000
+    GOONG_RPM: int = 20
+    GOONG_DAILY: int = 1500
+
     # Auth / JWT — override SECRET_KEY in production via env.
     SECRET_KEY: str = "dev-only-change-me-in-production-32-bytes-minimum"
     ALGORITHM: str = "HS256"

@@ -10,6 +10,7 @@ import logging
 import httpx
 
 from services.backend.app.core.config import settings
+from services.backend.app.core.rate_limit import foursquare_limiter
 from services.backend.app.schemas.nearby import NearbyPlace, NearbyResponse
 
 logger = logging.getLogger(__name__)
@@ -43,6 +44,9 @@ class FoursquareService:
         limit: int = 30,
     ) -> NearbyResponse:
         if not settings.FOURSQUARE_API_KEY:
+            return NearbyResponse(total=0, items=[])
+
+        if not await foursquare_limiter.allow():
             return NearbyResponse(total=0, items=[])
 
         fields = "fsq_place_id,name,latitude,longitude,categories,location,distance"

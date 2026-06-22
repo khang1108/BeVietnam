@@ -12,6 +12,7 @@ from typing import Any
 import httpx
 
 from services.backend.app.core.config import settings
+from services.backend.app.core.rate_limit import openweather_limiter
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +64,13 @@ class OpenWeatherResolver:
             result, cached_at = cached
             if time.monotonic() - cached_at < self._ttl_seconds:
                 return replace(result, source="cache")
+
+        # Shared free-tier guard. On limit, serve a stale cache entry if we have
+        # one, else a neutral fallback — never block the request.
+        if not await openweather_limiter.allow():
+            if cached:
+                return replace(cached[0], source="cache-stale")
+            return WeatherResult(condition="any", temp=None, source="rate_limited")
 
         try:
             async with httpx.AsyncClient(timeout=settings.OPENWEATHER_TIMEOUT) as client:
