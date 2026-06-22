@@ -6,7 +6,7 @@ TODO(Backend): Configure DB engine in core/database.py
     from sqlalchemy.orm import DeclarativeBase, sessionmaker
     DATABASE_URL = settings.DATABASE_URL
 """
-from sqlalchemy import Column, String, Float, DateTime, Boolean, Text, ForeignKey
+from sqlalchemy import Column, String, Float, DateTime, Boolean, Text, ForeignKey, JSON
 from sqlalchemy.orm import DeclarativeBase, relationship
 from datetime import datetime, timezone
 
@@ -46,6 +46,23 @@ class UserModel(Base):
     created_at = Column(DateTime, default=utcnow)
 
     captures = relationship("CaptureModel", back_populates="user")
+    preference = relationship(
+        "UserPreferenceModel", back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
+
+
+class UserPreferenceModel(Base):
+    """Per-user personalization signals used to rank the feed."""
+    __tablename__ = "user_preferences"
+
+    user_id = Column(String, ForeignKey("users.id"), primary_key=True)
+    # List of category tags, e.g. ["history", "architecture", "cuisine"].
+    interests = Column(JSON, nullable=False, default=list)
+    home_latitude = Column(Float, nullable=True)
+    home_longitude = Column(Float, nullable=True)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
+
+    user = relationship("UserModel", back_populates="preference")
 
 
 class CaptureModel(Base):

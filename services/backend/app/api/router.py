@@ -14,6 +14,7 @@ from services.backend.app.api.endpoints import (
     health,
     logs,
     places,
+    preferences,
     quest,
     question_pool,
     uploads,
@@ -24,6 +25,7 @@ api_router = APIRouter()
 
 api_router.include_router(health.router)
 api_router.include_router(auth.router)
+api_router.include_router(preferences.router)
 api_router.include_router(places.router)
 api_router.include_router(feed.router)
 api_router.include_router(storyline.router)

@@ -1,47 +1,42 @@
-from fastapi import APIRouter
-from datetime import datetime, timezone
-from services.backend.app.schemas import FeedResponse, FeedItem
+"""Personalized recommendation feed — ranked per authenticated user."""
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from services.backend.app.api.dependencies import get_current_user, get_db
+from services.backend.app.models.models import UserModel
+from services.backend.app.repositories.preference_repository import PreferenceRepository
+from services.backend.app.schemas.feed import FeedResponse
+from services.backend.app.services.post_service import post_service
+from services.backend.app.services.services import capture_service
 
 router = APIRouter()
 
-_MOCK_FEED = [
-    FeedItem(
-        id="f-001",
-        place_id="place-001",
-        name="Văn Miếu - Quốc Tử Giám",
-        category="temple",
-        thumbnail_url="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Van_Mieu.jpg/800px-Van_Mieu.jpg",
-        score=0.95,
-        explanation="Đây là di tích lịch sử nổi bật nhất Hà Nội, phù hợp với hành trình khám phá văn hoá của bạn.",
-        created_at=datetime.now(timezone.utc),
-    ),
-    FeedItem(
-        id="f-002",
-        place_id="place-002",
-        name="Hồ Hoàn Kiếm",
-        category="park",
-        thumbnail_url="https://upload.wikimedia.org/wikipedia/commons/5/5c/Hoan_Kiem_lake.jpg",
-        score=0.88,
-        explanation="Hồ Hoàn Kiếm nằm trung tâm thành phố, lý tưởng để tham quan buổi sáng sớm hoặc chiều tà.",
-        created_at=datetime.now(timezone.utc),
-    ),
-    FeedItem(
-        id="f-003",
-        place_id="place-003",
-        name="Bảo tàng Lịch sử Quốc gia",
-        category="museum",
-        thumbnail_url=None,
-        score=0.80,
-        explanation="Bảo tàng giúp bạn hiểu sâu hơn về lịch sử Việt Nam từ thời tiền sử đến hiện đại.",
-        created_at=datetime.now(timezone.utc),
-    ),
-]
-
 
 @router.get("/feed", response_model=FeedResponse, tags=["Feed"])
-async def get_feed():
+async def get_feed(
+    current_user: UserModel = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    weather: Optional[str] = Query(None, description="Override weather context, e.g. rainy/sunny"),
+    time_of_day: Optional[str] = Query(None, description="Override time context, e.g. morning"),
+    limit: int = Query(20, ge=1, le=50),
+):
     """
-    GET /feed — Danh sách địa điểm gợi ý theo điểm số và giải thích.
-    Android/web hiển thị recommendation cards kèm lý do gợi ý.
+    GET /feed — Danh sách bài viết gợi ý, xếp hạng riêng cho từng user.
+
+    Ranking dựa trên sở thích (interests), bối cảnh thời tiết/thời điểm,
+    và loại bỏ những địa điểm user đã ghé (novelty). Yêu cầu đăng nhập.
     """
-    return FeedResponse(items=_MOCK_FEED)
+    pref = await PreferenceRepository(db).get(current_user.id)
+    interests = list(pref.interests or []) if pref else []
+    visited = capture_service.get_visited_place_ids(current_user.id)
+
+    items = post_service.rank(
+        interests=interests,
+        visited_place_ids=visited,
+        weather=weather,
+        time_of_day=time_of_day,
+        limit=limit,
+    )
+    return FeedResponse(items=items)

@@ -21,16 +21,16 @@ _captures_store: list[CaptureResponse] = []
 
 class CaptureService:
 
-    async def create_capture(self, body: CaptureCreateRequest) -> CaptureResponse:
+    async def create_capture(self, user_id: str, body: CaptureCreateRequest) -> CaptureResponse:
         """
-        Create a capture record.
+        Create a capture record for the authenticated user.
         Sprint 1: in-memory store.
         TODO: Replace with capture_repo.create(data) + DB session.
         """
         now = datetime.now(timezone.utc)
         capture = CaptureResponse(
             id=str(uuid.uuid4()),
-            user_id=body.user_id,
+            user_id=user_id,
             task_id=body.task_id,
             place_id=body.place_id,
             timestamp=body.timestamp or now,
@@ -42,6 +42,11 @@ class CaptureService:
         )
         _captures_store.append(capture)
         return capture
+
+    def get_visited_place_ids(self, user_id: str) -> set[str]:
+        """Place IDs the user has already captured — used for feed novelty.
+        Sprint 1: in-memory. TODO: capture_repo.get_by_user(user_id)."""
+        return {c.place_id for c in _captures_store if c.user_id == user_id}
 
 
 class PlaceService:

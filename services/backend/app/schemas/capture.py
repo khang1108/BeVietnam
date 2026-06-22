@@ -5,7 +5,6 @@ from datetime import datetime
 
 
 class CaptureCreateRequest(BaseModel):
-    user_id: str
     task_id: Optional[str] = None
     place_id: str
     timestamp: Optional[datetime] = None

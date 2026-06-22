@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     # Context-aware question selection
     QUESTION_POOL_PATH: str = "data/question_pool.json"
 
+    # Pre-built spotlight posts that feed the personalized recommendation feed.
+    SPOTLIGHTS_PATH: str = "data/posts/hue_spotlights.json"
+
     # Goong context enrichment. Leave GOONG_API_KEY empty for local fallback mode.
     GOONG_API_KEY: str = ""
     GOONG_BASE_URL: str = "https://rsapi.goong.io"
