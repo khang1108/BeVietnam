@@ -57,8 +57,8 @@ docs/*
 !docs/PROJECT_SPEC.md
 !docs/HUE_PILOT_8_DAY_DELIVERY_PLAN.md
 !docs/AI_SERVICE_IMPLEMENTATION_PLAN.md
-!docs/computational-thinking/
-!docs/computational-thinking/**/
+!docs/report/
+!docs/report/**/
 !docs/computational-thinking/**/*.tex
 !docs/computational-thinking/**/*.bib
 !docs/computational-thinking/**/*.png

@@ -1,0 +1,84 @@
+\section{Abstraction}
+
+Nếu decomposition giúp ta chia nhỏ vấn đề, còn pattern recognition giúp
+ta tìm ra quy luật lặp, thì \textbf{abstraction} lại giúp ta loại bỏ các
+chi tiết không thiết yếu để giữ lại cấu trúc bản chất của bài toán. Đây
+là bước quan trọng trong phát triển phần mềm, vì thế giới thực luôn
+rất phức tạp, còn máy tính thì chỉ làm việc hiệu quả khi bài toán được
+biểu diễn dưới dạng các mô hình dữ liệu và các quan hệ rõ ràng~\cite{wing2006, spronck2023, openstax_ct}.
+
+Trong BeVietnam, bài toán du lịch ngoài đời thực có thể chứa vô số chi
+tiết khác nhau như cảm xúc cá nhân của du khách, mức độ nổi tiếng trên
+mạng xã hội, độ đẹp của ảnh chụp hay rất nhiều yếu tố khó định lượng
+khác. Nhưng để hệ thống có thể vận hành, ta buộc phải trừu tượng hóa các
+thành phần đó thành các đối tượng và thuộc tính cốt lõi, tóm tắt trong
+Định nghĩa~\ref{def:core-abstractions}.
+
+\begin{mydef}{Bốn Lớp Trừu Tượng Cốt Lõi}{core-abstractions}
+Hệ thống quy bài toán du lịch về bốn lớp trừu tượng:
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=2.2cm, noitemsep]
+    \item \textbf{\texttt{Place}} --- địa điểm với tọa độ, loại hình, mô tả
+          và metadata phục vụ xếp hạng.
+    \item \textbf{$\score$} --- mức độ phù hợp tại thời điểm hiện tại, một
+          đại lượng tính được từ các yếu tố ngữ cảnh.
+    \item \textbf{\texttt{Task}} --- một nút trong hành trình, có thứ tự,
+          điều kiện mở khóa và tiêu chí hoàn thành.
+    \item \textbf{\texttt{Capture}} --- bằng chứng thực địa, ánh xạ hành
+          động ngoài đời của người dùng thành dữ liệu xác minh được.
+\end{enumerate}
+\end{mydef}
+
+\textbf{Đầu tiên}, ta trừu tượng hóa khái niệm \textit{địa điểm du lịch}
+thành thực thể \texttt{Place}. Một \texttt{Place} không còn là toàn bộ
+trải nghiệm phong phú ngoài đời, mà được biểu diễn bằng các thuộc tính
+như tên, tọa độ, loại hình, mô tả, hình ảnh, thông tin văn hóa và các
+chỉ số phục vụ xếp hạng. Nhờ vậy máy tính mới có thể so sánh, lọc và
+sắp xếp các địa điểm một cách tường minh. Trong quá trình làm đề tài,
+lớp trừu tượng này còn giúp nhóm tách bạch ba tầng thông tin: dữ liệu
+cốt lõi của POI, dữ liệu ngữ cảnh chỉ được nạp thêm khi tính score, và
+nội dung diễn giải được sinh ra ở bước cuối để phục vụ người dùng.
+
+\textbf{Kế đến}, ta trừu tượng hóa khái niệm \textit{mức độ phù hợp tại
+thời điểm hiện tại} thành một \textbf{score} tổng hợp. Dù trên thực tế
+khái niệm ``nên đi đâu bây giờ'' là một nhận định mang tính định tính,
+nhưng để thuật toán có thể xử lý, ta phải biến nó thành một đại lượng có
+thể tính toán từ các thành phần như khoảng cách, thời tiết, giao thông,
+mật độ đông đúc và ưu tiên cá nhân. Trong tài liệu đặc tả, lớp trừu
+tượng này đã được đẩy thêm một bước thành weighted score với các yếu tố
+cultural value, distance, weather, traffic và estimated crowdedness cùng
+tham gia vào quyết định cuối cùng~\cite{bevietnam_spec}. Đây là bước
+trừu tượng hóa then chốt, vì nó buộc nhóm phải lượng hóa một câu hỏi rất
+đời thường. Trước khi có lớp abstraction này, mọi trao đổi kiểu ``địa
+điểm này có vẻ hợp hơn'' vẫn còn mang nặng trực giác. Khi đã có score,
+nhóm mới có cơ sở để thảo luận về trọng số, về fallback và về
+explainability theo đúng nghĩa kỹ thuật.
+
+\textbf{Tiếp đó}, ta trừu tượng hóa \textit{hành trình khám phá văn hóa}
+thành chuỗi các \texttt{Task} có thứ tự, điều kiện mở khóa và tiêu chí
+hoàn thành. Điều này cực kỳ quan trọng, vì nếu không có lớp trừu tượng
+này thì storyline sẽ chỉ còn là một đoạn văn giới thiệu dài chứ không
+thể trở thành một cơ chế tương tác có thể điều khiển được bằng hệ thống.
+Khi đưa vào thiết kế phần mềm, lớp trừu tượng này xuất hiện dưới dạng
+kho nhiệm vụ (question pool), lộ trình Mission Path và các nút nhiệm vụ
+có trạng thái mở khóa trên cả web lẫn mobile. Từ góc nhìn phân tích,
+đây là bước biến một hành trình mang màu sắc kể chuyện thành một cấu
+trúc có thể lưu trạng thái, xác minh tiến độ và mở khóa theo điều kiện
+rõ ràng.
+
+\textbf{Cuối cùng}, ta trừu tượng hóa hành động ngoài đời thật của người
+dùng thành các \texttt{CaptureMetadata} và trạng thái xác minh. Nói cách
+khác, việc ``đã thực sự tới nơi và chụp đúng đối tượng yêu cầu hay
+chưa'' phải được ánh xạ thành dữ liệu đầu vào cho hệ thống kiểm tra. Từ
+đó mà các agent hoặc service ở phía sau mới có thể đánh giá và phản hồi
+một cách nhất quán. Nếu không làm bước này, toàn bộ ý tưởng geocaching
+văn hóa sẽ chỉ còn là tuyên bố ở mức ý tưởng, bởi hệ thống sẽ không có
+cách nào để nối hành động thật của người dùng với state số của task.
+
+\begin{note}
+Điểm cốt lõi của abstraction trong BeVietnam là chuyển những khái niệm
+rất giàu ngữ nghĩa như ``một nơi đáng đi'', ``một hành trình khám phá''
+hay ``đã thực sự hoàn thành nhiệm vụ'' thành các thực thể, trạng thái và
+đại lượng mà hệ thống có thể xử lý được. Nếu không làm tốt bước này thì
+mọi phần còn lại, từ scoring đến storyline hay capture verification, đều
+sẽ chỉ dừng ở mức ý tưởng.
+\end{note}

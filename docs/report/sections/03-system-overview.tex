@@ -1,0 +1,458 @@
+\section{Tổng Quan Hệ Thống}
+
+Sau khi đã phân tích bài toán dưới góc nhìn Computational Thinking ở
+chương trước, ta tiến hành trình bày cái nhìn tổng thể về hệ thống
+BeVietnam. Mục tiêu của chương này không phải là đi sâu ngay vào chi tiết
+kiến trúc kỹ thuật, mà là làm rõ hệ thống này đang phục vụ ai, các actor
+chính tương tác với hệ thống theo cách nào, hệ thống cung cấp những tính
+năng cốt lõi gì, và đâu là các điểm đổi mới làm cho BeVietnam khác với
+những ứng dụng du lịch thông thường. Nói cách khác, đây là chương giúp
+ta chuyển từ câu hỏi ``ta đang giải bài toán gì'' sang câu hỏi ``hệ thống
+được tổ chức ra sao để giải bài to, bước quan trọng ở đây là 
+Với một hệ thống du lịch thông minh như BeVietnam, stakeholder không chỉ
+đơn thuần là người trực tiếp bấm vào màn hình ứng dụng. Trên thực tế, hệ
+thống này chịu ảnh hưởng bởi nhiều nhóm khác nhau, từ người sử dụng cuối,
+nhóm phát triển cho tới những bên gián tiếp đánh giá tính đúng đắn của
+nội dung văn hóa và chất lượng pilot. Các stakeholder chính của hệ thống
+được tóm tắt trong Bảng~\ref{tab:main_stakeholders}.
+
+\begin{table}[H]
+\centering
+\caption{Main Stakeholders của hệ thống BeVietnam}
+\label{tab:main_stakeholders}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.1cm} X X}
+\toprule
+\textbf{Stakeholder} & \textbf{Vai trò đối với hệ thống} & \textbf{Mối quan tâm chính} \\
+\midrule
+\textbf{Du khách} & Là nhóm người dùng cuối trực tiếp sử dụng web hoặc mobile để xem gợi ý, so sánh địa điểm, mở storyline và gửi capture. & Muốn biết nên đi đâu vào lúc này, vì sao địa điểm đó đáng đi và khi đến nơi thì nên làm gì để có trải nghiệm văn hóa sâu hơn. \\
+\textbf{Nhóm phát triển dự án} & Là nhóm xây dựng backend, AI Core, mobile app, web app và đồng thời vận hành pilot, kiểm thử và hoàn thiện báo cáo. & Cần một kiến trúc đủ rõ ràng để triển khai nhanh, kiểm thử được, có fallback và đủ ổn định cho Huế pilot. \\
+\textbf{Giảng viên / Hội đồng đánh giá} & Là bên đánh giá đề tài ở góc độ học thuật, tính hợp lý của lời giải và mức độ hoàn thiện của sản phẩm. & Quan tâm tới việc hệ thống có giải quyết đúng Pain Point hay không, cách áp dụng tư duy tính toán có chặt chẽ hay không, và các quyết định kỹ thuật có được lập luận rõ ràng hay không. \\
+\textbf{Nguồn tri thức văn hóa và dữ liệu bối cảnh} & Bao gồm các nguồn nội dung văn hóa đã được kiểm chứng, cùng các dịch vụ ngữ cảnh như weather, traffic hoặc crowd estimate được hệ thống sử dụng để ra quyết định. & Đòi hỏi hệ thống phải dùng dữ liệu một cách có nguồn gốc, không bịa nội dung văn hóa và không phụ thuộc hoàn toàn vào một tín hiệu duy nhất khi đề xuất địa điểm. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Main Actors}
+
+Nếu stakeholder mô tả các bên có lợi ích liên quan tới hệ thống, thì
+actor tập trung vào các nhóm thực sự tương tác với hệ thống trong luồng
+nghiệp vụ. Trong phạm vi pilot hiện tại, BeVietnam có ba actor chính như
+trong Bảng~\ref{tab:main_actors}. Việc tách các actor này là rất cần
+thiết, vì mỗi actor có quyền hạn, mục tiêu và luồng thao tác khác nhau.
+
+\begin{table}[H]
+\centering
+\caption{Main Actors của hệ thống BeVietnam}
+\label{tab:main_actors}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.1cm} X X}
+\toprule
+\textbf{Actor} & \textbf{Cách tương tác với hệ thống} & \textbf{Giới hạn / phạm vi thao tác} \\
+\midrule
+\textbf{Traveler} & Mở ứng dụng, xem feed, xem bubble map, đọc place detail, bắt đầu storyline, gửi capture và theo dõi tiến trình khám phá. & Là actor trung tâm của toàn bộ sản phẩm. Trong pilot Huế, actor này bao gồm cả du khách nội địa và quốc tế~\cite{bevietnam_spec}. \\
+\textbf{Project Team / Operator} & Seed dữ liệu, quan sát log, kiểm thử các flow chính, kiểm tra AI output, chuẩn bị nội dung pilot và đối chiếu hành vi hệ thống với đặc tả. & Không phải actor của trải nghiệm người dùng cuối, nhưng lại là actor quan trọng để hệ thống có thể chạy được trong bối cảnh pilot thực tế. \\
+\textbf{Future Admin / Moderator} & Xem xét dữ liệu, kiểm tra nội dung sinh tự động, theo dõi capture hoặc nội dung bị gắn cờ, và quản lý chất lượng hệ thống khi mở rộng về sau. & Chưa phải thành phần trọng tâm của Huế pilot, nhưng đã được nhận diện từ sớm để tránh việc kiến trúc hiện tại khóa mất khả năng quản trị trong tương lai~\cite{bevietnam_spec}. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Core Features}
+
+Sau khi khóa stakeholder và actor, bước tiếp theo là xác định những tính
+năng cốt lõi thật sự định nghĩa giá trị của hệ thống. Trong BeVietnam,
+đây không phải là danh sách càng dài càng tốt. Ngược lại, nhóm chủ động
+giữ lại một số lượng feature đủ tinh gọn để bảo vệ trọng tâm của pilot
+Huế. Các core feature hiện tại được trình bày trong
+Bảng~\ref{tab:core_features}.
+
+\begin{table}[H]
+\centering
+\caption{List of Core Features của BeVietnam}
+\label{tab:core_features}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.2cm} X >{\raggedright\arraybackslash}p{2.2cm}}
+\toprule
+\textbf{Core Feature} & \textbf{Chức năng cốt lõi} & \textbf{Vai trò trong pilot} \\
+\midrule
+\textbf{Curated Place Discovery} & Hiển thị các điểm đến văn hóa đã được chọn lọc, có thông tin nền rõ ràng và có thể mở chi tiết trên cả web lẫn mobile. & Nền dữ liệu cơ sở \\
+\textbf{Dynamic Recommendation Feed} & Trả về danh sách địa điểm được xếp hạng theo bối cảnh hiện tại cùng phần giải thích lý do đề xuất. & Giá trị chính của sản phẩm \\
+\textbf{Realtime Bubble Map} & Hiển thị các POI thời gian thực (Foursquare) quanh vị trí người dùng trong bán kính 3km, kích thước bong bóng co giãn theo khoảng cách và kèm thời tiết khu vực. & So sánh trực quan \\
+\textbf{Storyline Mission Path} & Trình bày kho nhiệm vụ văn hóa dưới dạng lộ trình kiểu Duolingo, mỗi nút là một nhiệm vụ nạp từ question pool, mở khóa tuần tự theo tiến độ. & Trải nghiệm đào sâu \\
+\textbf{Vision Capture Verification} & Chấm điểm ảnh minh chứng bằng mô hình thị giác theo rubric tường minh (so với ảnh tham chiếu), quyết định mở khóa nhiệm vụ. & Nối trải nghiệm số với thực địa \\
+\textbf{Bilingual Experience} & Hỗ trợ tiếng Việt và tiếng Anh cho các bề mặt tương tác chính trong pilot. & Phù hợp với đối tượng người dùng mục tiêu \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Explanation of Core Features}
+
+Mỗi core feature trong BeVietnam được tạo ra để giải một Pain Point cụ
+thể chứ không phải chỉ để làm cho hệ thống có nhiều chức năng hơn. Vì
+vậy, ở phần này ta không chỉ mô tả feature theo tên gọi, mà sẽ lần lượt
+trình bày ba câu hỏi cho từng feature: nó được tạo ra để giải quyết vấn
+đề nào, nó nhận đầu vào và tạo đầu ra ra sao, và cơ chế vận hành chính
+của nó là gì.
+
+\subsubsection{Curated Place Discovery}
+
+Pain Point đầu tiên của người dùng là thông tin du lịch bị phân tán trên
+nhiều nền tảng khác nhau. Người dùng có thể tìm thấy tên địa điểm trên
+Google Maps, đọc một vài câu chuyện trên blog, rồi lại phải chuyển sang
+mạng xã hội để xem hình ảnh thực tế. Điều này khiến quá trình khám phá
+ban đầu rất rời rạc và thiếu chiều sâu văn hóa. Vì vậy, feature
+\textbf{Curated Place Discovery} được xây dựng để tạo ra một lớp dữ liệu
+điểm đến có chọn lọc và có cấu trúc thống nhất ngay trong hệ thống.
+
+Đầu vào của feature này là tập dữ liệu POI đã được nhóm chọn lọc, bao
+gồm tên địa điểm, loại hình, tọa độ, mô tả, hình ảnh, thông tin văn hóa
+và một số metadata phục vụ cho các bước xử lý phía sau. Đầu ra của nó là
+danh sách địa điểm hoặc màn hình place detail mà người dùng có thể truy
+cập từ web và mobile. Đây là lớp đầu ra nền tảng, bởi tất cả các feature
+như feed, bubble map hay storyline đều cần một tập điểm đến đáng tin cậy
+để hoạt động.
+
+Với người dùng không chuyên về kỹ thuật, có thể hiểu feature này như một
+``lớp biên tập số'' của toàn hệ thống. Thay vì ném cho du khách một danh
+sách dài các điểm đến lẫn lộn về chất lượng, BeVietnam cố gắng chọn ra
+những nơi thật sự có ý nghĩa với pilot, rồi đóng gói lại thành một trải
+nghiệm khám phá mạch lạc. Khi người dùng mở ứng dụng, họ không chỉ thấy
+tên và ảnh của một địa điểm, mà còn thấy vì sao địa điểm đó đáng để đọc
+thêm, đáng để lưu ý, và đáng để bước sang các feature sâu hơn như feed
+hay storyline.
+
+Với người đọc kỹ thuật, feature này chính là tầng chuẩn hóa dữ liệu đầu
+vào cho toàn bộ sản phẩm. Backend cần tổ chức POI theo schema thống
+nhất, để cùng một thực thể \texttt{Place} có thể được dùng lại cho
+explore, place detail, feed, map và storyline mà không bị lệch nghĩa
+giữa các client. Một điểm quan trọng là lớp dữ liệu này không chỉ
+chứa thông tin hiển thị, mà còn mang theo metadata phục vụ scoring và
+liên kết tới các lớp nội dung văn hóa phía sau. Vì vậy, Curated Place
+Discovery không phải chỉ là feature ``xem địa điểm'', mà là tầng nền dữ
+liệu giúp mọi feature còn lại có thể hoạt động ổn định và nhất quán.
+
+\subsubsection{Dynamic Recommendation Feed}
+
+Pain Point thứ hai là người dùng không chỉ cần biết ``có những nơi nào'',
+mà họ cần biết ``nên đi đâu vào lúc này''. Nếu hệ thống chỉ liệt kê các
+địa điểm tĩnh thì nó không khác nhiều so với một danh bạ du lịch. Vì
+vậy, feature \textbf{Dynamic Recommendation Feed} được xây dựng để đưa ra
+quyết định xếp hạng trong bối cảnh hiện tại thay vì chỉ hiển thị dữ liệu
+thô.
+
+Đầu vào của feature này gồm vị trí người dùng, tập POI có sẵn, các yếu
+tố ngữ cảnh như weather, traffic, estimated crowdedness và các tham số
+ưu tiên đã được định nghĩa trong mô hình scoring. Đầu ra của nó là danh
+sách các địa điểm được xếp hạng theo mức độ phù hợp, kèm theo factor
+score và phần giải thích ngắn gọn để người dùng hiểu vì sao địa điểm đó
+được đưa lên hoặc bị hạ xuống.
+
+Với người dùng, đây là feature gần nhất với giá trị cốt lõi của sản
+phẩm. Người dùng không cần tự mình ngồi so từng địa điểm, đoán xem trời
+mưa có nên đi hay không, hay tự cân nhắc giữa khoảng cách và giá trị văn
+hóa. Họ chỉ cần mở feed và nhìn thấy một câu trả lời đã được hệ thống
+tổng hợp sẵn: nơi nào đang phù hợp hơn, nơi nào kém phù hợp hơn, và lý
+do của sự khác biệt đó là gì. Chính phần explanation làm cho feature này
+khác với một bảng xếp hạng thuần túy, bởi người dùng không chỉ nhận kết
+quả, mà còn hiểu được lập luận phía sau kết quả.
+
+Ở góc nhìn kỹ thuật, Dynamic Recommendation Feed là nơi mô hình quyết
+định của BeVietnam được triển khai rõ nhất. Backend phải lấy tập POI
+khả dụng, thu thập các tín hiệu ngữ cảnh tại thời điểm hiện tại, chuẩn
+hóa các factor, rồi tính \textit{suitability score} cho từng điểm đến.
+Sau bước tính score, hệ thống còn phải giữ lại factor score, fallback
+flag và explanation để trả về cho client. Điều này có nghĩa là feed
+không chỉ là một API trả danh sách, mà là một pipeline gồm thu thập dữ
+liệu, tính toán, giải thích và trình bày. Nếu pipeline này không chặt,
+hệ thống sẽ nhanh chóng rơi lại thành một ứng dụng danh bạ có thêm một
+ít văn bản trang trí.
+
+\subsubsection{Realtime Bubble Map}
+
+Pain Point thứ ba là ngay cả khi đã có danh sách gợi ý, người dùng vẫn
+cần một cách so sánh nhanh các địa điểm trong không gian xung quanh. Nếu
+chỉ đọc feed tuần tự từ trên xuống dưới, họ sẽ khó hình dung tương quan
+về vị trí và mức độ phù hợp giữa các điểm đến. Vì vậy, feature
+\textbf{Realtime Bubble Map} được xây dựng để biến quá trình so sánh
+đó thành một trải nghiệm trực quan hơn, dựa trên dữ liệu thời gian thực.
+
+Đầu vào của feature này gồm vị trí GPS thực của người dùng và một bán
+kính quét cố định (3km). Hệ thống truy vấn các POI thực tế quanh người
+dùng qua nguồn Foursquare và thu thập thời tiết khu vực (nhiệt độ, chỉ số
+UV ước lượng, lượng mưa). Đầu ra là các bong bóng hiển thị trên bản đồ,
+trong đó kích thước mỗi bong bóng co giãn theo khoảng cách thực tế từ địa
+điểm tới người dùng (càng gần càng lớn), kèm một chip thời tiết của khu vực.
+
+Với người dùng, bubble map giải quyết một nhu cầu rất tự nhiên khi đi du
+lịch: ngoài việc biết nơi nào tốt hơn, họ còn muốn nhìn thấy các lựa
+chọn đó đang nằm ở đâu quanh mình. Nếu feed giúp người dùng suy nghĩ
+theo trục ``đáng đi hay không đáng đi'', thì bubble map giúp họ suy nghĩ
+thêm theo trục ``gần hay xa'' và ``nằm trong không gian di chuyển của
+mình hay không''. Nhờ vậy, quyết định du lịch trở nên trực quan hơn rất
+nhiều, đặc biệt trong bối cảnh người dùng đang đứng giữa nhiều lựa chọn
+gần nhau.
+
+Với người đọc kỹ thuật, điểm quan trọng nhất của feature này là tính
+\textit{thời gian thực} và việc khóa nguồn dữ liệu về một mối. Ở bản
+đầu nhóm chỉ dùng tập POI tuyển chọn thủ công, nhưng một danh sách tĩnh
+không bao giờ phản ánh đúng những gì đang ở quanh người dùng, nên nhóm
+bổ sung nguồn Foursquare thời gian thực. Khóa
+Foursquare được giữ ở backend, còn client chỉ truyền tọa độ và nhận về
+danh sách POI đã được phân loại theo nhóm (ẩm thực, lưu trú, văn hóa,
+lịch sử...). Cả web lẫn mobile dùng chung một endpoint
+\texttt{/places/nearby}, nhờ đó hai client cho ra cùng một lớp bong bóng
+nhất quán. Việc co giãn theo khoảng cách được tính phía client bằng công
+thức haversine từ vị trí GPS, nên bản đồ luôn phản ánh đúng bối cảnh hiện
+tại của người dùng thay vì một danh sách tĩnh.
+
+\subsubsection{Storyline Mission Path}
+
+Pain Point tiếp theo là sau khi đã chọn được một địa điểm, người dùng
+vẫn thường không biết nên làm gì tại đó để thật sự hiểu được giá trị văn
+hóa của nơi mình đến. Nếu hệ thống chỉ dừng lại ở việc khuyên người dùng
+``hãy ghé thăm nơi này'', thì trải nghiệm khám phá vẫn còn khá thụ động.
+Vì vậy, feature \textbf{Storyline Mission Path} được xây dựng để trả lời
+câu hỏi \textit{khi đã đến đó thì nên làm gì tiếp theo}, trình bày toàn
+bộ nhiệm vụ dưới dạng một lộ trình trực quan kiểu Duolingo.
+
+Đầu vào của feature này là kho nhiệm vụ (question pool) đã được sinh
+offline từ nội dung văn hóa, cùng trạng thái tiến trình của người dùng.
+Đầu ra của nó là một lộ trình các nút nhiệm vụ có thứ tự, mỗi nút mang
+nội dung hướng dẫn, bối cảnh văn hóa, điều kiện mở khóa và yêu cầu minh
+chứng. Người dùng đi dọc lộ trình, mở từng nút để xem chi tiết và nộp
+ảnh minh chứng nhằm mở khóa nút kế tiếp.
+
+Với người dùng, feature này làm cho chuyến đi có cảm giác được dẫn dắt
+thay vì chỉ tự do đọc rồi tự đoán xem mình nên quan sát gì. Một nhiệm vụ
+được thiết kế tốt sẽ khiến người dùng chú ý tới một chi tiết kiến trúc,
+một dấu vết lịch sử hay một hành động văn hóa cụ thể mà nếu không có
+storyline họ rất dễ bỏ qua. Vì vậy, giá trị của feature này không nằm ở
+số lượng task, mà nằm ở việc nó biến kiến thức văn hóa thành hành động
+có thể thực hiện tại địa điểm thật.
+
+Từ góc nhìn kỹ thuật, Storyline Mission Path là một bài toán quản lý tiến
+trình có trạng thái. Hệ thống phải biết người dùng đang ở nút nào, nút
+nào đã hoàn thành, điều kiện nào cho phép mở khóa nút tiếp theo và nội
+dung nào cần được trả ra ở bước hiện tại. Vai trò của AI được tách bạch
+rất rõ: nội dung nhiệm vụ được \textbf{sinh trước offline} vào question
+pool dưới dạng có cấu trúc (tiêu đề, mô tả, giải nghĩa văn hóa, yêu cầu
+minh chứng), còn tại runtime client chỉ nạp pool, dựng lộ trình và quản
+lý trạng thái mở khóa cục bộ. Hướng này không có ngay từ đầu: ban đầu
+nhóm định để AI sinh từng nhiệm vụ ngay lúc người dùng chơi, nhưng khi
+thử thì kết quả thiếu ổn định (định dạng lệch, nội dung lúc được lúc
+không) và phụ thuộc nặng vào hạn mức gọi mô hình, nên nhóm chuyển sang
+dựng sẵn kho nhiệm vụ offline rồi nạp về. Nhờ vậy, feature này vừa là lớp
+kể chuyện cho người dùng, vừa là một state machine ổn định cho hệ thống,
+không phụ thuộc vào việc gọi mô hình ngôn ngữ theo từng lượt tương tác.
+
+\subsubsection{Vision Capture Verification}
+
+Nếu storyline chỉ yêu cầu người dùng bấm nút hoàn thành thì toàn bộ lớp
+trải nghiệm thực địa sẽ mất đi độ tin cậy. Pain Point ở đây là hệ thống
+cần một cách xác minh rằng người dùng thật sự đã tới nơi và chụp đúng
+chủ thể được yêu cầu. Vì vậy, feature \textbf{Vision Capture
+Verification} được xây dựng để nối trạng thái số của nhiệm vụ với hành
+vi thực tế ngoài đời.
+
+Đầu vào của feature này gồm nhiệm vụ hiện hành (kèm chủ thể cần chụp),
+ảnh người dùng nộp lên và một ảnh tham chiếu chuẩn của chủ thể đó. Đầu
+ra của nó là một trạng thái xác minh kèm điểm tin cậy: \textit{approved},
+\textit{needs\_review} hay \textit{rejected}, cùng lý do ngắn gọn, từ đó
+quyết định nút nhiệm vụ có được mở khóa hay không.
+
+Với người dùng, feature này làm cho việc hoàn thành nhiệm vụ có ý nghĩa
+thật sự. Nếu không có một cơ chế xác minh tối thiểu, storyline sẽ rất dễ
+trở thành một chuỗi nút bấm ``đã xong'' mà không còn gắn với hành động
+thực tế nào. Khi hệ thống yêu cầu GPS proximity và capture, người dùng
+có cảm giác rằng tiến trình của mình được gắn với trải nghiệm ngoài đời,
+không chỉ với thao tác trên màn hình.
+
+Ở góc nhìn kỹ thuật, đây là nơi hệ thống nối state số với bằng chứng
+thực địa thông qua một mô hình thị giác. Bản đầu tiên của phần này thực
+ra rất sơ sài: hệ thống chỉ kiểm tra ``có ảnh hay không'' rồi duyệt, nên
+khi nhóm thử tải lên một ảnh không liên quan thì nó vẫn được chấp nhận ở
+mức tin cậy cao. Chính lỗi đó buộc nhóm làm lại theo hướng chấm điểm thật.
+Nhóm cũng từng dùng Gemini cho bước này, nhưng vì gặp giới hạn hạn mức
+nên chuyển sang tự host một mô hình thị giác trên vLLM. Ở phiên bản hiện
+tại, khi nhận ảnh, AI Core tìm (hoặc tải về và lưu cache) một ảnh tham
+chiếu của chủ thể nhiệm vụ, rồi yêu cầu mô hình thị giác so sánh ảnh
+người dùng với ảnh tham chiếu theo một rubric tường minh và trả về điểm 0--1. Điểm này được ánh xạ sang ba
+trạng thái qua các ngưỡng cố định. Điểm mấu chốt về kiểm soát là kết quả
+của AI không bao giờ là một hộp đen tùy tiện: rubric, ngưỡng và cơ chế
+\textit{needs\_review} (khi mô hình không sẵn sàng hoặc điểm nằm ở vùng
+nghi ngờ) giữ cho quyết định luôn nằm trong một khung minh bạch. Do đó,
+feature này vừa mang tính trải nghiệm, vừa là lớp kiểm soát nghiệp vụ
+quan trọng, và cũng là tính năng duy nhất bắt buộc phải dùng tới mô
+hình AI tự host tại thời gian thực.
+
+\subsubsection{Bilingual Experience}
+
+Vì pilot hướng đến cả du khách nội địa và quốc tế, Pain Point cuối cùng
+ở đây là rào cản ngôn ngữ. Một sản phẩm có nội dung văn hóa tốt nhưng
+không truyền đạt được nhất quán cho hai nhóm người dùng mục tiêu thì vẫn
+chưa hoàn thành nhiệm vụ của nó. Do đó, feature \textbf{Bilingual
+Experience} được đưa vào như một lớp cốt lõi của hệ thống thay vì chỉ là
+phần phụ trợ về giao diện.
+
+Đầu vào của feature này là toàn bộ nội dung và nhãn hiển thị trên các bề
+mặt chính của hệ thống, cùng với trạng thái ngôn ngữ mà người dùng đã
+chọn. Đầu ra là giao diện và nội dung được hiển thị nhất quán theo tiếng
+Việt hoặc tiếng Anh.
+
+Với người dùng, feature này quyết định việc họ có thật sự hiểu được giá
+trị văn hóa mà hệ thống đang cố truyền tải hay không. Nếu nội dung chỉ
+được viết tốt bằng một ngôn ngữ, còn ngôn ngữ còn lại chỉ là bản dịch
+sơ sài, thì trải nghiệm của hai nhóm du khách sẽ bị lệch rất mạnh. Vì
+vậy, feature song ngữ không phải là một lớp trang trí giao diện, mà là
+điều kiện để sản phẩm giữ được cùng một thông điệp cho cả traveler nội
+địa lẫn quốc tế.
+
+Từ góc nhìn kỹ thuật, feature này yêu cầu cả client lẫn lớp nội dung
+phải phối hợp chặt. Client chịu trách nhiệm chuyển đổi nhãn hiển thị,
+điều hướng giao diện và trạng thái ngôn ngữ, trong khi backend và dữ
+liệu nội dung phải bảo đảm rằng các phần mô tả cốt lõi có thể được cung
+cấp nhất quán ở cả tiếng Việt lẫn tiếng Anh. Điều này đặc biệt quan
+trọng trong một hệ thống như BeVietnam, bởi rất nhiều giá trị của sản
+phẩm nằm ở phần diễn giải văn hóa chứ không chỉ ở vị trí địa lý của địa
+điểm.
+
+\subsection{Pipeline Tổng Thể Hệ Thống}
+
+Sau khi đã đi qua từng feature một cách riêng lẻ, phần này gom các thành
+phần đó lại thành một bức tranh chung để thấy chúng phối hợp ra sao trong
+một luồng chạy thật. Điểm quan trọng nhất khi nhìn ở mức tổng thể là hệ
+thống được chia thành ba lớp tách bạch: \textbf{Frontend Layer} (hai
+client web và mobile), \textbf{Backend Layer} (FastAPI cùng các data
+store và các nguồn dữ liệu bên ngoài) và \textbf{vLLM Layer} (mô hình thị
+giác tự host). Cách chia lớp này phản ánh đúng một quyết định thiết kế mà
+nhóm đã chốt từ sớm: backend giữ vai trò điều phối và product state, còn
+AI chỉ là một thành phần được gọi tới khi thật sự cần, chứ không phải
+trung tâm của hệ thống. Toàn bộ pipeline được trình bày trong
+Hình~\ref{fig:system_pipeline}.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  font=\footnotesize,
+  comp/.style={rectangle, rounded corners, draw=black!70, fill=white,
+    minimum height=8mm, minimum width=23mm, align=center, inner sep=3pt},
+  store/.style={comp, fill=black!5},
+  ext/.style={rectangle, rounded corners, draw=black!55, dashed,
+    fill=black!3, minimum height=7mm, minimum width=22mm, align=center,
+    inner sep=3pt},
+  llm/.style={comp, fill=black!8, minimum width=34mm},
+  flow/.style={-{Latex[length=2mm]}, thick},
+  ret/.style={-{Latex[length=2mm]}, thick, dashed, draw=black!55},
+  layerlabel/.style={font=\footnotesize\bfseries, rotate=90, anchor=south},
+]
+
+% ---- Frontend layer ----
+\node[comp] (web) {Web\\(Next.js)};
+\node[comp, right=12mm of web] (mob) {Mobile\\(Android Compose)};
+
+% ---- Backend layer ----
+\node[comp, below=20mm of web] (nearby) {\texttt{/places}\\\texttt{/nearby}};
+\node[comp, right=6mm of nearby] (feed) {\texttt{/feed}\\(ranking)};
+\node[comp, right=6mm of feed] (pool) {\texttt{/question}\\\texttt{-pool}};
+\node[comp, right=6mm of pool] (verify) {\texttt{/verify}\\\texttt{-capture}};
+
+\node[store, below=7mm of feed] (pg) {PostgreSQL};
+\node[store, right=6mm of pg] (minio) {MinIO};
+
+% ---- External services ----
+\node[ext, left=14mm of nearby] (fsq) {Foursquare};
+\node[ext, above=4mm of fsq] (ow) {OpenWeather};
+\node[ext, below=4mm of fsq] (serp) {SerpAPI\\(ref image)};
+
+% ---- vLLM layer ----
+\node[llm, below=18mm of verify] (vllm) {Qwen2.5-VL-7B\\(vLLM, GPU L40)};
+
+% ---- Layer background bands ----
+\begin{scope}[on background layer]
+  \node[draw=black!25, fill=black!2, rounded corners,
+    fit=(web)(mob), inner sep=4mm] (Lf) {};
+  \node[draw=black!25, fill=black!4, rounded corners,
+    fit=(nearby)(verify)(pg)(minio)(ow)(serp), inner sep=4mm] (Lb) {};
+  \node[draw=black!25, fill=black!6, rounded corners,
+    fit=(vllm), inner sep=4mm] (Lv) {};
+\end{scope}
+
+% ---- Layer labels ----
+\node[layerlabel] at ([xshift=-3mm]Lf.west) {Frontend Layer};
+\node[layerlabel] at ([xshift=-3mm]Lb.west) {Backend Layer};
+\node[layerlabel] at ([xshift=-3mm]Lv.west) {vLLM Layer};
+
+% ---- Flows ----
+% client -> backend
+\draw[flow] (web.south) -- ([yshift=4mm]web.south |- Lb.north)
+  node[midway, right, font=\scriptsize] {REST / JSON};
+\draw[flow] (mob.south) -- ([yshift=4mm]mob.south |- Lb.north);
+
+% backend -> external (place + weather)
+\draw[flow] (nearby) -- (fsq);
+\draw[flow] (nearby.west) to[bend left=12] (ow.east);
+% verify -> reference image
+\draw[flow] (verify.south west) to[out=200,in=0] (serp.east);
+
+% backend -> stores
+\draw[flow] (feed) -- (pg);
+\draw[flow] (verify) -- (minio);
+
+% verify-capture <-> vLLM (only AI call at runtime)
+\draw[flow] (verify.south) -- (vllm.north)
+  node[midway, right, font=\scriptsize] {ảnh + rubric};
+\draw[ret] ([xshift=6mm]vllm.north) -- ([xshift=6mm]verify.south)
+  node[midway, right, font=\scriptsize] {điểm 0--1};
+
+\end{tikzpicture}
+\caption{Pipeline tổng thể của BeVietnam, chia thành ba lớp Frontend,
+Backend và vLLM. Hai client dùng chung tập endpoint của backend; backend
+điều phối các nguồn dữ liệu ngoài (Foursquare, OpenWeather, SerpAPI) và
+data store (PostgreSQL, MinIO); riêng lớp vLLM chỉ được gọi tại endpoint
+\texttt{/verify-capture}.}
+\label{fig:system_pipeline}
+\end{figure}
+
+Nhìn vào Hình~\ref{fig:system_pipeline} có thể thấy ba điều phản ánh đúng
+cách nhóm đã xây hệ thống. Trước hết, hai client web và mobile không nói
+chuyện trực tiếp với nhau hay với mô hình AI, mà cùng đi qua một tập
+endpoint thống nhất của backend, nhờ đó hai bề mặt cho ra trải nghiệm
+nhất quán. Tiếp đến, các nguồn dữ liệu ngoài (Foursquare, OpenWeather,
+SerpAPI) đều bị khóa sau backend thay vì lộ ra client, vừa để giữ khóa
+API an toàn vừa để chuẩn hóa dữ liệu trước khi trả về. Sau cùng, lớp vLLM
+nằm tách hẳn và chỉ có duy nhất \texttt{/verify-capture} chạm tới, đúng
+với kết luận ở phần trước rằng xác minh ảnh là tính năng duy nhất bắt
+buộc dùng mô hình AI tự host tại thời gian thực.
+
+\subsection{Innovation Highlights}
+
+Điểm đổi mới của BeVietnam không nằm ở việc sử dụng AI như một nhãn mác
+chung chung, mà nằm ở cách hệ thống kết hợp nhiều thành phần công nghệ và
+nghiệp vụ để giải quyết đúng Pain Point của người đi du lịch. Các đổi mới
+nổi bật nhất của hệ thống được tóm tắt trong
+Bảng~\ref{tab:innovation_highlights}.
+
+\begin{table}[H]
+\centering
+\caption{Innovation Highlights của BeVietnam}
+\label{tab:innovation_highlights}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.3cm} X}
+\toprule
+\textbf{Điểm đổi mới} & \textbf{Ý nghĩa đối với hệ thống} \\
+\midrule
+\textbf{Recommendation theo ngữ cảnh thời gian thực} & Khác với nhiều ứng dụng du lịch chỉ hiển thị các điểm đến phổ biến, BeVietnam cố gắng trả lời câu hỏi điểm đến nào phù hợp \textit{ngay lúc này} bằng cách kết hợp cultural value với weather, traffic, distance và estimated crowdedness. \\
+\textbf{Explainable ranking} & Hệ thống không chỉ trả về kết quả xếp hạng, mà còn cố gắng giải thích vì sao địa điểm được đề xuất hoặc bị hạ ưu tiên. Điều này làm cho recommendation trở nên minh bạch hơn và phù hợp hơn với định hướng học thuật của đề tài. \\
+\textbf{Bản đồ POI thời gian thực} & Thay vì một danh sách tĩnh, bubble map truy vấn các địa điểm thực tế quanh vị trí GPS của người dùng và co giãn bong bóng theo khoảng cách thật. Hai client web và mobile dùng chung một nguồn dữ liệu để giữ trải nghiệm nhất quán. \\
+\textbf{Storyline gắn với hành động thực địa} & BeVietnam không dừng ở việc kể chuyện văn hóa, mà biến nội dung đó thành chuỗi nhiệm vụ có thể thực hiện tại địa điểm thật. Điều này tạo ra cầu nối giữa nội dung số và trải nghiệm thực tế tại điểm đến. \\
+\textbf{Xác minh ảnh bằng mô hình thị giác tự host} & Thay vì để AI chấm bừa hoặc duyệt thủ công, BeVietnam dùng một mô hình thị giác (Qwen2.5-VL tự host trên vLLM) chấm ảnh theo rubric tường minh, có ảnh tham chiếu và ngưỡng quyết định, kèm cơ chế chuyển duyệt thủ công khi nghi ngờ. \\
+\textbf{Kết hợp học văn hóa với quyết định du lịch} & Nhiều ứng dụng chỉ mạnh về thông tin địa điểm hoặc chỉ mạnh về nội dung kể chuyện. BeVietnam cố gắng kết hợp hai lớp giá trị này: giúp người dùng đưa ra quyết định đi đâu, đồng thời giúp họ hiểu sâu hơn về nơi họ tới. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Do đó ta có thể thấy rằng, tổng quan hệ thống BeVietnam không được xây
+dựng như một tập hợp tính năng rời rạc, mà được tổ chức thành một lời
+giải có trọng tâm rất rõ. Traveler là actor trung tâm, dynamic
+recommendation feed và bubble map là giá trị chính của pilot, còn
+storyline cùng capture verification là lớp trải nghiệm đào sâu giúp hệ
+thống khác biệt với các ứng dụng du lịch tra cứu thông thường. Từ nền
+tảng tổng quan này, chương tiếp theo có thể đi sâu hơn vào kiến trúc kỹ
+thuật, data flow và cách các thành phần backend, AI và client phối hợp
+với nhau để triển khai các feature trên.

@@ -1,0 +1,64 @@
+\section{Pattern Recognition}
+
+Sau khi phân rã bài toán, bước tiếp theo của tư duy tính toán là tìm ra
+những \textbf{pattern} lặp đi lặp lại giữa các bài toán con. Điều này có
+ý nghĩa quan trọng, vì nhiều khi các vấn đề trông có vẻ khác nhau ở
+bề mặt nhưng thực chất lại có chung một cấu trúc xử lý bên dưới. Khi
+nhận ra các quy luật đó, ta có thể tái sử dụng thiết kế, dữ liệu và
+logic thay vì xây dựng mọi thứ theo cách rời rạc~\cite{spronck2023, dejesus2020}.
+
+Đối với BeVietnam, ta nhận ra có ba mẫu lặp rất rõ, và mỗi mẫu lặp này
+đều dẫn tới một quyết định thiết kế cụ thể.
+
+\textbf{Đầu tiên} là mẫu \textbf{context-aware decision making}. Dù là
+feed gợi ý địa điểm, bubble map hay lựa chọn nhiệm vụ kế tiếp trong
+storyline thì tất cả đều dựa trên cùng một câu hỏi nền tảng: với trạng
+thái hiện tại của người dùng và môi trường xung quanh, hệ thống nên ưu
+tiên điều gì trước. Điều này có nghĩa là nhiều tính năng khác nhau thực
+ra cùng chia sẻ một lớp tư duy ra quyết định theo ngữ cảnh. Từ pattern
+này, nhóm đi tới quyết định rằng feed và bubble map không được phép dùng
+hai công thức khác nhau, mà phải dùng cùng một lõi suitability score để
+tránh việc hai bề mặt hiển thị đưa ra hai thông điệp mâu thuẫn. Nếu
+không nhận ra pattern này từ sớm, rất dễ xảy ra tình huống mỗi màn hình
+được xây theo một logic riêng: feed xếp theo mức hấp dẫn nội dung, bản
+đồ phóng to theo khoảng cách, còn storyline lại ưu tiên theo cảm hứng
+riêng của AI. Khi đó người dùng sẽ không còn thấy một hệ thống thống
+nhất, mà chỉ thấy nhiều tính năng đứng cạnh nhau nhưng không nói cùng
+một ngôn ngữ quyết định.
+
+\textbf{Kế đến} là mẫu \textbf{retrieve → explain → present}. Trong
+khám phá địa điểm, hệ thống truy xuất dữ liệu về điểm đến, sau đó giải
+thích giá trị của địa điểm đó và cuối cùng trình bày nó thành card, feed
+hoặc bong bóng bản đồ. Trong storyline, hệ thống cũng truy xuất bối cảnh
+văn hóa, sinh ra mô tả nhiệm vụ và cuối cùng hiển thị nó cho người dùng
+dưới dạng các bước hành động. Điều này cho thấy dù giao diện đầu ra khác
+nhau, cấu trúc xử lý thông tin vẫn rất tương đồng. Từ đó mà nhóm thiết
+kế AI theo hướng lấy dữ liệu văn hóa có nguồn gốc trước, sau đó mới sinh
+phần giải thích hoặc nhiệm vụ bằng mô hình ngôn ngữ~\cite{bevietnam_spec}.
+Điều này có ý nghĩa thực tế rất lớn, vì nó ngăn hệ thống rơi vào cách
+làm phổ biến nhưng rất yếu là đưa prompt chung chung cho mô hình rồi hy
+vọng mô hình ``sẽ tự biết'' nên nói gì. Thay vào đó, từng khối tính năng
+đều phải đi qua cùng một cấu trúc: lấy đúng dữ liệu nền, sinh nội dung
+dựa trên dữ liệu đó, rồi mới trình bày ra giao diện theo hình thức phù
+hợp.
+
+\textbf{Cuối cùng} là mẫu \textbf{verify → update state}. Sau mỗi hành động
+quan trọng của người dùng, ví dụ như hoàn thành một nhiệm vụ hay gửi một
+bức ảnh minh chứng, hệ thống đều phải kiểm tra dữ liệu đầu vào, xác minh
+tính hợp lệ rồi mới cập nhật trạng thái tiến trình. Mẫu này lặp lại rất
+nhiều trong backend, AI service và giao diện người dùng, từ đăng nhập,
+gửi capture cho tới hoàn thành task. Pattern này dẫn nhóm tới yêu cầu là
+mọi hành động cập nhật tiến trình phải đi qua lớp validation và không để
+AI ghi trực tiếp vào product state. Đây là quyết định quan trọng ở
+giai đoạn pilot, vì nếu bỏ qua lớp kiểm tra này thì các tính năng liên
+quan đến tài khoản, tiến trình storyline và capture sẽ rất dễ rơi vào
+tình trạng không nhất quán, đặc biệt khi hệ thống còn đang dùng nhiều
+nguồn dữ liệu và nhiều bề mặt client khác nhau.
+
+Việc nhận diện các mẫu lặp này có hậu quả kỹ thuật rất rõ ràng. Trước hết, nó giúp nhóm chuẩn hóa cách thiết kế API, vì nhiều luồng có thể
+dùng chung cấu trúc request/response và cách quản lý trạng thái. Kế đó, nó giúp nhóm chuẩn hóa cách viết service và repository, bởi dù dữ
+liệu thuộc về \texttt{place}, \texttt{feed} hay \texttt{task}, ta vẫn
+có thể tổ chức theo các tầng rất giống nhau. Sau cùng, nó tạo tiền đề để
+AI không hoạt động như một hộp đen độc lập, mà chỉ là một mắt xích trong
+một pipeline có pattern rõ ràng: nhận dữ liệu đầu vào, suy luận trong
+phạm vi kiểm soát và trả về output có cấu trúc.

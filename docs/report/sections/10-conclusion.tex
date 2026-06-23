@@ -1,0 +1,60 @@
+\section{Kết Luận và Hướng Phát Triển}
+
+\subsection{Kết Luận}
+
+Báo cáo đã trình bày hành trình từ một bài toán du lịch thực tế đến một
+hệ thống chạy được, dưới lăng kính của tư duy tính toán. Xuất phát từ ba
+nút thắt của ngành du lịch --- thông tin phân tán, thiếu chiều sâu văn
+hóa và không phản ứng theo bối cảnh --- nhóm đã lần lượt áp dụng đủ bốn
+trụ cột của Computational Thinking: \textbf{decomposition} để chia bài
+toán thành bốn khối chức năng, \textbf{pattern recognition} để nhận ra
+các mẫu lặp như ra quyết định theo ngữ cảnh và xác minh trước khi cập
+nhật trạng thái, \textbf{abstraction} để biến những khái niệm giàu ngữ
+nghĩa thành các thực thể và đại lượng tính toán được, và cuối cùng là
+\textbf{algorithm design} để biến chúng thành các quy trình thực thi được.
+
+Điểm nhấn của sản phẩm cuối cùng nằm ở chỗ ba tính năng trọng tâm đều đã
+được hiện thực và kiểm chứng: bản đồ bong bóng thời gian thực neo vào vị
+trí GPS thật của người dùng; Mission Path trình bày toàn bộ kho nhiệm vụ
+văn hóa thành một lộ trình trực quan; và quan trọng nhất, lớp xác minh
+ảnh đã chuyển từ một bản giả lập chấp nhận mọi ảnh thành một pipeline thị
+giác thật, chấm điểm theo rubric tường minh trên một mô hình VLM tự host.
+Chính sự chuyển dịch này thể hiện rõ giá trị của bước evaluation: nếu
+không kiểm thử hành vi, lỗi ``chấp nhận ảnh sai'' đã không bị phát hiện.
+
+Xuyên suốt quá trình, một quyết định thiết kế được giữ vững là
+\textbf{đóng khung vai trò của AI}. Thay vì để mô hình hoạt động như một
+hộp đen tự do, hệ thống luôn cấp cho nó dữ liệu nền (ảnh tham chiếu, mô
+tả nhiệm vụ), ép nó trả về kết quả có cấu trúc theo rubric, và để các
+ngưỡng số ở backend đưa ra quyết định cuối. Đây chính là biểu hiện cụ thể
+nhất của tư duy tính toán trong một hệ thống có AI: biến cái định tính
+thành cái kiểm soát được.
+
+\subsection{Hướng Phát Triển}
+
+Từ nền tảng pilot hiện tại, nhóm xác định một số hướng phát triển rõ ràng,
+tóm tắt trong Bảng~\ref{tab:future_work}.
+
+\begin{table}[H]
+\centering
+\caption{Các hướng phát triển tiếp theo}
+\label{tab:future_work}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.6cm} X}
+\toprule
+\textbf{Hướng phát triển} & \textbf{Nội dung} \\
+\midrule
+\textbf{Nhiệm vụ cá nhân hóa} & Hiện kho nhiệm vụ dùng chung cho mọi người dùng; bước tiếp theo là chọn lọc và sắp xếp nhiệm vụ theo vị trí, sở thích và lịch sử của từng người. \\
+\textbf{Củng cố ảnh tham chiếu} & Thay vì chỉ lấy ảnh đầu tiên từ tìm kiếm web, có thể tuyển và lưu sẵn một bộ ảnh tham chiếu chất lượng cho mỗi nhiệm vụ để tăng độ chính xác của việc chấm điểm. \\
+\textbf{Kiểm thử tự động} & Bổ sung bộ kiểm thử tự động cho backend và một tập ảnh chuẩn (đúng/sai) để đo độ chính xác của Capture Judge một cách định lượng. \\
+\textbf{Bổ sung yếu tố ngữ cảnh} & Đưa thêm giao thông và mật độ đông đúc vào mô hình bong bóng, tiến gần hơn tới tầm nhìn ban đầu về suitability score đa yếu tố. \\
+\textbf{Mở rộng ngoài Huế} & Nhân rộng kho dữ liệu văn hóa và nhiệm vụ sang các địa phương khác, tận dụng kiến trúc đã tách bạch sẵn giữa nội dung và luồng điều hướng. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Tựu trung, BeVietnam ở giai đoạn pilot đã chứng minh được tính khả thi
+của một hệ thống du lịch văn hóa thông minh có khả năng phản ứng theo bối
+cảnh và xác minh được trải nghiệm thực địa. Quan trọng hơn cả sản phẩm,
+quá trình xây dựng nó là một minh họa hoàn chỉnh cho việc áp dụng tư duy
+tính toán vào một bài toán thực tế nhiều ràng buộc, từ lúc phân tích vấn
+đề cho tới khi vận hành một hệ thống có AI được kiểm soát chặt chẽ.

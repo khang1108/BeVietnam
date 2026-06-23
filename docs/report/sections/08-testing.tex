@@ -1,0 +1,95 @@
+\section{Kiểm Thử và Đánh Giá}
+
+Như đã nêu ở phần Evaluation, nhóm xem việc đánh giá là một vòng phản
+biện chạy song song với phát triển chứ không phải bước cuối. Chương này
+trình bày cách kiểm thử thực tế trong giai đoạn pilot và đối chiếu kết
+quả với các tiêu chí đã đặt ra.
+
+\subsection{Phương Pháp Kiểm Thử}
+
+Vì BeVietnam là một hệ thống nhiều thành phần (hai client, backend, AI
+Core, vLLM), nhóm kiểm thử theo bốn lớp từ thấp đến cao, tóm tắt trong
+Bảng~\ref{tab:test_levels}.
+
+\begin{table}[H]
+\centering
+\caption{Bốn lớp kiểm thử của hệ thống}
+\label{tab:test_levels}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.0cm} X}
+\toprule
+\textbf{Lớp kiểm thử} & \textbf{Cách thực hiện} \\
+\midrule
+\textbf{Biên dịch / kiểu dữ liệu} & Kiểm tra web bằng trình biên dịch TypeScript, mobile bằng Gradle, mã Python của AI bằng \texttt{py\_compile}; đảm bảo toàn bộ build không lỗi trước khi tích hợp. \\
+\textbf{Tích hợp dịch vụ} & Gọi trực tiếp các endpoint qua đường hầm public để xác nhận backend, proxy dịch vụ ngoài và AI Core hoạt động đúng từ ngoài mạng. \\
+\textbf{Trải nghiệm trên thiết bị} & Cài bản APK thực lên điện thoại Android, kiểm tra bản đồ thời gian thực, định vị GPS và luồng chụp ảnh tại hiện trường. \\
+\textbf{Hành vi AI} & Thử nghiệm Capture Judge với ảnh đúng và ảnh sai chủ thể để kiểm tra xem rubric có phân biệt được hay không. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Kết Quả Kiểm Thử Chính}
+
+Bảng~\ref{tab:test_results} liệt kê một số ca kiểm thử tiêu biểu và kết
+quả quan sát được. Các ca tích hợp được thực hiện bằng cách gọi endpoint
+qua đường hầm Cloudflare, mô phỏng đúng cách client thật truy cập hệ thống.
+
+\begin{table}[H]
+\centering
+\caption{Một số ca kiểm thử tiêu biểu và kết quả}
+\label{tab:test_results}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.6cm} X >{\raggedright\arraybackslash}p{2.0cm}}
+\toprule
+\textbf{Ca kiểm thử} & \textbf{Kỳ vọng} & \textbf{Kết quả} \\
+\midrule
+POI thời gian thực tại trung tâm TP.HCM & Trả về danh sách quán/địa điểm quanh tọa độ, có phân loại nhóm. & Đạt \\
+Kho nhiệm vụ \texttt{/question-pool} & Trả về toàn bộ nhiệm vụ cho Mission Path. & Đạt (133 nhiệm vụ) \\
+Thời tiết khu vực & Trả về nhiệt độ, UV ước lượng, lượng mưa. & Đạt \\
+Xác minh ảnh \textit{sai} chủ thể & Không được chấp nhận (rejected / needs\_review). & Đạt sau khi thay stub bằng mô hình thị giác \\
+Build web (production) & Biên dịch và tạo trang \texttt{/storyline} thành công. & Đạt \\
+Build mobile (APK debug) & Gradle hoàn tất, tạo được file cài đặt. & Đạt \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Một quan sát quan trọng trong quá trình kiểm thử AI: phiên bản đầu của
+Capture Judge chỉ kiểm tra ``có ảnh hay không'' rồi chấp nhận ở mức tin
+cậy cao, nên một ảnh hoàn toàn không liên quan vẫn được duyệt. Đây chính
+là loại lỗi mà chỉ kiểm thử hành vi mới phát hiện được, và là lý do nhóm
+thay thế bằng pipeline rubric + ảnh tham chiếu + mô hình thị giác mô tả
+ở chương trước.
+
+\subsection{Đánh Giá theo Bốn Tiêu Chí}
+
+Nhóm đối chiếu hệ thống đã hiện thực với bốn lớp tiêu chí đã đặt ra ở
+chương System and Algorithm Design.
+
+\textbf{Đúng chức năng.} Ba vòng lặp sản phẩm cốt lõi đều chạy thông từ
+đầu đến cuối: người dùng mở bản đồ và thấy POI thời gian thực quanh mình;
+mở Mission Path và đi qua các nút nhiệm vụ; chụp ảnh và nhận kết quả xác
+minh có cơ sở. Các endpoint nền tảng đều phản hồi đúng khi gọi từ ngoài
+mạng qua đường hầm.
+
+\textbf{Chất lượng trải nghiệm.} Việc đồng bộ giao diện mobile theo hệ
+màu Huế của web, bổ sung nhãn tên địa điểm trên bong bóng và nút định vị
+nhanh giúp trải nghiệm liền mạch hơn giữa hai nền tảng. Mission Path dạng
+lộ trình trực quan giúp người dùng nắm được tiến độ rõ ràng thay vì một
+danh sách phẳng.
+
+\textbf{Độ tin cậy của AI.} Sau khi thay stub bằng mô hình thị giác có
+rubric, hệ thống không còn duyệt bừa ảnh sai chủ thể. Cơ chế
+\textit{needs\_review} bảo đảm rằng khi mô hình không sẵn sàng hoặc còn
+nghi ngờ, hệ thống không tự ý chấp nhận --- một hành vi an toàn quan trọng
+trong pilot.
+
+\textbf{Khả năng mở rộng.} Việc khóa nguồn POI về một endpoint dùng chung
+cho cả hai client, tách nội dung nhiệm vụ (sinh offline) khỏi luồng điều
+hướng, và đặt khóa dịch vụ ngoài sau một rate limiter chung khiến hệ
+thống dễ nhân rộng sang địa phương khác mà không phải viết lại lõi.
+
+\begin{note}[Giới hạn của kiểm thử]
+Trong phạm vi pilot, kiểm thử còn nghiêng về kiểm tra tích hợp và hành vi
+thủ công, chưa có bộ kiểm thử tự động đầy đủ hay đánh giá người dùng quy
+mô lớn. Độ chính xác của mô hình thị giác cũng phụ thuộc vào chất lượng
+ảnh tham chiếu lấy từ tìm kiếm web. Đây là những hướng cần củng cố khi
+đưa hệ thống ra khỏi giai đoạn thí điểm.
+\end{note}

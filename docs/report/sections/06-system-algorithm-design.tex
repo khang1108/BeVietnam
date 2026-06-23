@@ -1,0 +1,404 @@
+\section{System and Algorithm Design}
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    node distance=1.2cm and 1.8cm,
+    actor/.style={
+        draw=primaryblue,
+        fill=blue!4!white,
+        rounded corners=4pt,
+        minimum width=2.8cm,
+        minimum height=0.95cm,
+        align=center,
+        font=\small
+    },
+    core/.style={
+        draw=accentblue,
+        fill=accentblue!8!white,
+        rounded corners=5pt,
+        minimum width=3.4cm,
+        minimum height=1.1cm,
+        align=center,
+        font=\small
+    },
+    service/.style={
+        draw=jade,
+        fill=green!5!white,
+        rounded corners=4pt,
+        minimum width=3.1cm,
+        minimum height=0.95cm,
+        align=center,
+        font=\small
+    },
+    external/.style={
+        draw=warnorange,
+        fill=orange!8!white,
+        rounded corners=4pt,
+        minimum width=2.9cm,
+        minimum height=0.95cm,
+        align=center,
+        font=\small
+    }
+]
+
+\node[actor] (traveler) {Du khách\\Nội địa / Quốc tế};
+\node[service, right=2.1cm of traveler, yshift=1.0cm] (mobile) {Mobile Client\\Android};
+\node[service, right=2.1cm of traveler, yshift=-1.0cm] (web) {Web Client\\PWA / Browser};
+
+\node[core, right=3.0cm of mobile, yshift=-1.0cm] (backend) {Backend Nghiệp vụ\\API + Product State};
+\node[core, right=3.2cm of backend] (ai) {AI Core\\Storyline + Giải thích};
+
+\node[external, below=1.6cm of backend] (db) {PostgreSQL / Storage\\POI, tiến trình, capture};
+\node[external, above=1.8cm of backend] (ctx) {Nguồn ngữ cảnh ngoài\\Weather / Traffic / Crowd Estimate};
+
+\draw[->, thick, primaryblue] (traveler) -- (mobile);
+\draw[->, thick, primaryblue] (traveler) -- (web);
+
+\draw[->, thick, accentblue] (mobile) -- node[above, font=\scriptsize, pos=0.45]{feed, map} (backend);
+\draw[->, thick, accentblue] (web) -- node[below, font=\scriptsize, pos=0.45]{storyline, detail} (backend);
+
+\draw[->, thick, jade] (backend.east) -- node[above, font=\scriptsize, pos=0.45]{quest request} (ai.west);
+\draw[->, thick, jade] (ai.west) to[bend left=28] node[below, font=\scriptsize, pos=0.45]{structured output} (backend.east);
+
+\draw[->, thick, warnorange] (backend) -- node[right, font=\scriptsize, pos=0.45]{read / write} (db);
+\draw[->, thick, warnorange] (ctx.south) -- node[left, font=\scriptsize, pos=0.4]{context factors} (backend.north);
+
+\draw[->, dashed, thick, darkgray] (backend.west) to[out=160,in=0] node[above, font=\scriptsize, pos=0.35]{score + reason} (mobile.east);
+\draw[->, dashed, thick, darkgray] (backend.west) to[out=200,in=0] node[below, font=\scriptsize, pos=0.35]{score + reason} (web.east);
+
+\end{tikzpicture}
+}
+\caption{Sơ đồ mức cao của hệ thống BeVietnam. Du khách tương tác qua mobile hoặc web, backend giữ quyền kiểm soát nghiệp vụ và product state, AI Core chỉ xử lý các tác vụ suy luận có cấu trúc, còn dữ liệu ngữ cảnh ngoài được đưa vào để phục vụ recommendation score và storyline.}
+\label{fig:bevietnam_high_level}
+\end{figure}
+
+\subsection{Algorithm Design}
+
+Sau khi đã phân rã bài toán, nhận diện quy luật và xây dựng mô hình trừu
+tượng, bước tiếp theo là thiết kế \textbf{algorithm}. Trong bối cảnh của
+BeVietnam, thuật toán không chỉ là một công thức toán học đơn lẻ, mà nó
+là toàn bộ chuỗi bước xử lý mà hệ thống phải thực hiện để biến dữ liệu
+thô thành hành động hữu ích cho người dùng~\cite{spronck2023}.
+
+Đối với bài toán feed và bubble map, ý tưởng cốt lõi của thuật toán là:
+thu thập trạng thái hiện tại của người dùng và môi trường, chuẩn hóa các
+đặc trưng cần thiết, tính ra điểm phù hợp cho từng địa điểm, sau đó sắp
+xếp và trình bày kết quả. Nếu viết dưới dạng tư duy thuật toán, tiến
+trình này có thể được mô tả tường minh như Bảng~\ref{tab:feed_algorithm}.
+
+\begin{table}[H]
+\centering
+\caption{Quy trình thuật toán cho feed và bubble map}
+\label{tab:feed_algorithm}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{1.6cm} X X}
+\toprule
+\textbf{Bước} & \textbf{Thao tác xử lý} & \textbf{Ý nghĩa trong hệ thống} \\
+\midrule
+\textbf{B1} & Nhận vị trí hiện tại và tùy chọn sở thích của người dùng. & Thiết lập trạng thái đầu vào ban đầu cho bài toán ra quyết định. \\
+\textbf{B2} & Truy xuất danh sách các địa điểm khả dụng trong khu vực. & Xác định không gian lựa chọn mà hệ thống được phép xếp hạng. \\
+\textbf{B3} & Thu thập thêm thông tin ngữ cảnh như thời tiết, khoảng cách, giao thông hoặc trạng thái hệ thống. & Bổ sung các biến bối cảnh để việc scoring phản ánh đúng thời điểm hiện tại. \\
+\textbf{B4} & Tính \textbf{recommendation score} cho từng địa điểm dựa trên các trọng số đã định nghĩa. & Biến nhận định định tính ``nên đi đâu'' thành đại lượng có thể tính toán được. \\
+\textbf{B5} & Sắp xếp danh sách theo score và sinh ra phần giải thích ngắn gọn cho từng đề xuất. & Đảm bảo người dùng không chỉ nhận kết quả xếp hạng mà còn hiểu lý do của kết quả đó. \\
+\textbf{B6} & Trả kết quả đã xếp hạng cho feed cá nhân hóa. Riêng bubble map dùng một biến thể thời gian thực: truy vấn POI quanh vị trí GPS và co giãn bong bóng theo khoảng cách thực tế. & Cùng một tư duy ra quyết định theo ngữ cảnh, thể hiện qua hai bề mặt phù hợp với từng mục đích. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Trong quá trình phân tích, nhóm cũng dùng kỹ thuật \textbf{if--then rule
+design} để xác định fallback cho các tình huống lỗi. Chẳng hạn, nếu API
+thời tiết không phản hồi thì hệ thống không được dừng feed, mà phải dùng
+giá trị fallback; nếu traffic service lỗi thì ranking vẫn phải chạy với
+các yếu tố còn lại; nếu AI sinh nhiệm vụ thất bại thì phải trả về quest
+fallback có cấu trúc thay vì trả về một đoạn văn tự do. Đây là biểu
+hiện rất rõ của tư duy thuật toán trong bối cảnh hệ thống thật, bởi lời
+giải không chỉ xử lý ca lý tưởng mà còn phải mô tả rõ ứng xử khi đầu
+vào thiếu hoặc dịch vụ ngoài gặp sự cố~\cite{bevietnam_spec}. Cũng chính
+ở bước này, nhóm mới tách được đâu là phần phải deterministic và đâu là
+phần có thể để AI hỗ trợ. Những gì liên quan tới ràng buộc nghiệp vụ,
+quyền truy cập, trạng thái task hay dữ liệu bền vững đều phải nằm ở lớp
+thuật toán kiểm soát được. Những gì liên quan tới diễn giải, kể chuyện
+hay đánh giá ngữ nghĩa ảnh mới là phần có thể giao thêm cho AI.
+
+\begin{note}[Hạn chế hiện tại]
+Trong phạm vi pilot, nhóm chưa xử lý đầy đủ dữ liệu giao thông thời gian
+thực. Vì vậy, yếu tố traffic hiện được mô hình hóa ở mức tham số giả lập
+hoặc dùng giá trị fallback khi API không khả dụng; việc tích hợp giao
+thông thật là một hướng nhóm để lại cho giai đoạn sau.
+\end{note}
+
+\subsection{Ranking Algorithm}
+
+Ở phần này nhóm đi sâu vào \textit{cách thực sự suy nghĩ} khi thiết kế
+lõi xếp hạng. Câu hỏi đặt ra là: với một tập POI hoặc nhiệm vụ và một bối
+cảnh hiện tại, làm sao biến nhận định ``cái nào phù hợp hơn'' thành một
+con số? Nhóm đã cân nhắc hai hướng. Hướng thứ nhất là dùng một mô hình
+học máy để học thứ hạng từ dữ liệu. Hướng thứ hai là dùng một mô hình
+\textbf{cộng trọng số có luật} (weighted additive scoring). Nhóm chọn
+hướng thứ hai vì ba lý do gắn chặt với bối cảnh pilot, tóm tắt trong
+Bảng~\ref{tab:why_rule_scoring}.
+
+\begin{table}[H]
+\centering
+\caption{Vì sao chọn weighted additive scoring thay vì học máy}
+\label{tab:why_rule_scoring}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.2cm} X}
+\toprule
+\textbf{Tiêu chí} & \textbf{Lập luận} \\
+\midrule
+\textbf{Dữ liệu} & Pilot chưa có log hành vi đủ lớn để huấn luyện một mô hình xếp hạng đáng tin; cold-start sẽ làm mô hình học máy hoạt động kém. \\
+\textbf{Giải thích được} & Mỗi số hạng cộng vào điểm chính là một \textit{lý do} có thể hiển thị cho người dùng (``gần bạn'', ``hợp thời tiết''), đúng yêu cầu explainable ranking. \\
+\textbf{Chi phí thời gian thực} & Công thức cộng chạy trong vài mili-giây, không cần gọi mô hình tại thời điểm request, phù hợp cho feed và bản đồ tương tác. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{Personally Ranking Feed}
+
+Xét một bài viết / địa điểm $p$, tập sở thích của người dùng $I$, tập
+nhãn danh mục của bài viết $C_p$, bối cảnh gồm thời tiết $w$, buổi trong
+ngày $t$, mùa $s$, và tập địa điểm người dùng đã ghé $V$. Nhóm định nghĩa
+điểm phù hợp như một tổng có trọng số tường minh, phát biểu trong
+Định nghĩa~\ref{def:feed-score}.
+
+\begin{mydef}{Hàm Điểm Phù Hợp Của Feed}{feed-score}
+Điểm thô của bài viết $p$ trong bối cảnh $(w,t,s)$ là
+\[
+\score(p) = b
++ \big(\alpha + \beta\,|I \cap C_p|\big)\,\mathbf{1}[I \cap C_p \neq \emptyset]
++ f_w(w,p) + f_t(t,p) + f_s(s,p)
+- \gamma\,\mathbf{1}[\place_p \in V],
+\]
+trong đó các hàm khớp ngữ cảnh là hàm bậc thang
+\[
+f_w =
+\begin{cases}
+20 & w \in W_p \\
+6  & \text{any} \in W_p \\
+0  & \text{khác}
+\end{cases}
+\qquad
+f_t =
+\begin{cases}
+12 & t \in T_p \\
+4  & \text{any} \in T_p \\
+0  & \text{khác}
+\end{cases}
+\qquad
+f_s =
+\begin{cases}
+8 & s \in S_p \\
+0 & \text{khác}
+\end{cases}
+\]
+và điểm chuẩn hóa về đoạn $[0,1]$ qua một trần $N$ là
+$\hat{\score}(p) = \mathrm{clip}\!\big(\score(p)/N,\, 0,\, 1\big)$.
+\end{mydef}
+
+Các tham số được nhóm chốt là $b=5$ (điểm sàn để mọi bài đều có cơ hội
+xuất hiện), $\alpha=10,\ \beta=5$ (sở thích là tín hiệu cá nhân hóa mạnh
+nhất), $\gamma=25$ (phạt novelty để hạ ưu tiên nơi đã đi) và $N=60$.
+Thuật toán~\ref{alg:rank} trình bày toàn bộ vòng xếp hạng. Điểm mấu chốt
+là cùng tập số hạng vừa cho ra điểm để sắp xếp, vừa cho ra danh sách lý
+do để giải thích.
+
+\begin{algorithm}[H]
+\caption{Xếp hạng feed theo ngữ cảnh (weighted additive)}
+\label{alg:rank}
+\begin{algorithmic}[1]
+\Require Danh sách \textit{posts}, sở thích $I$, tập đã ghé $V$, bối cảnh $(w,t,s)$
+\ForAll{bài viết $p \in \textit{posts}$}
+    \State $sc \gets 5$ \Comment{điểm sàn}
+    \State $O \gets I \cap \mathrm{categories}(p)$
+    \If{$|O| > 0$}
+        \State $sc \gets sc + 10 + 5\,|O|$ \Comment{tín hiệu sở thích}
+    \EndIf
+    \State $sc \gets sc + f_w(w,p) + f_t(t,p) + f_s(s,p)$
+    \If{$\place_p \in V$}
+        \State $sc \gets sc - 25$ \Comment{phạt novelty}
+    \EndIf
+    \State $p.\textit{score} \gets \mathrm{clip}(sc/60,\,0,\,1)$
+\EndFor
+\State \textbf{sắp xếp} \textit{posts} theo \textit{score} giảm dần
+\State \Return \textit{posts}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{myinsight}{Điểm số chính là lời giải thích}{scoring}
+Vì điểm là một tổng tường minh, ta có thể truy ngược mỗi địa điểm đã được
+cộng/trừ ở đâu. Ví dụ một bài viết khớp 2 sở thích, đúng thời tiết nắng,
+đúng buổi sáng và người dùng chưa từng ghé sẽ có
+$\score = 5 + (10 + 5\cdot 2) + 20 + 12 + 0 - 0 = 57$, tức
+$\hat{\score} = 57/60 \approx 0.95$. Hệ thống không chỉ trả về $0.95$ mà
+còn trả kèm các lý do ``hợp sở thích'', ``hợp thời tiết'', ``hợp buổi
+sáng'' --- đúng tinh thần explainable ranking.
+\end{myinsight}
+
+\subsubsection{Grading for Mission Path}
+
+Khi cần chọn nhiệm vụ phù hợp nhất quanh người dùng từ kho question pool,
+nhóm dùng cùng triết lý cộng trọng số nhưng thêm \textbf{thành phần
+khoảng cách}. Với nhiệm vụ $q$ có tọa độ và bán kính hiệu lực $R_q$, gọi
+$d$ là khoảng cách từ người dùng tới $q$. Số hạng khoảng cách thưởng mạnh
+khi người dùng nằm trong bán kính và giảm tuyến tính khi ra xa:
+\begin{equation}
+g_d(q) =
+\begin{cases}
+40 & d \le R_q \\[2pt]
+\max\!\big(0,\ 25 - \dfrac{d - R_q}{200}\big) & d > R_q
+\end{cases}
+\label{eq:task_dist}
+\end{equation}
+
+Các số hạng còn lại tương tự feed: khớp thời tiết ($+20$ / $+8$), phạt
+$-25$ nếu trời mưa mà nhiệm vụ ngoài trời, thưởng $+12$ nếu mưa mà nhiệm
+vụ trong nhà, khớp buổi ($+12$ / $+4$), khớp sở thích ($10 + 5\cdot$ số
+nhãn trùng), và $+3$ cho nhiệm vụ dễ. Thuật toán~\ref{alg:taskscore} mô
+tả logic này, đồng thời thu thập một danh sách \textit{reasons} để giải
+thích vì sao nhiệm vụ được chọn.
+
+\begin{algorithm}[H]
+\caption{Chấm điểm chọn nhiệm vụ theo ngữ cảnh}
+\label{alg:taskscore}
+\begin{algorithmic}[1]
+\Require Nhiệm vụ $q$, bối cảnh $(\textit{gps}, w, t, I)$
+\State $sc \gets 0$;\quad $\textit{reasons} \gets \emptyset$
+\State $d \gets \mathrm{haversine}(\textit{gps}, q.\textit{coord})$
+\If{$d \le R_q$}
+    \State $sc \gets sc + 40$;\quad thêm \texttt{near\_user} vào \textit{reasons}
+\Else
+    \State $sc \gets sc + \max(0,\ 25 - (d - R_q)/200)$
+\EndIf
+\State $sc \gets sc + f_w(w,q) + f_t(t,q)$ \Comment{khớp thời tiết / buổi}
+\If{$w = \text{rainy}$ và $q$ ngoài trời} \State $sc \gets sc - 25$ \EndIf
+\If{$w = \text{rainy}$ và $q$ trong nhà} \State $sc \gets sc + 12$ \EndIf
+\State $O \gets I \cap q.\textit{categories}$
+\If{$|O| > 0$} \State $sc \gets sc + 10 + 5\,|O|$;\quad thêm \texttt{interest\_match} \EndIf
+\If{$q.\textit{difficulty} = \text{easy}$} \State $sc \gets sc + 3$ \EndIf
+\State \Return $(sc,\ \textit{reasons})$
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Dynamic Bubble Marker}
+
+Bản đồ thời gian thực không xếp hạng theo công thức trên mà chấm theo
+khoảng cách thuần túy. Khoảng cách trắc địa giữa người dùng và POI được
+tính bằng công thức \textbf{haversine}~\cite{sinnott1984}:
+\begin{equation}
+d = 2R\,\arcsin\!\sqrt{\sin^2\!\frac{\Delta\phi}{2} + \cos\phi_1\cos\phi_2\,\sin^2\!\frac{\Delta\lambda}{2}}
+\label{eq:haversine}
+\end{equation}
+với $\phi$ là vĩ độ, $\lambda$ là kinh độ và $R$ là bán kính Trái Đất.
+Sau đó bán kính bong bóng được nội suy tuyến tính theo trọng số
+$\,\omega = 1 - d/d_{\max}\,$ như đã trình bày ở
+Pseudocode~\ref{lst:bubble}, để địa điểm càng gần thì bong bóng càng lớn.
+
+\subsection{Thuật Toán Điều Hướng và Xác Minh}
+
+Đối với storyline, thuật toán lại mang màu sắc của một bài toán điều
+hướng tiến trình. Từ một điểm đến ban đầu, hệ thống phải xác định nhiệm
+vụ nào là hợp lý tiếp theo, nhiệm vụ đó yêu cầu bằng chứng gì, điều kiện
+nào được xem là hoàn thành và khi nào thì mở khóa bước kế tiếp. Điều này
+có nghĩa là ta đang thiết kế một \textit{state machine} ở mức khái niệm,
+trong đó mỗi trạng thái tương ứng với một mốc tiến độ của hành trình văn
+hóa.
+
+Đối với xác minh capture, quy trình giải kết hợp một bước suy luận thị
+giác với một khung quyết định tường minh. Hệ thống nhận ảnh người dùng,
+lấy một ảnh tham chiếu của chủ thể nhiệm vụ, rồi yêu cầu mô hình thị giác
+chấm điểm độ khớp theo một rubric chia thang 0--1. Điểm trả về được ánh
+xạ qua các ngưỡng cố định thành \textit{approved}, \textit{needs\_review}
+hay \textit{rejected}, và chỉ trạng thái \textit{approved} mới mở khóa nút
+kế tiếp. Đây là một ví dụ điển hình cho việc biến một yêu cầu đời thực
+mang tính định tính (``ảnh này có đúng địa điểm không'') thành một
+pipeline xử lý vừa tận dụng được sức mạnh suy luận của AI, vừa giữ được
+tính kiểm soát qua rubric và ngưỡng.
+
+Điều đặc biệt quan trọng là trong BeVietnam, nhiều thuật toán không nên
+được đặt hoàn toàn bên trong mô hình AI. AI chỉ nên tham gia ở những
+khâu cần sinh ngôn ngữ, diễn giải văn hóa hoặc đánh giá ảnh ở mức ngữ
+nghĩa. Còn cấu trúc điều hướng nghiệp vụ, cập nhật trạng thái, ràng buộc
+API và kiểm tra tính hợp lệ của dữ liệu vẫn phải nằm trong backend và
+schema có cấu trúc. Đây chính là biểu hiện của tư duy tính toán đúng
+đắn: thuật toán phải minh bạch, kiểm soát được và không phụ thuộc hoàn
+toàn vào một hộp đen sinh ngẫu nhiên. Chính vì vậy, trong giai đoạn
+phân tích, nhóm ưu tiên thiết kế contract API, schema output và ràng
+buộc state transition trước khi bàn sâu đến việc chọn model nào mạnh
+hơn.
+
+\subsection{Evaluation}
+
+Bước cuối cùng của Computational Thinking là \textbf{evaluation}, tức là
+đánh giá xem lời giải mà ta xây dựng có thực sự giải quyết bài toán ban
+đầu hay không~\cite{spronck2023}. Với một sản phẩm như BeVietnam, đây là
+bước không thể thiếu, bởi một thiết kế nghe có vẻ hợp lý trên giấy chưa
+chắc đã hữu ích khi đưa vào bối cảnh du lịch thực tế.
+
+Trong BeVietnam, evaluation không phải là công việc để cuối cùng mới
+làm, mà là bộ tiêu chuẩn được dùng để phản biện lại toàn bộ lời giải
+ngay từ giai đoạn phân tích. Mỗi khi đề xuất một tính năng hay một
+pipeline, nhóm đều đặt câu hỏi ngược lại rằng ta sẽ biết nó đúng bằng
+cách nào, đo được bằng gì và nếu nó thất bại thì thất bại ở đâu. Cách
+đặt vấn đề này giúp nhóm tránh được tình huống xây xong hệ thống rồi mới
+phát hiện ra rằng không có tiêu chí rõ ràng để kiểm tra.
+
+Lớp đánh giá đầu tiên là \textbf{đúng chức năng}. Ở đây, nhóm đối chiếu
+trực tiếp với các functional requirement của pilot Huế: feed phải trả về
+giải thích điểm số, bubble map phải dùng cùng một score như feed,
+storyline phải mở được nhiệm vụ kế tiếp, và capture phải lưu được
+metadata một cách nhất quán~\cite{bevietnam_spec}. Điểm quan trọng là
+nhóm không xem việc API trả về dữ liệu là đủ, mà phải kiểm tra xem mỗi
+thành phần có thực sự hoàn thành đúng vai trò của nó trong vòng lặp sản
+phẩm hay chưa.
+
+Lớp đánh giá thứ hai là \textbf{chất lượng trải nghiệm}. Một kết quả có
+thể đúng về mặt dữ liệu nhưng vẫn không hữu ích nếu lời giải thích quá
+chung chung, nhiệm vụ quá khó hiểu hoặc luồng xác minh gây phiền hà. Vì
+vậy, evaluation trong BeVietnam còn phải đi qua góc nhìn của người dùng
+thật: họ có hiểu vì sao một địa điểm được đề xuất hay không, họ có thấy
+nhiệm vụ đủ hấp dẫn để tiếp tục hành trình hay không. Chính từ logic này
+mà phần đặc tả pilot đã đưa luôn các success metric như tỷ lệ người dùng
+thấy gợi ý hữu ích, tỷ lệ học thêm được nội dung văn hóa mới và tỷ lệ
+hoàn thành ít nhất một nhiệm vụ storyline~\cite{bevietnam_spec}. Nói cách
+khác, hệ thống không chỉ được đo bằng log kỹ thuật, mà còn bằng khả năng
+tạo ra giá trị du lịch và giá trị học hỏi văn hóa cho người dùng.
+
+Lớp đánh giá thứ ba là \textbf{độ tin cậy của AI}. Các agent văn hóa hay
+task generation không thể chỉ được xem là ``chạy ra kết quả'' là đủ, mà
+còn phải được kiểm tra về tính đúng đắn của nội dung, tính an toàn, cấu
+trúc đầu ra và khả năng fallback khi mô hình trả về kết quả kém chất
+lượng. Đây là lý do tài liệu kỹ thuật của BeVietnam đặt ra các nguyên
+tắc \textit{structured output}, \textit{retrieval before generation} và
+\textit{fail safe}~\cite{bevietnam_spec}. Cũng từ góc nhìn evaluation mà
+nhóm không chọn cách làm chatbot mở hoàn toàn, bởi loại hệ thống đó rất
+khó kiểm tra đúng sai một cách nhất quán. Ngược lại, các output có
+schema, có fallback và có dữ liệu nền rõ ràng thì dễ kiểm chứng hơn rất
+nhiều.
+
+Lớp đánh giá cuối cùng là \textbf{khả năng mở rộng}. Một lời giải tốt
+không chỉ giải được Huế trong giai đoạn pilot, mà còn phải giữ được cấu
+trúc đủ sạch để có thể mở rộng sang những địa phương khác về sau. Nếu
+các mô hình dữ liệu, API và pipeline xử lý được thiết kế đúng từ đầu thì
+việc bổ sung địa điểm, câu chuyện văn hóa hay nguồn dữ liệu mới sẽ dễ
+dàng hơn rất nhiều. Cũng chính vì nhìn bài toán dưới lăng kính này mà
+nhóm chốt thêm một quyết định quan trọng: pilot Huế phải được đóng phạm
+vi chặt. Nếu mở rộng quá sớm ra nhiều địa phương, nhóm sẽ không thể đánh
+giá công bằng chất lượng dữ liệu, chất lượng storyline và độ đúng của
+recommendation score.
+
+Do đó ta có thể thấy rằng, evaluation trong BeVietnam không chỉ là bước
+``kiểm thử xem code có chạy hay không'', mà là quá trình phản biện liên
+tục đối với cả kỹ thuật, sản phẩm lẫn trải nghiệm thực tế. Chính nhờ lớp
+đánh giá này mà tư duy tính toán mới trở thành một vòng lặp khép kín: ta
+phân tích bài toán, thiết kế lời giải, triển khai hệ thống, quan sát kết
+quả, rồi quay lại tinh chỉnh mô hình và thuật toán khi cần thiết.
+
+\begin{note}
+Evaluation trong BeVietnam không đứng tách biệt ở cuối dự án. Nó xuất
+hiện ngay từ lúc nhóm chọn scope pilot, xác định functional requirement,
+ràng buộc output của AI và đặt ra success metric cho người dùng. Chính
+nhờ đó mà toàn bộ lời giải của hệ thống mới giữ được tính kiểm chứng,
+thay vì trôi dần về những tính năng khó đo lường hoặc khó vận hành.
+\end{note}

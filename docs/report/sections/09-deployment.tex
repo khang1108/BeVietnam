@@ -1,0 +1,107 @@
+\section{Triển Khai}
+
+Chương này trình bày cách BeVietnam được đưa lên môi trường chạy thật cho
+giai đoạn pilot, từ cách bố trí dịch vụ trên máy chủ GPU đến cơ chế công
+khai hệ thống ra Internet và cách bảo vệ các thông tin bí mật.
+
+\subsection{Bố Trí Triển Khai}
+
+Toàn bộ phần lõi phía server được gom về một máy chủ GPU duy nhất (1
+card L40) để đơn giản hóa vận hành trong pilot. Trên máy này, một script
+khởi tạo dựng lần lượt các dịch vụ: cơ sở dữ liệu, lưu trữ ảnh, mô hình
+thị giác, AI Core và backend; cuối cùng là một đường hầm Cloudflare để
+công khai backend ra một tên miền cố định. Web client chạy độc lập và
+trỏ về tên miền này, còn mobile được phân phối dưới dạng APK cài trực
+tiếp lên điện thoại. Hình~\ref{fig:deploy} mô tả bố trí đó.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    vm/.style={draw=primaryblue, thick, rounded corners=6pt, inner sep=8pt},
+    svc/.style={draw=accentblue, fill=accentblue!8!white, rounded corners=4pt, minimum width=2.5cm, minimum height=0.85cm, align=center, font=\scriptsize},
+    gpu/.style={draw=jade, fill=green!6!white, rounded corners=4pt, minimum width=2.5cm, minimum height=0.85cm, align=center, font=\scriptsize},
+    edge/.style={draw=warnorange, fill=orange!8!white, rounded corners=4pt, minimum width=2.6cm, minimum height=0.85cm, align=center, font=\scriptsize},
+    client/.style={draw=darkgray, fill=lightgray, rounded corners=4pt, minimum width=2.4cm, minimum height=0.85cm, align=center, font=\scriptsize}
+]
+% clients
+\node[client] (web) at (0,1.0) {Web client};
+\node[client] (mob) at (0,-1.0) {Mobile (APK)};
+% edge
+\node[edge] (cf) at (3.3,0) {Cloudflare\\Tunnel};
+% VM box content
+\node[svc] (be) at (7.0,1.6) {Backend\\FastAPI};
+\node[svc] (ai) at (7.0,0.4) {AI Core};
+\node[gpu] (vllm) at (7.0,-0.8) {vLLM\\Qwen2.5-VL};
+\node[svc] (pg) at (10.3,1.6) {PostgreSQL};
+\node[svc] (minio) at (10.3,0.4) {MinIO};
+\node[gpu] (l40) at (10.3,-0.8) {GPU L40};
+
+\begin{scope}[on background layer]
+\node[vm, fit=(be)(vllm)(pg)(l40), label={[font=\small\bfseries, primaryblue]above:Máy chủ GPU (setup.sh)}] {};
+\end{scope}
+
+\draw[->, thick, darkgray] (web) -- (cf);
+\draw[->, thick, darkgray] (mob) -- (cf);
+\draw[->, thick, warnorange] (cf) -- node[above, font=\scriptsize]{https} (be);
+\draw[->, thick, accentblue] (be) -- (ai);
+\draw[->, thick, jade] (ai) -- (vllm);
+\draw[->, thick, accentblue] (be) -- (pg);
+\draw[->, thick, accentblue] (be) -- (minio);
+\draw[->, thick, jade] (vllm) -- (l40);
+\end{tikzpicture}}
+\caption{Bố trí triển khai pilot. Toàn bộ dịch vụ server nằm trên một máy chủ GPU, được dựng tự động bởi script \texttt{setup.sh}. Cloudflare Tunnel công khai backend ra một tên miền cố định; cả web lẫn mobile đều truy cập qua đường hầm này nên hoạt động được trên mọi mạng.}
+\label{fig:deploy}
+\end{figure}
+
+\subsection{Tự Động Hóa Khởi Tạo}
+
+Việc đưa nhiều dịch vụ lên cùng một máy được gói trong một script khởi
+tạo duy nhất, chạy tuần tự theo thứ tự phụ thuộc
+(Bảng~\ref{tab:deploy_steps}). Cách này giúp một lệnh duy nhất có thể
+dựng lại toàn bộ stack, đồng thời ghi cấu hình ra các file môi trường
+riêng cho từng dịch vụ.
+
+\begin{table}[H]
+\centering
+\caption{Trình tự khởi tạo của script triển khai}
+\label{tab:deploy_steps}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.9cm} >{\raggedright\arraybackslash}p{3.2cm} X}
+\toprule
+\textbf{Bước} & \textbf{Dịch vụ} & \textbf{Vai trò} \\
+\midrule
+1 & PostgreSQL & Khởi tạo cơ sở dữ liệu và chạy migration. \\
+2 & MinIO & Dựng kho lưu trữ ảnh capture. \\
+3 & vLLM & Tải và phục vụ mô hình thị giác Qwen2.5-VL trên GPU. \\
+4 & AI Core & Khởi động dịch vụ agent (gồm Capture Judge). \\
+5 & Backend & Khởi động API nghiệp vụ, kết nối DB, MinIO và AI Core. \\
+6 & Cloudflare Tunnel & Công khai backend ra tên miền cố định. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Riêng vLLM~\cite{vllm_docs}, vì phải phục vụ mô hình thị giác, cần một
+cấu hình đặc thù: chọn đúng model VLM, cho phép gửi tối đa hai ảnh trong
+một yêu cầu (ảnh tham chiếu và ảnh người dùng), và đặt độ dài ngữ cảnh đủ
+lớn vì token ảnh khá nặng. Một card L40 48\,GB đủ chỗ cho mô hình bản 7B
+cùng KV-cache nên không cần thêm GPU.
+
+\subsection{Bảo Mật và Cấu Hình Bí Mật}
+
+Một nguyên tắc vận hành được tuân thủ chặt là \textbf{không đưa thông tin
+bí mật vào mã nguồn quản lý phiên bản}. Các khóa dịch vụ (Foursquare,
+OpenWeather, Goong, SerpAPI, token mô hình), bí mật của đường hầm và file
+cấu hình thực thi đều được giữ ngoài Git. Backend chỉ lắng nghe nội bộ và
+chỉ được công khai gián tiếp qua đường hầm Cloudflare, nên không mở cổng
+trực tiếp ra Internet công cộng. Các ảnh tham chiếu tải về từ web phục vụ
+việc xác minh cũng được lưu cache cục bộ và loại khỏi Git để tránh phát
+tán nội dung có bản quyền.
+
+\begin{note}
+Việc gom toàn bộ server lên một máy GPU là lựa chọn có chủ đích cho
+pilot: đơn giản, rẻ và đủ cho quy mô thử nghiệm. Khi mở rộng, các dịch vụ
+trạng thái (PostgreSQL, MinIO) và dịch vụ tính toán nặng (vLLM) hoàn toàn
+có thể tách ra các máy riêng mà không phải đổi kiến trúc, vì chúng đã
+giao tiếp qua API và biến môi trường ngay từ đầu.
+\end{note}

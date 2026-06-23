@@ -1,0 +1,529 @@
+\section{Phân Tích Bài Toán}
+
+\subsection{Tổng Quan Cách Tiếp Cận}
+Để giải quyết được bài toán cũng như là triển khai được sản phẩm thì nó đòi hỏi
+ta phải có kỹ năng phân tích vấn đề, ta cần biết được ta sẽ cần những gì và sẽ làm những gì
+chứ không thể nào bắt tay vào làm liền. Chính vì lẽ đó để thực hiện được điều đó, nhóm đã áp dụng
+các kỹ năng và kiến thức của bộ môn Tư duy tính toán để có thể tận dụng cấc bộ khuôn tư duy trong phát triển phần mềm.
+Và rõ ràng bài toán được ra không chỉ là viết ra một ứng dụng có giao diện đẹp hay kết nối được với một vài
+API, mà sâu xa hơn, ta phải tìm được một cách \textit{mô hình hóa} vấn
+đề sao cho máy tính có thể xử lý được một cách rõ ràng, có kiểm soát
+và có khả năng mở rộng về sau. Đây chính là lý do vì sao nhóm lựa chọn
+cách tiếp cận \textbf{Computational Thinking} làm nền tảng để phân tích
+và phát triển hệ thống này~\cite{wing2006, spronck2023, dejesus2020}.
+
+Tư duy tính toán không chỉ là việc lập trình bằng một ngôn ngữ cụ thể, mà nó là
+một bộ khuôn tư duy giúp ta phân rã một vấn đề phức tạp ngoài thực tế
+thành các thành phần nhỏ hơn, nhận diện quy luật lặp lại, trừu tượng hóa
+những yếu tố cốt lõi và cuối cùng xây dựng ra một quy trình giải có thể
+thực thi được bằng máy tính~\cite{spronck2023}. Khi áp dụng vào
+BeVietnam, ta có thể thấy rằng đây là một ví dụ rất rõ ràng của một bài
+toán thực tế có độ phức tạp cao, bởi nó đồng thời liên quan đến dữ liệu
+du lịch, ngữ cảnh thời gian thực, hành vi người dùng, nội dung văn hóa
+và khả năng ra quyết định tự động. Và như vậy sau những phân tích về bối cảnh của ngành du lịch ở trên
+nhóm cũng đã tìm các pain point chính hiện thời mà khách hàng đang còn mắc phải.
+
+\begin{table}[H]
+\centering
+\caption{Các Pain Point chính dẫn tới bài toán BeVietnam}
+\label{tab:problem_pain_points}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.1cm} X >{\raggedright\arraybackslash}p{3.6cm}}
+\toprule
+\textbf{Pain Point} & \textbf{Biểu hiện trong trải nghiệm du lịch} & \textbf{Hệ quả đối với hệ thống cần xây dựng} \\
+\midrule
+\textbf{Thông tin phân tán} & Người dùng phải chuyển qua nhiều nền tảng như bản đồ, blog, review và mạng xã hội để ghép thông tin về một địa điểm. & Hệ thống phải có một lớp dữ liệu điểm đến đủ thống nhất để giảm công việc tìm kiếm và đối chiếu thủ công. \\
+\textbf{Thiếu chiều sâu văn hóa} & Người dùng biết nơi nào nổi tiếng nhưng không hiểu vì sao nơi đó quan trọng về mặt lịch sử hoặc văn hóa. & Hệ thống không được dừng ở việc liệt kê POI, mà phải trả thêm lớp giải nghĩa văn hóa có thể đọc và hiểu được. \\
+\textbf{Không biết nên đi đâu lúc này} & Một địa điểm có thể rất hay nhưng lại không phù hợp ở thời điểm hiện tại vì mưa, xa, kẹt xe hoặc quá đông. & Hệ thống phải đưa yếu tố ngữ cảnh thời gian thực vào bài toán xếp hạng thay vì chỉ dùng danh sách tĩnh. \\
+\textbf{Không biết nên làm gì tiếp theo} & Sau khi chọn được địa điểm, người dùng vẫn dễ rơi vào trạng thái tham quan thụ động, không có hành động cụ thể để khám phá sâu hơn. & Hệ thống cần có cơ chế storyline hoặc quest chain để biến việc đọc thông tin thành hành trình có hướng dẫn. \\
+\textbf{Khó xác minh trải nghiệm thực địa} & Nếu không có cơ chế kiểm chứng, việc hoàn thành nhiệm vụ chỉ còn là thao tác trên giao diện chứ không còn gắn với địa điểm thật. & Hệ thống phải có lớp GPS + capture verification để nối trạng thái số với hành vi ngoài đời. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{5W1H và 5 Whys}
+
+Trong giai đoạn đầu, khi những thông tin phân tích chỉ mới dừng lại ở mức độ là ý tưởng thì việc triển khai
+vẫn chưa được thực hiện. Do đó ta cần thêm một giai đoạn để có thể làm rõ lên những yêu cầu và mong muốn đặt ra
+khi làm sản phẩm này nhóm dùng bộ câu hỏi
+\textbf{5W1H} để khóa phạm vi bài toán và dùng \textbf{5 Whys} để truy
+tìm nguyên nhân gốc. Trước hết, 5W1H giúp nhóm trả lời sáu câu hỏi nền
+tảng \textit{Cái gì, Tại sao, Ai, Ở đâu, Khi nào, Như thế nào}
+nhằm chốt đúng phạm vi của bài toán, tổng hợp trong
+Bảng~\ref{tab:5w1h}~\cite{bevietnam_spec}.
+
+\begin{table}[H]
+\centering
+\caption{Phân tích 5W1H để khóa phạm vi bài toán BeVietnam}
+\label{tab:5w1h}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.7cm} X}
+\toprule
+\textbf{Câu hỏi} & \textbf{Câu trả lời cho BeVietnam} \\
+\midrule
+\textbf{What --- Cái gì} & Giúp du khách chọn một địa điểm có ý nghĩa văn hóa và phù hợp để đi \textit{ngay tại thời điểm hiện tại}. \\
+\textbf{Why --- Tại sao} & Vì sản phẩm du lịch thiếu chiều sâu, thông tin phân tán và không phản ứng theo bối cảnh, khiến du khách khó quyết định và ít quay lại. \\
+\textbf{Who --- Ai} & Du khách nội địa và quốc tế là người dùng cuối; nhóm phát triển đóng vai trò vận hành và kiểm thử pilot. \\
+\textbf{Where --- Ở đâu} & Khóa phạm vi pilot tại Huế để kiểm soát chất lượng dữ liệu và nội dung văn hóa. \\
+\textbf{When --- Khi nào} & Quyết định theo bối cảnh thời gian thực (vị trí, thời tiết, thời điểm) thay vì tra cứu tĩnh. \\
+\textbf{How --- Như thế nào} & Bằng suitability score giải thích được, storyline tương tác, và xác minh thực địa qua GPS kết hợp capture. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Sau 5W1H, nhóm tiếp tục dùng \textbf{5 Whys} để đào sâu nguyên nhân gốc
+của các Pain Point chính. Ví dụ với hiện tượng ``du khách không biết nên
+đi đâu bây giờ'', nếu chỉ dừng ở bề mặt thì ta rất dễ kết luận rằng
+``cần nhiều dữ liệu hơn''. Nhưng khi hỏi tiếp nhiều lần, nhóm rút ra
+được chuỗi nguyên nhân như sau.
+
+\begin{table}[H]
+\centering
+\caption{Phân tích 5 Whys cho bài toán ``du khách không biết nên đi đâu bây giờ''}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{1.8cm} X X}
+\toprule
+\textbf{Bước} & \textbf{Câu hỏi Why} & \textbf{Kết quả phân tích} \\
+\midrule
+\textbf{Why 1} & Tại sao du khách không biết nên đi đâu? & Vì có quá nhiều lựa chọn rời rạc giữa Google Maps, blog, review và mạng xã hội. \\
+\textbf{Why 2} & Tại sao nhiều lựa chọn lại gây bối rối? & Vì các nền tảng đó không xếp hạng theo bối cảnh thực tế của chuyến đi. \\
+\textbf{Why 3} & Tại sao không xếp hạng được theo bối cảnh? & Vì dữ liệu thời tiết, giao thông, khoảng cách và mức độ phù hợp chưa được gom về cùng một mô hình quyết định. \\
+\textbf{Why 4} & Tại sao chưa có mô hình quyết định chung? & Vì feed, map và place detail thường được phát triển như các bề mặt hiển thị tách rời chứ không cùng dùng một lõi scoring. \\
+\textbf{Why 5} & Tại sao điều đó nguy hiểm? & Vì người dùng nhìn thấy thông tin nhưng không nhận được câu trả lời rõ ràng cho hành động kế tiếp. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Điều này dẫn trực tiếp tới một quyết định quan trọng trong thiết kế
+BeVietnam: \textbf{feed và bubble map phải dùng cùng một suitability
+score, và score đó phải giải thích được}~\cite{bevietnam_spec}. Đây
+không còn là một ý tưởng chung chung, mà là kết quả cụ thể của bước
+phân tích bài toán bằng 5 Whys.
+
+\subsection{Decomposition}
+
+Trong thực tế, khi ta đối mặt với một bìa toán lớn, một yêu cầu của khách hàng, ta không trực tiếp suy luận
+là làm sao để ta làm được điều đó, mà ta sẽ phải chia bài
+toán tổng thể thành các bài toán con nhỏ hơn và có thể kiểm soát được. Ý tưởng cốt
+lõi của \textbf{decomposition} là thay vì cố gắng giải trực tiếp toàn bộ
+vấn đề ``xây dựng một hệ thống du lịch thông minh cho Việt Nam'', ta sẽ
+phân rã nó thành các thành phần nhỏ hơn, mỗi thành phần có đầu vào, đầu
+ra và mục tiêu riêng biệt~\cite{spronck2023, openstax_ct}. Đối với BeVietnam, điều
+này là cần thiết vì hệ thống không chỉ có một chức năng duy
+nhất, mà nó phải trả lời liên tiếp ba câu hỏi cho người dùng: \textit{nên
+đi đâu bây giờ, vì sao địa điểm đó đáng đi và khi đến đó thì nên làm gì}.
+
+Trong thực tế làm đề tài, nhóm không chỉ phân rã bài toán ở mức tính
+năng, mà còn phân rã nó theo \textbf{user journey}, \textbf{dữ liệu},
+\textbf{dịch vụ} và \textbf{ràng buộc kỹ thuật}. Đây là điểm quan
+trọng, vì nếu chỉ chia theo menu giao diện thì ta sẽ dễ bỏ sót các phụ
+thuộc cốt lõi của hệ thống. Ba lát cắt phân rã quan trọng nhất được trình
+bày trong Bảng~\ref{tab:decomposition_views}.
+
+\begin{table}[H]
+\centering
+\caption{Các lát cắt phân rã chính trong quá trình phân tích BeVietnam}
+\label{tab:decomposition_views}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.2cm} X X}
+\toprule
+\textbf{Mức phân rã} & \textbf{Cách nhóm phân tích} & \textbf{Kết quả rút ra} \\
+\midrule
+\textbf{User journey} & Nhóm chia hành trình của du khách thành chuỗi hành vi gồm mở ứng dụng, xem gợi ý, hiểu lý do đề xuất, chọn một địa điểm, mở chi tiết, bắt đầu storyline, di chuyển tới nơi, gửi capture và mở khóa nhiệm vụ tiếp theo~\cite{bevietnam_spec}. & Chuỗi hành vi này giúp nhóm xác định được đâu là vòng lặp sản phẩm cốt lõi, từ đó không để phạm vi trôi sang các chức năng thứ cấp như vlog tự động hay cộng đồng xã hội. \\
+\textbf{Dữ liệu} & Nhóm chia hệ thống thành các lớp dữ liệu gồm dữ liệu POI, dữ liệu ngữ cảnh thời gian thực, dữ liệu tài khoản người dùng, dữ liệu tiến trình nhiệm vụ và dữ liệu capture. Việc phân rã này dẫn tới các mô hình như \texttt{Place}, \texttt{User}, \texttt{Task}, \texttt{CaptureMetadata} và các repository tương ứng trong codebase. & Hệ thống có được biên giới dữ liệu rõ ràng, từ đó thuận lợi hơn cho việc thiết kế schema, repository và luồng đồng bộ giữa backend với client. \\
+\textbf{Dịch vụ} & Nhóm tách rõ backend nghiệp vụ, web client, mobile client và AI Core. Một số tài liệu cũ mô tả AI như trung tâm của toàn hệ thống, nhưng khi phân tích lại theo hướng phân rã, nhóm xem AI chỉ là một thành phần trong pipeline tổng thể~\cite{bevietnam_spec}. & Nhóm đi tới quyết định rằng backend phải giữ quyền kiểm soát product state, còn AI chỉ xử lý các khâu cần suy luận hoặc sinh nội dung. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    >=Stealth,
+    box/.style={
+        draw=primaryblue,
+        fill=blue!4!white,
+        rounded corners=5pt,
+        minimum width=4.1cm,
+        minimum height=1.15cm,
+        align=center,
+        font=\small
+    },
+    subbox/.style={
+        draw=accentblue,
+        fill=accentblue!8!white,
+        rounded corners=4pt,
+        minimum width=3.7cm,
+        minimum height=1.0cm,
+        align=center,
+        font=\small
+    }
+]
+\node[box] (problem) at (0,0) {Bài toán tổng thể\\Hỗ trợ quyết định du lịch văn hóa};
+
+\node[subbox] (discovery) at (-6,-3.1) {Khám phá địa điểm\\Place discovery};
+\node[subbox] (ranking) at (-2,-3.1) {Xếp hạng đề xuất\\Suitability score};
+\node[subbox] (storyline) at (2,-3.1) {Storyline nhiệm vụ\\Quest chain};
+\node[subbox] (verify) at (6,-3.1) {Xác minh thực địa\\GPS + Capture};
+
+\draw[->, thick, primaryblue] (problem) -- (discovery);
+\draw[->, thick, primaryblue] (problem) -- (ranking);
+\draw[->, thick, primaryblue] (problem) -- (storyline);
+\draw[->, thick, primaryblue] (problem) -- (verify);
+
+\draw[<->, dashed, thick, darkgray] (discovery) -- node[above, font=\scriptsize, pos=0.5, yshift=6pt]{POI data} (ranking);
+\draw[<->, dashed, thick, darkgray] (ranking) -- node[above, font=\scriptsize, pos=0.5, yshift=6pt]{gợi ý / ưu tiên} (storyline);
+\draw[<->, dashed, thick, darkgray] (storyline) -- node[above, font=\scriptsize, pos=0.5, yshift=6pt]{task state} (verify);
+\end{tikzpicture}
+\caption{Sơ đồ phân rã bài toán BeVietnam thành bốn khối chức năng cốt lõi. Từ một bài toán hỗ trợ quyết định du lịch văn hóa, hệ thống được tách thành lớp dữ liệu địa điểm, lớp ra quyết định, lớp dẫn dắt hành trình và lớp xác minh thực địa.}
+\label{fig:decomposition_overview}
+\end{figure}
+
+Các lát cắt này cũng phản ánh hai lần nhóm phải sửa lại hướng đi. Bởi lẽ ban đầu nhóm đã triển khai
+AI-centric tức là một việc đều bỏ vô AI và giiar quyết. Nhưng một bất cập diễn ra sau khi nhóm xây dựng MVP theo ý tưởng đó, thấy được một điều 
+là độ trễ giữa các công việc rất lâu thường mất khoảng 10s-20s. Điều này là rất tệ bởi lẽ, thay vì dành thời gian 10s-20s đó để chờ
+thì họ hoàn toàn có thể đi lên một nền tảng khác search và có được kết quả mong muốn. Đặc biệt là có giai đoạn nhóm đã 
+phác thảo AI như ``bộ não'' trung tâm điều phối gần như mọi
+quyết định và xây dựng nó theo cơ chế Multi-Agent. Và rõ ràng khi chỉ với một Agent mà độ trễ đã rất lơn
+thì việc áp dụng nhiều agent với nhau với các vòng thì độ trễ càng tăng cao và làm cho trải nghiệm
+người dùng sẽ trở nên tệ hơn; và khi phân rã theo dịch vụ, nhóm nhận ra rằng thực tế có những giai đoạn ta hoàn toàn có 
+thể tiền xử lý trước và sau đó đưa cho bên Backend kiểm soát và giữ lấy. Điều này sẽ khiến
+sản phẩm dễ kiểm soát và kiểm thử hơn và khi đó AI là một agent thì thực hiện tác vụ rất ít và sẽ có thể đem lại
+trải nghiệm thú vị hơn, mượt mà hơn. Tương tự, ở lát cắt dữ liệu,
+nhóm ban đầu định dùng Firebase cho cả xác thực lẫn lưu trữ, sau đó đổi
+sang PostgreSQL + MinIO + JWT để chủ động hơn về schema và phần backend
+tự vận hành và đặc biệt là chi phí vận hành sẽ tập trung vào một chỗ hơn thay vì 
+là phân tán ở nhiều nơi. Từ các lát cắt đó, nhóm mới chốt bốn khối chức năng cốt lõi.
+
+\begin{table}[H]
+\centering
+\caption{Bốn khối chức năng cốt lõi sau bước decomposition}
+\label{tab:decomposition_core_blocks}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.0cm} X X}
+\toprule
+\textbf{Khối chức năng} & \textbf{Đầu vào chính} & \textbf{Đầu ra / vai trò chính} \\
+\midrule
+\textbf{Khám phá địa điểm} & Dữ liệu POI đã chọn lọc, metadata văn hóa, hình ảnh, mô tả địa điểm. & Cung cấp lớp dữ liệu nền cho explore, place detail, feed và các feature phía sau. \\
+\textbf{Xếp hạng đề xuất} & Vị trí người dùng, POI, weather, traffic, estimated crowdedness, rule scoring. & Trả về suitability score, explanation và thứ tự ưu tiên địa điểm tại thời điểm hiện tại. \\
+\textbf{Storyline nhiệm vụ} & Place hiện tại, quest chain, progress state, nội dung văn hóa nền. & Sinh và điều phối chuỗi nhiệm vụ có mở khóa, có trạng thái và có bước tiếp theo rõ ràng. \\
+\textbf{Xác minh thực địa} & GPS proximity, task hiện hành, capture metadata, tín hiệu hỗ trợ từ AI nếu cần. & Quyết định task có được đánh dấu hoàn thành hay không và lưu bằng chứng tương ứng. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Trước mắt đối với bài toán \textbf{khám phá địa điểm}. Tại đây hệ thống
+cần thu thập và lưu trữ thông tin về các điểm đến văn hóa, lịch sử, ẩm
+thực hay trải nghiệm địa phương, sau đó trả chúng về cho người dùng dưới
+dạng danh sách hoặc bản đồ. Nhưng khi đi vào phân tích kỹ hơn, nhóm nhận
+ra rằng ``khám phá địa điểm'' không chỉ là hiển thị tên địa danh và tọa
+độ trên bản đồ mà nó còn phải được chuẩn hóa dữ liệu POI để backend và hai
+client cùng hiểu một cấu trúc thống nhất. Song với đó nó phải mang bên mình một chiều sâu văn
+hóa của từng điểm đến thay vì chỉ còn lại các metadata khô cứng như địa
+chỉ hay giờ mở cửa. Từ đó, nó cho phép người dùng đi từ mức nhìn
+tổng quan trên feed hoặc map xuống mức đọc chi tiết về từng địa điểm mà
+không bị đứt mạch trải nghiệm. Đây là lý do thành phần này được gắn với
+các mô-đun \texttt{places}, \texttt{feed}, \texttt{place detail} và phần
+giao diện \texttt{Explore} trong cả mobile lẫn web~\cite{bevietnam_spec}.
+Nói cách khác, đây là lớp nền giúp tất cả các quyết định sau đó có dữ
+liệu để hoạt động.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    flow/.style={
+        draw=accentblue,
+        fill=accentblue!8!white,
+        rounded corners=4pt,
+        minimum width=3.1cm,
+        minimum height=0.95cm,
+        align=center,
+        font=\small
+    }
+]
+\node[flow] (u1) at (0,0) {Người dùng\\mở Explore};
+\node[flow] (u2) at (4.2,0) {Hệ thống tải\\danh sách POI};
+\node[flow] (u3) at (8.4,0) {Hiển thị địa điểm\\theo danh sách / map};
+\node[flow] (u4) at (12.6,0) {Người dùng mở\\place detail};
+
+\draw[->, thick, primaryblue] (u1) -- (u2);
+\draw[->, thick, primaryblue] (u2) -- (u3);
+\draw[->, thick, primaryblue] (u3) -- (u4);
+\end{tikzpicture}}
+\caption{User journey mức cao của feature khám phá địa điểm.}
+\label{fig:journey_place_discovery}
+\end{figure}
+
+Nhưng câu hỏi đặt ra là dữ liệu ở đâu ra? Để trả lời câu hỏi này, ta cần biết được khả năng của mô hình ngô ngữ lớn tới đâu. Để tiết kiệm chi phí
+và phù hợp với budget của nhóm, nhóm đã chọn phương án là tự self-hosting một mô hình mã nguồn nhẹ để đảm bảo được tốc độ của phản hồi. 
+Tuy nhiên đối với các mô hình này chỉ rơi vào khoảng \textbf{3-8B} thì khả năng suy luận cũng như là kiến thức của nó về văn hóa cũng rất
+là hạn hẹp và thiếu thốn. Chính vì lẽ đó mà nhóm quyết định rằng, ta sẽ cần phải xây dựng được một kho tàng tri thức cho để giải quyết được bất cập trên.
+Lúc này bài toán sẽ được chuyển tiếp sang một bài toán mới đó là làm sao để có thể cung cấp được kho tàng tri thức văn hóa cho mô hình.
+
+
+Tiếp đó là bài toán \textbf{xếp hạng và cá nhân hóa đề xuất}.
+Đây là phần quan trọng hơn, bởi hệ thống không chỉ hiển thị các địa điểm có
+sẵn mà còn phải quyết định địa điểm nào phù hợp hơn trong bối cảnh hiện
+tại. Điều này kéo theo các biến đầu vào như vị trí người dùng, khoảng
+cách, thời tiết, điều kiện giao thông, mức độ đông đúc và sở thích cá
+nhân. Nói cách khác, đây là một bài toán ra quyết định đa tiêu chí trong
+điều kiện dữ liệu thay đổi theo thời gian. Trong quá trình phân tích,
+nhóm xác định đây mới là trái tim thực sự của hệ thống, bởi nếu thành
+phần này yếu thì toàn bộ hệ thống sẽ quay lại trạng thái của một ứng
+dụng danh bạ du lịch thông thường. Do đó, thay vì chỉ nói ``gợi ý điểm
+đến'', nhóm đã cụ thể hóa nó thành bài toán suitability score. Mỗi địa
+điểm phải được chấm điểm dựa trên cùng một logic chung, sau đó kết quả
+đó phải được tái sử dụng nhất quán cho cả feed lẫn bubble map. Hơn nữa,
+score này không được là một con số đen hộp. Nó còn phải sinh ra được lý
+do giải thích để người dùng hiểu vì sao một điểm đến được đẩy lên cao
+hay hạ xuống thấp tại thời điểm hiện tại. Đây chính là nơi tư duy tính
+toán buộc nhóm phải chuyển từ ``cảm giác địa điểm này đáng đi'' sang một
+mô hình quyết định có thể mô tả, kiểm tra và điều chỉnh được.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    flow/.style={
+        draw=jade,
+        fill=green!5!white,
+        rounded corners=4pt,
+        minimum width=3.2cm,
+        minimum height=0.95cm,
+        align=center,
+        font=\small
+    }
+]
+\node[flow] (r1) at (0,0) {Người dùng cấp\\vị trí hiện tại};
+\node[flow] (r2) at (4.3,0) {Backend lấy POI\\và context factors};
+\node[flow] (r3) at (8.6,0) {Tính suitability\\score};
+\node[flow] (r4) at (12.9,0) {Trả feed +\\explanation};
+
+\draw[->, thick, jade] (r1) -- (r2);
+\draw[->, thick, jade] (r2) -- (r3);
+\draw[->, thick, jade] (r3) -- (r4);
+\end{tikzpicture}}
+\caption{User journey mức cao của feature xếp hạng và cá nhân hóa đề xuất.}
+\label{fig:journey_recommendation}
+\end{figure}
+
+\textbf{Kế đến} là bài toán \textbf{dẫn dắt hành trình trải nghiệm}
+thông qua các nhiệm vụ văn hóa \textit{storyline}. Hệ thống cần một tập
+nhiệm vụ hợp lý, có bối cảnh văn hóa và có thể mở khóa theo tiến độ.
+Như đã phân tích ở trên thay vì để mô hình ngôn ngữ sinh tự do từng nhiệm vụ theo mỗi lượt gọi,
+nhóm xây dựng trước một \textbf{kho nhiệm vụ}
+được sinh offline từ nguồn tri thức văn hóa, rồi nạp về client qua
+endpoint \texttt{/question-pool}. Toàn bộ kho này được trình bày dưới
+dạng một \textbf{Mission Path} trực quan (các màn hình \texttt{Storyline},
+\texttt{TaskDetail}), trong đó mỗi nút là một nhiệm vụ. Nếu nhìn ở mức
+sản phẩm, đây là cơ chế biến quá trình tham quan từ bị động sang chủ
+động. Nhưng ở mức phân tích bài toán, đây là một bài toán điều hướng
+tiến trình rất rõ ràng: hệ thống phải biết người dùng đang ở bước nào,
+nhiệm vụ nào đã hoàn thành, nhiệm vụ nào đủ điều kiện mở khóa, và nội
+dung văn hóa nào nên xuất hiện ở bước tiếp theo. Điều này khiến storyline
+không còn là một đoạn content dài hay một mô-đun chat đơn giản, mà trở
+thành một cấu trúc tiến độ có trạng thái, có luật chuyển bước và có
+ràng buộc đầu vào. Việc tách kho nhiệm vụ (nội dung sinh offline) khỏi
+luồng suy luận của mô hình chính là cách nhóm giữ cho storyline ổn
+định và kiểm soát được, thay vì phụ thuộc vào AI sinh tự do theo runtime.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    flow/.style={
+        draw=primaryblue,
+        fill=blue!4!white,
+        rounded corners=4pt,
+        minimum width=3.0cm,
+        minimum height=0.95cm,
+        align=center,
+        font=\small
+    }
+]
+\node[flow] (s1) at (0,0) {Người dùng mở\\Mission Path};
+\node[flow] (s2) at (4.1,0) {Nạp nhiệm vụ từ\\question pool};
+\node[flow] (s3) at (8.2,0) {Dựng lộ trình +\\trạng thái mở khóa};
+\node[flow] (s4) at (12.3,0) {Hiển thị nút\\nhiệm vụ kế tiếp};
+
+\draw[->, thick, primaryblue] (s1) -- (s2);
+\draw[->, thick, primaryblue] (s2) -- (s3);
+\draw[->, thick, primaryblue] (s3) -- (s4);
+\end{tikzpicture}}
+\caption{User journey mức cao của feature storyline nhiệm vụ.}
+\label{fig:journey_storyline}
+\end{figure}
+
+\textbf{Cuối cùng} là bài toán \textbf{xác minh tương tác thực địa}. Nếu chỉ
+giao nhiệm vụ cho người dùng mà không có cơ chế xác minh, hệ thống sẽ
+mất đi tính tin cậy và cũng chả có gì lý thú và hấp dẫn. Bởi lẽ nếu chỉ
+là nhiệm vụ dạng text bình thường thì người dùng đọc xong và cũng không muốn làm tiếp
+thì cũng không thể ép. Thay vào đó ta sẽ thêm một cơ chế xác minh để đảm bảo việc người dùng
+đã thật sự vượt qua task đó, đã tới đúng điểm đó để check-in thay vì chỉ là chụp đại một chỗ
+nào đó để qua. Do đó ta cần một cơ chế check-in, chụp ảnh và đánh
+giá việc hoàn thành nhiệm vụ. Đây là lý do BeVietnam có luồng
+\texttt{capture} và dịch vụ xác minh ảnh bằng AI, nhằm nối hành vi số
+trên ứng dụng với hành động thực tế ngoài đời. Hệ thống cần thực hiện các công việc
+bao gồm việc kiểm tra GPS proximity, lưu metadata của lần tương tác,
+gắn capture với đúng task và quyết định liệu trạng thái tiến trình có
+được cập nhật hay chưa. Để đánh giá ngữ nghĩa của ảnh, nhóm dùng một mô
+hình thị giác chấm điểm ảnh người dùng theo một \textbf{thang đánh giá
+tường minh} (rubric 0--1) so với chủ thể mà nhiệm vụ yêu cầu, trả về ba
+trạng thái \textit{approved}, \textit{needs\_review} hoặc \textit{rejected}.
+Điểm mấu chốt về mặt kiểm soát là kết quả của AI luôn nằm trong một
+khung nhất quán, để đảm bảo được sự toàn vẹn trong mỗi lần upload và kiểm thử: ngưỡng điểm quyết định trạng thái, và khi mô hình
+không sẵn sàng hoặc điểm nằm ở vùng nghi ngờ thì hệ thống chuyển sang
+\textit{needs\_review} chứ không tự ý chấp nhận. Nhờ vậy mà ta có thể giúp storyline gắn được với hành động thực địa thật
+thay vì chỉ là một lớp trò chơi hóa tồn tại trên màn hình.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    flow/.style={
+        draw=warnorange,
+        fill=orange!8!white,
+        rounded corners=4pt,
+        minimum width=3.1cm,
+        minimum height=0.95cm,
+        align=center,
+        font=\small
+    }
+]
+\node[flow] (v1) at (0,0) {Người dùng tới nơi\\và chụp ảnh};
+\node[flow] (v2) at (4.2,0) {Mô hình thị giác\\chấm điểm (rubric)};
+\node[flow] (v3) at (8.4,0) {Lưu capture +\\trạng thái xác minh};
+\node[flow] (v4) at (12.6,0) {Mở khóa nút\\nếu đạt ngưỡng};
+
+\draw[->, thick, warnorange] (v1) -- (v2);
+\draw[->, thick, warnorange] (v2) -- (v3);
+\draw[->, thick, warnorange] (v3) -- (v4);
+\end{tikzpicture}}
+\caption{User journey mức cao của feature xác minh thực địa.}
+\label{fig:journey_verification}
+\end{figure}
+
+\subsection{Interact Diagram}
+
+Đối với các user journey ở trên mới vừa phân tích cũng như là từng feature thì nó chỉ nằm ở mức độ là
+rời rạc, và liệt kê. Tuy nhiên, trong một phiên sử dụng thực tế, người dùng đi xuyên qua nhiều
+feature liên tiếp, và mỗi thao tác lại kéo theo một chuỗi trao đổi giữa
+client, backend và các dịch vụ phía sau. Do đó nếu chỉ liệt kê và nói xuông thì ta sẽ không thể thấy rõ bức tranh động này,
+nhóm đã vẽ nên một phiên điển hình bằng \textbf{sequence diagram} ở
+Hình~\ref{fig:sequence_main}, trong đó thể hiện đầy đủ vòng lặp sản phẩm:
+mở bản đồ thời gian thực, mở Mission Path và hoàn thành một nhiệm vụ qua
+xác minh ảnh.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth, font=\small,
+    head/.style={draw=primaryblue, fill=blue!6!white, rounded corners=3pt, minimum width=2.3cm, minimum height=0.85cm, align=center, font=\small\bfseries},
+    life/.style={dashed, gray},
+    msg/.style={->, thick, primaryblue},
+    ret/.style={->, dashed, thick, darkgray}
+]
+% participants
+\node[head] (U) at (0,0)    {User};
+\node[head] (C) at (3.6,0)  {Client\\web/mobile};
+\node[head] (B) at (7.4,0)  {Backend};
+\node[head] (A) at (10.8,0) {AI Core};
+\node[head] (V) at (13.8,0) {VLM\\(vLLM)};
+% lifelines
+\foreach \x in {0,3.6,7.4,10.8,13.8} \draw[life] (\x,-0.5) -- (\x,-13.4);
+% messages
+\draw[msg] (0,-1.1)   -- node[above,font=\scriptsize]{mở ứng dụng} (3.6,-1.1);
+\draw[msg] (3.6,-2.0) -- node[above,font=\scriptsize]{GET /places/nearby + /weather} (7.4,-2.0);
+\draw[ret] (7.4,-2.9) -- node[above,font=\scriptsize]{POI + thời tiết (bong bóng)} (3.6,-2.9);
+\draw[msg] (0,-3.9)   -- node[above,font=\scriptsize]{mở Mission Path} (3.6,-3.9);
+\draw[msg] (3.6,-4.8) -- node[above,font=\scriptsize]{GET /question-pool} (7.4,-4.8);
+\draw[ret] (7.4,-5.7) -- node[above,font=\scriptsize]{danh sách nhiệm vụ} (3.6,-5.7);
+\draw[msg] (0,-6.7)   -- node[above,font=\scriptsize]{chụp / tải ảnh minh chứng} (3.6,-6.7);
+\draw[msg] (3.6,-7.6) -- node[above,font=\scriptsize]{POST /storyline/verify-capture} (7.4,-7.6);
+\draw[msg] (7.4,-8.5) -- node[above,font=\scriptsize]{verify(task, capture)} (10.8,-8.5);
+\draw[msg] (10.8,-9.4) -- node[above,font=\scriptsize]{ảnh tham chiếu + ảnh user + rubric} (13.8,-9.4);
+\draw[ret] (13.8,-10.3) -- node[above,font=\scriptsize]{score (0..1)} (10.8,-10.3);
+\draw[ret] (10.8,-11.2) -- node[above,font=\scriptsize]{status + confidence} (7.4,-11.2);
+\draw[ret] (7.4,-12.1) -- node[above,font=\scriptsize]{approved / rejected} (3.6,-12.1);
+\draw[ret] (3.6,-13.0) -- node[above,font=\scriptsize]{mở khóa nút kế tiếp} (0,-13.0);
+\end{tikzpicture}}
+\caption{Sequence diagram cho một phiên sử dụng điển hình. Mũi tên liền là lời gọi, mũi tên đứt là phản hồi. Chỉ bước xác minh ảnh mới đi sâu xuống AI Core và mô hình thị giác (VLM); các bước còn lại do backend trực tiếp phục vụ.}
+\label{fig:sequence_main}
+\end{figure}
+
+Điểm đáng chú ý khi nhìn theo trục thời gian là phần lớn tương tác kết
+thúc ngay ở backend, chỉ riêng nhánh xác minh ảnh mới lan xuống AI Core
+rồi tới mô hình thị giác. Điều này phản ánh đúng quyết định thiết kế đã
+nêu: backend giữ vai trò điều phối, còn AI chỉ được kích hoạt ở đúng một
+mắt xích cần suy luận. Sơ đồ cũng cho thấy ranh giới trách nhiệm rõ ràng
+giữa các thành phần, từ đó giúp việc kiểm thử và xử lý lỗi trở nên dễ
+khoanh vùng hơn.
+
+\subsection{Data Model}
+Và sau khi ta đã phân rã được hành vi của người dùng, các chức năng chính thì tiếp đó ta cần trả lời câu hỏi là \textit{các thông tin
+ấy sẽ nhìn như thế nào bên trong hệ thống?}. Rõ ràng là máy tính sẽ không hiểu như cách con người chúng ta hiểu được, chính vì lẽ đó 
+ta cần phải chuyển các tín hiệu thực tế thành các con số, các trường dữ liệu, các mô hình dữ liệu để ta có thể xử lý được bên trong máy tính.
+Một trong những lát cắt phân rã quan trọng nhất ở Bảng~\ref{tab:decomposition_views}
+là lát cắt \textbf{dữ liệu}. Tuy nhiên, việc liệt kê các nhóm dữ liệu mới
+chỉ là bước trung gian, bước quan trọng ở đây là biến các
+nhóm dữ liệu trừu tượng đó thành một \textbf{lược đồ cơ sở dữ liệu} cụ
+thể, có khóa chính, khóa ngoại và quan hệ rõ ràng, để backend có thể lưu
+trữ và truy vấn một cách nhất quán. Bảng~\ref{tab:decomp_to_db} trình bày
+ánh xạ này.
+
+\begin{table}[H]
+\centering
+\caption{Ánh xạ từ nhóm dữ liệu (decomposition) sang bảng dữ liệu}
+\label{tab:decomp_to_db}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.6cm} >{\ttfamily\raggedright\arraybackslash}p{3.0cm} X}
+\toprule
+\textbf{Nhóm dữ liệu} & \textbf{\normalfont Bảng} & \textbf{Vai trò} \\
+\midrule
+Dữ liệu POI & places & Điểm đến văn hóa cốt lõi của hệ thống. \\
+Tài khoản người dùng & users & Danh tính và xác thực người dùng. \\
+Sở thích cá nhân & user\_preferences & Tín hiệu cá nhân hóa cho feed (quan hệ 1--1 với người dùng). \\
+Tiến trình \& capture & captures & Bằng chứng thực địa, gắn người dùng với địa điểm và nhiệm vụ. \\
+Kho nhiệm vụ & \textnormal{(tệp JSON)} & Sinh offline, nạp trực tiếp về client nên không cần bảng riêng trong pilot. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Quan hệ giữa các bảng được mô tả trong sơ đồ thực thể -- liên kết ở
+Hình~\ref{fig:er_diagram}. Có ba quan hệ chính: mỗi người dùng có tối đa
+một bản ghi sở thích (1--1), mỗi người dùng có thể tạo nhiều capture
+(1--$\ast$), và mỗi địa điểm cũng có thể nhận nhiều capture (1--$\ast$).
+Chính bảng \texttt{captures} là nơi nối hành động thực địa của người dùng
+với địa điểm và nhiệm vụ, nên nó mang hai khóa ngoại trỏ về
+\texttt{users} và \texttt{places}.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    entity/.style={draw=primaryblue, fill=blue!4!white, rounded corners=3pt, align=left, font=\footnotesize, inner sep=5pt},
+    rel/.style={draw=darkgray, thick},
+    card/.style={font=\scriptsize\bfseries, fill=white, inner sep=1pt}
+]
+\node[entity] (prefs) at (-6.2,1.9) {\textbf{user\_preferences}\\[2pt]\underline{user\_id} (PK, FK)\\interests (JSON)\\home\_latitude\\home\_longitude};
+\node[entity] (users) at (-0.4,2.3) {\textbf{users}\\[2pt]\underline{id} (PK)\\name\\email\\hashed\_password};
+\node[entity] (places) at (6.0,2.3) {\textbf{places}\\[2pt]\underline{id} (PK)\\name\\category\\latitude, longitude\\description, image\_url};
+\node[entity] (caps) at (2.8,-2.3) {\textbf{captures}\\[2pt]\underline{id} (PK)\\user\_id (FK)\\place\_id (FK)\\task\_id\\timestamp, media\_url};
+
+\draw[rel] (prefs.east) -- node[card, pos=0.15]{1} node[card, pos=0.85]{1} (users.west);
+\draw[rel] (users.south) -- node[card, pos=0.15]{1} node[card, pos=0.9]{$\ast$} (caps.north);
+\draw[rel] (places.south) -- node[card, pos=0.12]{1} node[card, pos=0.9]{$\ast$} (caps.east);
+\end{tikzpicture}}
+\caption{Sơ đồ thực thể -- liên kết (ER) của BeVietnam. Bảng \texttt{captures} đóng vai trò bảng nối, mang khóa ngoại tới \texttt{users} và \texttt{places}; \texttt{user\_preferences} mở rộng \texttt{users} theo quan hệ một -- một để phục vụ cá nhân hóa.}
+\label{fig:er_diagram}
+\end{figure}
+
+Việc đi từ decomposition tới lược đồ dữ liệu này không chỉ là một thao
+tác kỹ thuật, mà còn là một bước trừu tượng hóa có chủ đích. Khi gom đúng
+các thuộc tính vào đúng thực thể và đặt quan hệ chính xác, hệ thống tránh
+được tình trạng dữ liệu trùng lặp hoặc mâu thuẫn giữa các client. Đồng
+thời, lược đồ gọn này cũng để ngỏ khả năng mở rộng: nếu sau pilot cần
+biến kho nhiệm vụ thành dữ liệu động hoặc thêm bảng tiến trình riêng cho
+storyline, ta chỉ việc bổ sung bảng mới trỏ về \texttt{users} mà không
+phải phá vỡ cấu trúc hiện có.
