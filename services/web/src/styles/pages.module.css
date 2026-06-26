@@ -391,6 +391,29 @@
   color: var(--color-primary-700);
 }
 
+.loadMoreRow {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-6);
+}
+
+.loadMoreButton {
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-full);
+  background: rgba(198, 154, 63, 0.12);
+  border: 1px solid rgba(198, 154, 63, 0.28);
+  color: var(--gold);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  transition: all var(--transition-fast);
+}
+
+.loadMoreButton:hover {
+  background: rgba(198, 154, 63, 0.2);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
 [data-theme="dark"] .eventBadgeOngoing {
   color: var(--color-emerald-300);
 }

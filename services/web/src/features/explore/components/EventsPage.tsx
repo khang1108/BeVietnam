@@ -11,9 +11,13 @@ import styles from '@/styles/pages.module.css';
 
 type FeedState = {
     userId: string | null;
+    limit: number;
     items: FeedItem[];
     error: string | null;
 };
+
+const INITIAL_FEED_LIMIT = 10;
+const FEED_PAGE_SIZE = 10;
 
 const filters = [
     { key: 'all', label_vi: 'Tất cả', label_en: 'All' },
@@ -65,30 +69,31 @@ export function EventsPage() {
     const { t, locale } = useI18n();
     const { isAuthenticated, user } = useAuth();
     const [activeFilter, setActiveFilter] = useState('all');
-    const [feedState, setFeedState] = useState<FeedState>({ userId: null, items: [], error: null });
+    const [feedLimit, setFeedLimit] = useState(INITIAL_FEED_LIMIT);
+    const [feedState, setFeedState] = useState<FeedState>({ userId: null, limit: 0, items: [], error: null });
 
     useEffect(() => {
         if (!isAuthenticated || !user) return;
 
         let cancelled = false;
 
-        feedApi.getFeed({ limit: '20' }).then((result) => {
+        feedApi.getFeed({ limit: String(feedLimit) }).then((result) => {
             if (cancelled) return;
 
             if (result.error || !result.data) {
-                setFeedState({ userId: user.id, items: [], error: result.error || t('common.error') });
+                setFeedState({ userId: user.id, limit: feedLimit, items: [], error: result.error || t('common.error') });
                 return;
             }
 
-            setFeedState({ userId: user.id, items: result.data.items, error: null });
+            setFeedState({ userId: user.id, limit: feedLimit, items: result.data.items, error: null });
         });
 
         return () => {
             cancelled = true;
         };
-    }, [isAuthenticated, t, user]);
+    }, [feedLimit, isAuthenticated, t, user]);
 
-    const isLoading = isAuthenticated && feedState.userId !== user?.id;
+    const isLoading = isAuthenticated && (feedState.userId !== user?.id || feedState.limit !== feedLimit);
     const error = isAuthenticated && feedState.userId === user?.id ? feedState.error : null;
 
     const filteredItems = useMemo(() => {
@@ -96,6 +101,12 @@ export function EventsPage() {
         if (activeFilter === 'all') return displayItems;
         return displayItems.filter((item) => normalizeCategory(item.category) === activeFilter);
     }, [activeFilter, feedState, isAuthenticated, user]);
+
+    const canLoadMore = isAuthenticated && !isLoading && !error && activeFilter === 'all' && feedState.items.length >= feedLimit;
+
+    const handleLoadMore = () => {
+        setFeedLimit((limit) => limit + FEED_PAGE_SIZE);
+    };
 
     return (
         <div className={styles.pageContainer} id="events-page">
@@ -154,34 +165,47 @@ export function EventsPage() {
             )}
 
             {isAuthenticated && !isLoading && !error && filteredItems.length > 0 && (
-                <div className={styles.eventList}>
-                    {filteredItems.map((item) => (
-                        <Link key={item.id} href={`/place/${item.place_id}`} className={styles.eventCard}>
-                            <div className={styles.eventDate}>
-                                <span className={styles.eventDateMonth}>{locale === 'vi' ? 'Điểm' : 'Score'}</span>
-                                <span className={styles.eventDateDay}>{Math.round(item.score * 100)}</span>
-                            </div>
-                            <div className={styles.eventImage}>
-                                {item.thumbnail_url ? (
-                                    <img src={item.thumbnail_url} alt={item.name} />
-                                ) : (
-                                    <div className={styles.cardImage}>🏛️</div>
-                                )}
-                            </div>
-                            <div className={styles.eventInfo}>
-                                <h3 className={styles.eventTitle}>{item.name}</h3>
-                                <p className={styles.eventDesc}>{item.explanation}</p>
-                                <div className={styles.eventMeta}>
-                                    <span>📍 {item.place_id}</span>
-                                    <span>🏷️ {categoryLabel(item.category, locale)}</span>
+                <>
+                    <div className={styles.eventList}>
+                        {filteredItems.map((item) => (
+                            <Link key={item.id} href={`/place/${item.place_id}`} className={styles.eventCard}>
+                                <div className={styles.eventDate}>
+                                    <span className={styles.eventDateMonth}>{locale === 'vi' ? 'Điểm' : 'Score'}</span>
+                                    <span className={styles.eventDateDay}>{Math.round(item.score * 100)}</span>
                                 </div>
-                            </div>
-                            <div className={`${styles.eventBadge} ${styles.eventBadgeOngoing}`}>
-                                {t('feed.recommended')}
-                            </div>
-                        </Link>
-                    ))}
-                </div>
+                                <div className={styles.eventImage}>
+                                    {item.thumbnail_url ? (
+                                        <img src={item.thumbnail_url} alt={item.name} />
+                                    ) : (
+                                        <div className={styles.cardImage}>🏛️</div>
+                                    )}
+                                </div>
+                                <div className={styles.eventInfo}>
+                                    <h3 className={styles.eventTitle}>{item.name}</h3>
+                                    <p className={styles.eventDesc}>{item.explanation}</p>
+                                    <div className={styles.eventMeta}>
+                                        <span>📍 {item.place_id}</span>
+                                        <span>🏷️ {categoryLabel(item.category, locale)}</span>
+                                    </div>
+                                </div>
+                                <div className={`${styles.eventBadge} ${styles.eventBadgeOngoing}`}>
+                                    {t('feed.recommended')}
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+
+                    {canLoadMore && (
+                        <div className={styles.loadMoreRow}>
+                            <button
+                                className={styles.loadMoreButton}
+                                onClick={handleLoadMore}
+                            >
+                                {locale === 'vi' ? 'Tải thêm 10 gợi ý' : 'Load 10 more'}
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );
