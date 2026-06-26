@@ -40,6 +40,7 @@ class SpotlightPost(BaseModel):
     body: str = Field(min_length=40, max_length=900)
     cultural_hook: str = Field(default="", max_length=400)
     language: str = Field(default="vi", min_length=2, max_length=5)
+    image_url: str | None = Field(default=None, max_length=1000)
 
     weather_tags: list[str] = Field(default_factory=list)
     time_tags: list[str] = Field(default_factory=list)
@@ -72,6 +73,11 @@ class SpotlightPost(BaseModel):
     @classmethod
     def strip_text(cls, value: str) -> str:
         return value.strip()
+
+    @field_validator("image_url")
+    @classmethod
+    def strip_image_url(cls, value: str | None) -> str | None:
+        return value.strip() if value else None
 
     @field_validator("weather_tags")
     @classmethod

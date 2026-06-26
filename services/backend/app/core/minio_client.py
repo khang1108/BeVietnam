@@ -45,7 +45,19 @@ class MinioClient:
             Body=data,
             ContentType=content_type,
         )
-        return f"{settings.MINIO_ENDPOINT.rstrip('/')}/{self._bucket}/{key}"
+        return self.object_url(key)
+
+    def get_bytes(self, key: str) -> tuple[bytes, str]:
+        """Read an object from storage and return (bytes, content_type)."""
+        obj = self._client.get_object(Bucket=self._bucket, Key=key)
+        data = obj["Body"].read()
+        content_type = obj.get("ContentType") or "application/octet-stream"
+        return data, content_type
+
+    def object_url(self, key: str) -> str:
+        """Return the public API URL for a stored object key."""
+        base = settings.PUBLIC_API_BASE_URL.rstrip("/")
+        return f"{base}/media/{key}"
 
 
 minio_client = MinioClient()

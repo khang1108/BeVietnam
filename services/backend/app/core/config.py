@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Tourism App API"
     VERSION: str = "0.1.0"
     API_PREFIX: str = "/api/v1"
+    PUBLIC_API_BASE_URL: str = "http://localhost:8000/api/v1"
 
     # CORS
     ALLOWED_ORIGINS: List[str] = ["*"]
@@ -31,6 +32,10 @@ class Settings(BaseSettings):
     OPENWEATHER_API_KEY: str = ""
     OPENWEATHER_BASE_URL: str = "https://api.openweathermap.org/data/2.5"
     OPENWEATHER_TIMEOUT: int = 10
+
+    # SerpAPI is used offline to enrich stored feed posts with MinIO image URLs.
+    SERPAPI_API_KEY: str = ""
+    FEED_IMAGE_PREFIX: str = "feed-posts"
 
     # Foursquare Places (new platform) — live nearby POIs (cafe / homestay / …).
     # Leave key empty to disable the /places/nearby endpoint (returns empty).
