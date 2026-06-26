@@ -28,12 +28,12 @@ def _to_user_response(user: UserModel) -> UserResponse:
 
 @router.post(
     "/register",
-    response_model=UserResponse,
+    response_model=TokenResponse,
     status_code=status.HTTP_201_CREATED,
 )
 async def register(body: UserRegisterRequest, db: AsyncSession = Depends(get_db)):
-    user = await AuthService(db).register(body.name, body.email, body.password)
-    return _to_user_response(user)
+    token, user = await AuthService(db).register(body.name, body.email, body.password)
+    return TokenResponse(access_token=token, user=_to_user_response(user))
 
 
 @router.post("/login", response_model=TokenResponse)

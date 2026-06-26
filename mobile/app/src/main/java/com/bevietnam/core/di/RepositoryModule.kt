@@ -1,7 +1,7 @@
 package com.bevietnam.core.di
 
-import com.bevietnam.core.data.mock.MockAuthRepository
-import com.bevietnam.core.data.mock.MockUserRepository
+import com.bevietnam.core.data.repository.AuthRepository
+import com.bevietnam.core.data.repository.UserRepository
 import com.bevietnam.core.data.mock.MockPlaceRepository
 import com.bevietnam.core.data.mock.MockFeedRepository
 import com.bevietnam.core.data.mock.MockTaskRepository
@@ -40,13 +40,13 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAuthRepository(
-        authRepository: MockAuthRepository
+        authRepository: AuthRepository
     ): IAuthRepository
 
     @Binds
     @Singleton
     abstract fun bindUserRepository(
-        userRepository: MockUserRepository
+        userRepository: UserRepository
     ): IUserRepository
 
     @Binds

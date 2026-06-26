@@ -16,17 +16,19 @@ class AuthService:
     def __init__(self, db: AsyncSession):
         self.repo = UserRepository(db)
 
-    async def register(self, name: str, email: str, password: str) -> UserModel:
+    async def register(self, name: str, email: str, password: str) -> tuple[str, UserModel]:
         if await self.repo.get_by_email(email):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered",
             )
-        return await self.repo.create(
+        user = await self.repo.create(
             name=name,
             email=email,
             hashed_password=hash_password(password),
         )
+        token = create_access_token({"sub": user.id})
+        return token, user
 
     async def login(self, email: str, password: str) -> tuple[str, UserModel]:
         user = await self.repo.get_by_email(email)
