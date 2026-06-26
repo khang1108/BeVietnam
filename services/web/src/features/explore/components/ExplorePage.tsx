@@ -10,7 +10,7 @@ import React, {
 import type { Map, Marker } from '@goongmaps/goong-js';
 import { Crosshair, List, MagnifyingGlass, X } from '@phosphor-icons/react';
 import styles from '../styles/explore.module.css';
-import { weatherApi, nearbyApi, type WeatherCondition as ApiWeatherCondition, type NearbyPlace } from '@/lib/api';
+import { weatherApi, nearbyApi, mapApi, type WeatherCondition as ApiWeatherCondition, type NearbyPlace } from '@/lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -113,7 +113,9 @@ const CITY_HUBS: CityHub[] = [
     { id: 'quangnam', name: 'Quảng Nam', lat: 15.7625, lng: 108.1292, count: 2 },
 ];
 
-const GOONG_API_KEY = process.env.NEXT_PUBLIC_GOONG_API_KEY ?? '';
+// Fallback: direct Goong key for G.accessToken (GoongJS SDK requires this).
+// The actual style/tile URLs are served through the backend proxy.
+const GOONG_FALLBACK_KEY = process.env.NEXT_PUBLIC_GOONG_API_KEY ?? '';
 
 async function loadGoongSdk() {
     try {
@@ -419,6 +421,8 @@ export function ExplorePage() {
     const goongRef = useRef<any>(null);
 
     const [mapLoaded, setMapLoaded] = useState(false);
+    const [mapReady, setMapReady] = useState(false); // true once we have a style URL (from backend or fallback)
+    const [mapStyleUrl, setMapStyleUrl] = useState<string | null>(null);
     const [selectedPlace, setSelectedPlace] = useState<NearbyPlace | null>(null);
     const [activeCategory, setActiveCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
@@ -450,10 +454,12 @@ export function ExplorePage() {
         }
     }, []);
 
-    // Initialize Goong map — loaded dynamically to avoid SSR issues
+    // Initialize Goong map — fetch style URL from backend first so the API key
+    // stays server-side. Falls back to NEXT_PUBLIC_GOONG_API_KEY if backend
+    // /maps/config is unavailable (e.g. first deploy before maps route exists).
     useEffect(() => {
         const container = mapContainerRef.current;
-        if (!container || !GOONG_API_KEY || mapRef.current) return;
+        if (!container || mapRef.current) return;
 
         let map: Map | null = null;
         let cancelled = false;
@@ -462,6 +468,29 @@ export function ExplorePage() {
         const initMap = async () => {
             try {
                 setMapError('');
+
+                // ── Step 1: Resolve style URL from backend ──────────────────
+                let styleUrl: string;
+                const configResult = await mapApi.getConfig();
+                const backendConfig = configResult.data;
+
+                if (backendConfig?.enabled && backendConfig.style_url) {
+                    // Backend is up and has the Goong key → use its proxied style.
+                    styleUrl = backendConfig.style_url;
+                    setMapStyleUrl(styleUrl);
+                    setMapReady(true);
+                } else if (GOONG_FALLBACK_KEY) {
+                    // Backend down or key not set → fall back to direct Goong tile URL.
+                    styleUrl = `https://tiles.goong.io/assets/goong_map_dark.json?api_key=${GOONG_FALLBACK_KEY}`;
+                    setMapStyleUrl(styleUrl);
+                    setMapReady(true);
+                } else {
+                    // No key anywhere → cannot show map.
+                    setMapReady(false);
+                    return;
+                }
+
+                // ── Step 2: Boot GoongJS SDK ────────────────────────────────
                 const G = await loadGoongSdk();
                 if (cancelled) return;
 
@@ -473,13 +502,14 @@ export function ExplorePage() {
                     throw new Error('WEBGL_UNSUPPORTED');
                 }
 
-                // Goong JS requires accessToken to be set before creating Map
-                G.accessToken = GOONG_API_KEY;
+                // GoongJS SDK requires a non-empty accessToken — use the client
+                // fallback key (or a placeholder when backend proxy handles tiles).
+                G.accessToken = GOONG_FALLBACK_KEY || 'backend-proxied';
                 goongRef.current = G;
 
                 map = new G.Map({
                     container,
-                    style: `https://tiles.goong.io/assets/goong_map_dark.json?api_key=${GOONG_API_KEY}`,
+                    style: styleUrl,
                     center: [107.95, 16.15],
                     zoom: 8,
                 }) as Map;
@@ -831,7 +861,7 @@ export function ExplorePage() {
                 <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
 
                 {/* Locate-me button */}
-                {GOONG_API_KEY && mapLoaded && (
+                {mapReady && mapLoaded && (
                     <button
                         className={`${styles.locateBtn} ${locating ? styles.locateBtnActive : ''}`}
                         onClick={handleLocate}
@@ -885,24 +915,18 @@ export function ExplorePage() {
                     </div>
                 )}
 
-                {/* Overlay: API key missing */}
-                {!GOONG_API_KEY && (
+                {/* Overlay: map config unavailable (backend down + no fallback key) */}
+                {!mapReady && (
                     <div className={styles.mapStatus}>
                         <div className={styles.mapStatusTitle}>Goong Maps chưa được cấu hình</div>
                         <div className={styles.mapStatusDesc}>
-                            Thêm Goong API key vào file <code>.env</code> để hiển thị bản đồ tương tác.
-                        </div>
-                        <code className={styles.mapStatusCode}>
-                            NEXT_PUBLIC_GOONG_API_KEY=your_key_here
-                        </code>
-                        <div className={styles.mapStatusDesc} style={{ fontSize: '0.72rem', marginTop: 4 }}>
-                            Đăng ký miễn phí tại account.goong.io
+                            Backend chưa trả về cấu hình bản đồ. Kiểm tra <code>GOONG_MAPTILES_KEY</code> trên server hoặc thêm <code>NEXT_PUBLIC_GOONG_API_KEY</code> để dùng chế độ dự phòng.
                         </div>
                     </div>
                 )}
 
                 {/* Overlay: Map fallback */}
-                {GOONG_API_KEY && mapError && (
+                {mapReady && mapError && (
                     <div className={styles.mapStatus}>
                         <div className={styles.mapStatusTitle}>Bản đồ chưa sẵn sàng</div>
                         <div className={styles.mapStatusDesc}>{mapError}</div>
@@ -910,7 +934,7 @@ export function ExplorePage() {
                 )}
 
                 {/* Overlay: Map loading */}
-                {GOONG_API_KEY && !mapLoaded && !mapError && (
+                {mapReady && !mapLoaded && !mapError && (
                     <div className={styles.mapStatus}>
                         <div className={styles.mapLoadingSpinner} />
                         <div className={styles.mapStatusDesc}>Đang tải bản đồ...</div>

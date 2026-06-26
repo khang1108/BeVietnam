@@ -303,6 +303,17 @@ export const nearbyApi = {
     }),
 };
 
+// Map config — backend serves the MapLibre/Goong style URL so the API key
+// is never exposed to the client.
+export interface MapConfigResponse {
+  enabled: boolean;
+  style_url: string | null;
+}
+
+export const mapApi = {
+  getConfig: () => apiRequest<MapConfigResponse>('/maps/config'),
+};
+
 // Capture verification (AI Capture Judge via backend proxy)
 export interface VerifyCaptureBody {
   user_id: string;
