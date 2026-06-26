@@ -8,7 +8,7 @@
  * NEVER logs passwords or tokens to the console.
  */
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { authApi, tokenManager } from '@/lib/api-client';
 import type { UserResponse } from '@/lib/types';
 
@@ -44,18 +44,33 @@ function parseUserFromToken(token: string): UserResponse | null {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  /* Lazy initializer: rehydrate user from saved token on first render */
-  const [user, setUser] = useState<UserResponse | null>(() => {
+  const [user, setUser] = useState<UserResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(() => Boolean(tokenManager.getToken()));
+
+  useEffect(() => {
     const token = tokenManager.getToken();
-    if (!token) return null;
+    if (!token) return;
+
+    let cancelled = false;
     const parsed = parseUserFromToken(token);
-    if (!parsed) {
-      tokenManager.removeToken();
-      return null;
-    }
-    return parsed;
-  });
-  const [isLoading, setIsLoading] = useState(false);
+
+    authApi.me().then((result) => {
+      if (cancelled) return;
+      if (result.data) {
+        setUser(result.data);
+      } else if (parsed) {
+        setUser(parsed);
+      } else {
+        tokenManager.removeToken();
+        setUser(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const login = useCallback(
     async (email: string, password: string): Promise<string | null> => {

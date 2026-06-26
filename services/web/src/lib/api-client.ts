@@ -13,6 +13,7 @@ import type {
   UserLoginRequest,
   FeedResponse,
   PlacesResponse,
+  UserResponse,
 } from '@/lib/types';
 
 const API_BASE_URL =
@@ -110,6 +111,10 @@ export const authApi = {
       method: 'POST',
       body: JSON.stringify(body),
     });
+  },
+
+  me() {
+    return apiRequest<UserResponse>('/auth/me');
   },
 };
 

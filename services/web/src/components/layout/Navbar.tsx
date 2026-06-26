@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/i18n';
 import { useTheme } from '@/hooks/useTheme';
+import { useAuth } from '@/hooks/useAuth';
 import { localeNames } from '@/i18n/translations';
-import { IconCalendar, IconExplore, IconFeed, IconSparkle, IconStoryline } from '@/components/icons/UiIcons';
 import styles from './Navbar.module.css';
 
 const navItems = [
@@ -20,6 +20,7 @@ const navItems = [
 export default function Navbar() {
   const { t, locale, setLocale } = useI18n();
   const { theme, toggleTheme } = useTheme();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -53,6 +54,13 @@ export default function Navbar() {
   };
 
   const closeMobile = () => setMobileOpen(false);
+
+  const handleLogout = () => {
+    logout();
+    closeMobile();
+  };
+
+  const userInitial = user?.name?.trim().charAt(0).toUpperCase() || 'U';
 
   return (
     <nav className={`${styles.navbar} ${scrolled ? styles.navbarScrolled : ''}`} id="main-navbar">
@@ -99,9 +107,21 @@ export default function Navbar() {
             {locale === 'vi' ? 'EN' : 'VI'}
           </button>
 
-          <Link href="/auth/login" className={styles.authButton}>
-            {t('nav.login')}
-          </Link>
+          {!isLoading && isAuthenticated && user ? (
+            <div className={styles.profileMenu} title={user.email}>
+              <Link href="/auth/login" className={styles.profileButton} aria-label={t('nav.profile')}>
+                <span className={styles.profileAvatar}>{userInitial}</span>
+                <span className={styles.profileName}>{user.name}</span>
+              </Link>
+              <button className={styles.logoutButton} onClick={handleLogout}>
+                {t('nav.logout')}
+              </button>
+            </div>
+          ) : (
+            <Link href="/auth/login" className={styles.authButton}>
+              {t('nav.login')}
+            </Link>
+          )}
 
           {/* Hamburger */}
           <button
@@ -141,9 +161,21 @@ export default function Navbar() {
           </button>
         </div>
 
-        <Link href="/auth/login" className={styles.mobileAuthButton} onClick={closeMobile}>
-          {t('nav.login')}
-        </Link>
+        {!isLoading && isAuthenticated && user ? (
+          <div className={styles.mobileProfileBox}>
+            <div className={styles.mobileProfileUser}>
+              <span className={styles.profileAvatar}>{userInitial}</span>
+              <span>{user.name}</span>
+            </div>
+            <button className={styles.mobileAuthButton} onClick={handleLogout}>
+              {t('nav.logout')}
+            </button>
+          </div>
+        ) : (
+          <Link href="/auth/login" className={styles.mobileAuthButton} onClick={closeMobile}>
+            {t('nav.login')}
+          </Link>
+        )}
       </div>
     </nav>
   );

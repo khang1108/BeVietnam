@@ -200,6 +200,52 @@
   background-color: var(--gold-soft);
 }
 
+.profileMenu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.profileButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-primary);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+}
+
+.profileAvatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500));
+  color: white;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+}
+
+.profileName {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logoutButton {
+  color: var(--text-secondary);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  transition: color var(--transition-fast);
+}
+
+.logoutButton:hover {
+  color: var(--gold);
+}
+
 /* Mobile hamburger */
 .hamburger {
   display: none;
@@ -305,6 +351,24 @@
   font-weight: var(--fw-semibold);
   text-decoration: none;
   margin-top: var(--space-2);
+}
+
+.mobileProfileBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  border: 1px solid var(--border-primary);
+}
+
+.mobileProfileUser {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
 }
 
 @keyframes slideDown {
