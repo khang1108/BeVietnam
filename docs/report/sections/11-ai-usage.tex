@@ -1,0 +1,94 @@
+\section{Quá trình Sử dụng Trợ lý AI}
+
+Trong quá trình làm đồ án, nhóm dùng trợ lý lập trình \textbf{Claude Code}
+(mô hình Claude của Anthropic) như một cộng sự để tăng tốc xây dựng hệ
+thống và báo cáo. Phần này không lặp lại danh sách mô hình AI bên trong
+sản phẩm (đã trình bày ở Chương~7 và Chương~9), mà \textbf{trình bày cách
+nhóm đã prompt và với mục đích gì}. Nội dung dưới đây được tổng hợp từ
+nhật ký prompt mà nhóm lưu lại qua các phiên làm việc.
+
+\subsection{Các Nhóm Prompt và Mục đích}
+\contrib
+
+Việc sử dụng AI bám theo dòng phát triển của dự án, từ chốt hướng đi đến
+triển khai từng phần rồi hoàn thiện báo cáo. Bảng~\ref{tab:prompts_build}
+tóm tắt các nhóm prompt ở giai đoạn xây dựng hệ thống, còn
+Bảng~\ref{tab:prompts_report} là giai đoạn hoàn thiện báo cáo và slide.
+
+\begin{table}[H]
+\centering
+\caption{Prompt giai đoạn xây dựng hệ thống}
+\label{tab:prompts_build}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.4cm} >{\raggedright\arraybackslash}p{3.6cm} X}
+\toprule
+\textbf{Nhóm prompt} & \textbf{Mục đích} & \textbf{Kết quả} \\
+\midrule
+Viết và tinh chỉnh spec, kế hoạch pilot & Biến ý tưởng thành việc làm được trong 8--10 ngày & \texttt{PROJECT\_SPEC}, kế hoạch pilot Huế, kế hoạch AI service. \\
+Dựng AI service chạy được, sửa import theo monorepo & Khởi động được dịch vụ AI & Sửa import + Docker entrypoint; dịch vụ boot. \\
+Định nghĩa knowledge chunk schema & Bảo đảm truy vết nguồn (traceability) & Schema chunk có \texttt{source\_type}, \texttt{review\_status}. \\
+Dựng lại retrieval cho Culture Scout & Truy hồi tri thức theo ngữ cảnh & Retrieval theo place/category/language/interests. \\
+Hiện thực scoring + giải thích đề xuất (Task 4) & Điểm số tính trong code, LLM chỉ diễn đạt & Scoring tất định + fallback khi mô hình lỗi; test đạt. \\
+Crawl nguồn chính thống + UNESCO + ebook & KB có dẫn nguồn, duyệt trước & Registry nguồn vetted + knowledge chunk + validator. \\
+Tích hợp weather thật từ OpenWeather theo GPS & Biến weather mock thành ngữ cảnh thật, khóa key ở backend & Weather service chung; storyline/explore dùng weather thật; fallback an toàn khi từ chối GPS. \\
+Chốt hạ tầng tự host & Tránh phụ thuộc và hạn mức & Firebase $\to$ PostgreSQL + MinIO + JWT; Gemini $\to$ vLLM tự host. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Prompt giai đoạn hoàn thiện báo cáo và slide (đầy đủ, theo thứ tự)}
+\label{tab:prompts_report}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}p{0.4cm} >{\raggedright\arraybackslash}p{4.2cm} >{\raggedright\arraybackslash}p{3.3cm} X@{}}
+\toprule
+\textbf{\#} & \textbf{Prompt} & \textbf{Mục đích} & \textbf{Kết quả} \\
+\midrule
+1 & Vẽ graph pipeline, chia rõ Frontend/Backend/vLLM layer & Làm rõ kiến trúc tổng thể & Sơ đồ 3 lớp (Hình~\ref{fig:system_pipeline}). \\
+2 & ``Bạn tự update nguồn giúp tôi đi'' & Số liệu phải có nguồn thật, không bịa & Xác minh 4 thống kê du lịch, sửa \texttt{ref.bib} trỏ URL thật. \\
+3 & ``Commit all changes'' & Lưu thay đổi theo dõi & Commit gỡ report CT cũ. \\
+4 & ``Commit features also'' & Theo dõi luôn report & Un-ignore \texttt{docs/report/}, commit source + pdf. \\
+5 & ``Push to main'' & Phát hành nhánh chính & Fast-forward + push \texttt{main}. \\
+6 & Thêm pseudo-code + JSON mẫu vào §3.3, dựa vào \texttt{data/} & Minh họa schema bằng dữ liệu thật & 6 listing JSON từ dữ liệu thật. \\
+7 & Dịch vLLM layer xuống (đang dính Backend) & Sửa bố cục sơ đồ & Tách band vLLM khỏi Backend. \\
+8 & Nói rõ hạ tầng: Web$\to$Azure, Backend+vLLM$\to$Thundercompute L40 & Khai báo nền tảng chạy thật & Prose + bảng \texttt{tab:infra}. \\
+9 & Làm slide theo style FactChecking, ít chữ & Bộ slide thuyết trình & Deck beamer keyword + diagram. \\
+10 & Tải ảnh pain-point (×3 URL) vào slide 2 & Đưa ảnh thật vào slide & 3 ảnh gắn slide 2. \\
+11 & Thêm slide terminal vLLM & Minh chứng vLLM chạy & Slide log vLLM. \\
+12 & Đổi slide đó sang figure \texttt{vllm\_example.png} & Để tự thay ảnh thật sau & Figure placeholder \texttt{\textbackslash IfFileExists}. \\
+13 & Thêm figure homepage §7.1 + slide homepage & Đưa ảnh sản phẩm vào & \texttt{fig:homepage} + slide Web App. \\
+14 & Thêm bubble map (overview + detail) vào report \& slide & Minh họa bản đồ thật & \texttt{fig:bubble\_maps} + slide 9. \\
+15 & Chỉnh size ảnh bubble map (tràn slide) & Sửa tràn khung & 2 map cạnh nhau, cap height. \\
+16 & Thêm \texttt{bevietnam.iamphuckhang.dev} đầu báo cáo & Gắn live demo lên bìa & Hyperlink trang tiêu đề. \\
+17 & Gỡ lỗi \texttt{setup.sh} (minio Permission denied / Segfault) & Khắc phục vận hành VM & Chẩn đoán chmod + tải lại binary. \\
+18 & Gỡ lỗi KV cache vLLM (0.26 < 0.88 GiB) & Chạy được model trên L40 & Chẩn đoán OOM do VL profiling. \\
+19 & Bổ sung pipeline \texttt{vllm\_hosting} sinh knowledge & Trình bày khâu offline & \texttt{fig:offline\_pipeline} + bảng agent + slide. \\
+20 & Thêm ảnh mobile/storyline/vLLM vào report \& slide & Minh chứng sản phẩm & \texttt{fig:storyline}, \texttt{fig:mobile}, \texttt{fig:vllm\_serve}. \\
+21 & Thêm mục trình bày cách prompt qua các session & Minh bạch cách dùng AI & Chương này + tài liệu nhật ký prompt. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Nguyên tắc Prompt Vận hành}
+\contrib
+
+Nhóm thống nhất một số nguyên tắc khi đặt câu lệnh, để giữ AI bám đúng
+việc và để kết quả luôn kiểm chứng được:
+
+\begin{itemize}
+  \item \textbf{Nêu rõ mục tiêu và bối cảnh} trong mỗi prompt, ưu tiên đọc
+  mã nguồn trước khi kết luận thay vì đoán mò.
+  \item \textbf{Thay đổi nhỏ, bám pattern sẵn có} của repo; thực hiện
+  triển khai thật trong workspace thay vì chỉ đề xuất.
+  \item \textbf{Không bịa nguồn}: mọi số liệu, trích dẫn phải truy được về
+  tài liệu thật, nếu không thì bỏ.
+  \item \textbf{Bảo toàn thay đổi của nhóm}: không tự ý revert file người
+  dùng, không dùng lệnh phá hủy khi chưa được yêu cầu.
+  \item \textbf{Làm theo vòng lặp}: AI đề xuất, nhóm biên dịch/chạy
+  thử/đọc lại, rồi prompt tiếp để sửa.
+\end{itemize}
+
+Tóm lại, AI được dùng chủ yếu ở vai trò \textit{tăng tốc thực thi} (sinh
+mã, dựng sơ đồ, soạn báo cáo, gỡ lỗi) chứ không thay nhóm ra quyết định
+thiết kế hay tự ý đưa ra số liệu. Nhóm đọc lại, chỉnh sửa, kiểm thử và
+chịu trách nhiệm cuối cùng cho mọi dòng mã cũng như nội dung báo cáo.

@@ -57,8 +57,15 @@ docs/*
 !docs/PROJECT_SPEC.md
 !docs/HUE_PILOT_8_DAY_DELIVERY_PLAN.md
 !docs/AI_SERVICE_IMPLEMENTATION_PLAN.md
+!docs/SESSION_PROMPT_AND_PURPOSE_2026-06-23.md
 !docs/report/
 !docs/report/**/
+!docs/slides/
+!docs/slides/**/*.tex
+!docs/slides/**/*.pdf
+!docs/slides/**/*.png
+!docs/slides/**/*.jpg
+!docs/slides/**/.gitignore
 !docs/computational-thinking/**/*.tex
 !docs/computational-thinking/**/*.bib
 !docs/computational-thinking/**/*.png
@@ -66,8 +73,8 @@ docs/*
 !docs/computational-thinking/**/.gitignore
 !docs/codex/
 !docs/codex/memory
-slides/
-.slides/
+/slides/
+/.slides/
 submit/
 PA_Decomposition.md
 

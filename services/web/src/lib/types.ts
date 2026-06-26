@@ -54,16 +54,17 @@ export interface ApiErrorDetail {
 
 export interface FeedItem {
   id: string;
-  title: string;
-  description: string;
-  image_url?: string;
-  category?: string;
+  place_id: string;
+  name: string;
+  category: string;
+  thumbnail_url?: string | null;
+  score: number;
+  explanation: string;
   created_at: string;
 }
 
 export interface FeedResponse {
   items: FeedItem[];
-  total: number;
 }
 
 /* ── Places ────────────────────────────────────────────────────────────────── */

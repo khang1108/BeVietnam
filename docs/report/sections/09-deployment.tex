@@ -5,14 +5,22 @@ giai đoạn pilot, từ cách bố trí dịch vụ trên máy chủ GPU đến
 khai hệ thống ra Internet và cách bảo vệ các thông tin bí mật.
 
 \subsection{Bố Trí Triển Khai}
+\contrib
 
-Toàn bộ phần lõi phía server được gom về một máy chủ GPU duy nhất (1
-card L40) để đơn giản hóa vận hành trong pilot. Trên máy này, một script
-khởi tạo dựng lần lượt các dịch vụ: cơ sở dữ liệu, lưu trữ ảnh, mô hình
-thị giác, AI Core và backend; cuối cùng là một đường hầm Cloudflare để
-công khai backend ra một tên miền cố định. Web client chạy độc lập và
-trỏ về tên miền này, còn mobile được phân phối dưới dạng APK cài trực
-tiếp lên điện thoại. Hình~\ref{fig:deploy} mô tả bố trí đó.
+Pilot được triển khai trên hai nền tảng tách biệt theo đúng đặc thù của
+từng phần. Toàn bộ phần lõi phía server (backend FastAPI, AI Core và mô
+hình thị giác vLLM) được gom về một máy chủ GPU duy nhất thuê theo giờ từ
+nền tảng \textbf{Thundercompute} (một card NVIDIA L40 48\,GB), vì phần này
+cần GPU để chạy mô hình và muốn gom mọi dịch vụ về một chỗ cho dễ vận
+hành trong pilot. Trên máy này, một script khởi tạo dựng lần lượt các
+dịch vụ: cơ sở dữ liệu, lưu trữ ảnh, mô hình thị giác, AI Core và backend;
+cuối cùng là một đường hầm Cloudflare để công khai backend ra một tên
+miền cố định. Trong khi đó, \textbf{Web App được triển khai trên Azure}
+(không cần GPU, chỉ phục vụ tài nguyên tĩnh và gọi API), chạy độc lập và
+trỏ ngược về tên miền Cloudflare của backend; còn mobile được phân phối
+dưới dạng APK cài trực tiếp lên điện thoại. Cách tách này giúp chi phí
+GPU chỉ phát sinh ở đúng phần cần tính toán, còn web giữ được độ sẵn sàng
+cao trên hạ tầng PaaS. Hình~\ref{fig:deploy} mô tả bố trí đó.
 
 \begin{figure}[H]
 \centering
@@ -26,7 +34,7 @@ tiếp lên điện thoại. Hình~\ref{fig:deploy} mô tả bố trí đó.
     client/.style={draw=darkgray, fill=lightgray, rounded corners=4pt, minimum width=2.4cm, minimum height=0.85cm, align=center, font=\scriptsize}
 ]
 % clients
-\node[client] (web) at (0,1.0) {Web client};
+\node[client] (web) at (0,1.0) {Web App\\(Azure)};
 \node[client] (mob) at (0,-1.0) {Mobile (APK)};
 % edge
 \node[edge] (cf) at (3.3,0) {Cloudflare\\Tunnel};
@@ -39,7 +47,7 @@ tiếp lên điện thoại. Hình~\ref{fig:deploy} mô tả bố trí đó.
 \node[gpu] (l40) at (10.3,-0.8) {GPU L40};
 
 \begin{scope}[on background layer]
-\node[vm, fit=(be)(vllm)(pg)(l40), label={[font=\small\bfseries, primaryblue]above:Máy chủ GPU (setup.sh)}] {};
+\node[vm, fit=(be)(vllm)(pg)(l40), label={[font=\small\bfseries, primaryblue]above:Máy chủ GPU L40 --- Thundercompute (setup.sh)}] {};
 \end{scope}
 
 \draw[->, thick, darkgray] (web) -- (cf);
@@ -51,11 +59,31 @@ tiếp lên điện thoại. Hình~\ref{fig:deploy} mô tả bố trí đó.
 \draw[->, thick, accentblue] (be) -- (minio);
 \draw[->, thick, jade] (vllm) -- (l40);
 \end{tikzpicture}}
-\caption{Bố trí triển khai pilot. Toàn bộ dịch vụ server nằm trên một máy chủ GPU, được dựng tự động bởi script \texttt{setup.sh}. Cloudflare Tunnel công khai backend ra một tên miền cố định; cả web lẫn mobile đều truy cập qua đường hầm này nên hoạt động được trên mọi mạng.}
+\caption{Bố trí triển khai pilot. Toàn bộ dịch vụ server (backend, AI Core, vLLM) nằm trên một máy chủ GPU L40 thuê từ Thundercompute, được dựng tự động bởi script \texttt{setup.sh}; Web App triển khai trên Azure. Cloudflare Tunnel công khai backend ra một tên miền cố định; cả web lẫn mobile đều truy cập qua đường hầm này nên hoạt động được trên mọi mạng.}
 \label{fig:deploy}
 \end{figure}
 
+Tóm lại, hạ tầng pilot được phân bổ như trong Bảng~\ref{tab:infra}.
+
+\begin{table}[H]
+\centering
+\caption{Phân bổ thành phần lên hạ tầng triển khai}
+\label{tab:infra}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.6cm} >{\raggedright\arraybackslash}p{3.4cm} X}
+\toprule
+\textbf{Thành phần} & \textbf{Nền tảng / hạ tầng} & \textbf{Lý do} \\
+\midrule
+Web App (Next.js) & Azure (PaaS) & Không cần GPU; ưu tiên độ sẵn sàng cao và phân phối tài nguyên tĩnh. \\
+Backend (FastAPI) + AI Core & Thundercompute --- máy chủ GPU L40 & Gom cùng máy với vLLM để gọi mô hình nội bộ, giảm độ trễ và đơn giản hóa vận hành. \\
+vLLM (Qwen2.5-VL-7B) & Thundercompute --- card NVIDIA L40 48\,GB & Cần GPU để phục vụ mô hình thị giác; thuê theo giờ nên chi phí GPU chỉ phát sinh khi chạy. \\
+Mobile (Android) & APK cài trực tiếp & Pilot phân phối thủ công, chưa lên store. \\
+Cổng công khai & Cloudflare Tunnel & Đưa backend ra tên miền cố định mà không mở cổng trực tiếp. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 \subsection{Tự Động Hóa Khởi Tạo}
+\contrib
 
 Việc đưa nhiều dịch vụ lên cùng một máy được gói trong một script khởi
 tạo duy nhất, chạy tuần tự theo thứ tự phụ thuộc
@@ -85,9 +113,20 @@ Riêng vLLM~\cite{vllm_docs}, vì phải phục vụ mô hình thị giác, cầ
 cấu hình đặc thù: chọn đúng model VLM, cho phép gửi tối đa hai ảnh trong
 một yêu cầu (ảnh tham chiếu và ảnh người dùng), và đặt độ dài ngữ cảnh đủ
 lớn vì token ảnh khá nặng. Một card L40 48\,GB đủ chỗ cho mô hình bản 7B
-cùng KV-cache nên không cần thêm GPU.
+cùng KV-cache nên không cần thêm GPU. Hình~\ref{fig:vllm_serve} là log của
+vLLM khi phục vụ mô hình trên máy chủ L40.
+
+\begin{figure}[H]
+\centering
+\IfFileExists{images/vllm.png}
+  {\includegraphics[width=0.92\textwidth]{images/vllm.png}}
+  {\fbox{\parbox[c][4cm][c]{0.92\textwidth}{\centering\itshape\color{darkgray}images/vllm.png}}}
+\caption{vLLM phục vụ mô hình Qwen2.5-VL trên máy chủ GPU L40 (Thundercompute).}
+\label{fig:vllm_serve}
+\end{figure}
 
 \subsection{Bảo Mật và Cấu Hình Bí Mật}
+\contrib
 
 Một nguyên tắc vận hành được tuân thủ chặt là \textbf{không đưa thông tin
 bí mật vào mã nguồn quản lý phiên bản}. Các khóa dịch vụ (Foursquare,
