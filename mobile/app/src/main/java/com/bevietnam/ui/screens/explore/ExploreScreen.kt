@@ -509,11 +509,15 @@ private fun ExploreMapView(
     // Sync bubbles: rebuild the GeoJSON source from the live nearby POIs whenever
     // the data, the user position, or the selection changes.
     LaunchedEffect(state.nearbyPlaces, state.userLatitude, state.userLongitude, state.focusedPlaceId, isStyleLoaded) {
+        android.util.Log.d("MapDebug", "LaunchedEffect triggered: nearbyPlaces size = ${state.nearbyPlaces.size}, isStyleLoaded = $isStyleLoaded")
         if (!isStyleLoaded) return@LaunchedEffect
         mapView.getMapAsync { map ->
+            android.util.Log.d("MapDebug", "getMapAsync callback: map style is null? ${map.style == null}")
             map.style?.let { style ->
                 addBubbleLayer(style) // no-op if already present
-                (style.getSource(PLACES_SOURCE_ID) as? GeoJsonSource)?.setGeoJson(
+                val source = style.getSource(PLACES_SOURCE_ID)
+                android.util.Log.d("MapDebug", "Source $PLACES_SOURCE_ID exists? ${source != null}")
+                (source as? GeoJsonSource)?.setGeoJson(
                     nearbyFeatureCollection(
                         state.nearbyPlaces,
                         state.userLatitude,
