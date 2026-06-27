@@ -69,6 +69,7 @@ import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
 import org.maplibre.android.style.expressions.Expression
 import org.maplibre.android.style.layers.CircleLayer
+import org.maplibre.android.style.layers.Layer
 import org.maplibre.android.style.layers.Property
 import org.maplibre.android.style.layers.PropertyFactory
 import org.maplibre.android.style.layers.SymbolLayer
@@ -210,9 +211,17 @@ private const val HALO_LAYER_ID = "bv-places-halo"
 private const val PIN_LAYER_ID = "bv-places-pin"
 private const val LABEL_LAYER_ID = "bv-places-label"
 
-// Match web map: every live POI is an orange pin with a soft blue bubble halo.
-private const val LIVE_POI_PIN = "#F97316"
-private const val LIVE_POI_HALO = "#60A5FA"
+// Dynamic category color mapping to achieve full parity with the web map
+private val CATEGORY_COLORS = mapOf(
+    "history" to "#e6b422",
+    "culture" to "#c9302c",
+    "food" to "#f97316",
+    "nature" to "#2d9d6f",
+    "festival" to "#d946ef",
+    "amusement" to "#3b82f6",
+    "lodging" to "#6366f1",
+    "place" to "#9ca3af"
+)
 
 private fun distanceMeters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
     val out = FloatArray(1)
@@ -220,27 +229,53 @@ private fun distanceMeters(lat1: Double, lon1: Double, lat2: Double, lon2: Doubl
     return out[0].toDouble()
 }
 
+private fun normalizeWeather(condition: String?): String {
+    return when (condition) {
+        "rainy" -> "rainy"
+        "cloudy" -> "cloudy"
+        else -> "sunny"
+    }
+}
+
 private fun nearbyFeatureCollection(
     places: List<NearbyPlace>,
     userLat: Double?,
     userLng: Double?,
+    weatherCondition: String?,
     focusedId: String?
 ): FeatureCollection {
-    // Distance-to-user drives the halo radius. Without a fix, everything is mid-size.
     val dists = if (userLat != null && userLng != null) {
         places.associate { it.id to distanceMeters(userLat, userLng, it.latitude, it.longitude) }
     } else emptyMap()
     val maxDist = dists.values.maxOrNull() ?: 1.0
+
+    val weather = normalizeWeather(weatherCondition)
+    val haloColor = when (weather) {
+        "sunny" -> "rgba(251, 191, 36, 0.22)"
+        "cloudy" -> "rgba(96, 165, 250, 0.18)"
+        "rainy" -> "rgba(167, 139, 250, 0.18)"
+        else -> "rgba(198, 154, 63, 0.18)"
+    }
+    val strokeColor = when (weather) {
+        "sunny" -> "#fbbf24"
+        "cloudy" -> "#60a5fa"
+        "rainy" -> "#a78bfa"
+        else -> "#c69a3f"
+    }
 
     val features = places.map { place ->
         val d = dists[place.id]
         // weight 1 = closest/biggest, 0 = farthest/smallest.
         val weight = if (d != null && maxDist > 0) (1.0 - d / maxDist) else 0.5
         val haloRadius = (16f + (weight * 24f)).toFloat() + if (place.id == focusedId) 8f else 0f
+        val color = CATEGORY_COLORS[place.category] ?: "#9ca3af"
+
         Feature.fromGeometry(Point.fromLngLat(place.longitude, place.latitude)).apply {
             addStringProperty("id", place.id)
             addStringProperty("name", place.name)
-            addStringProperty("color", LIVE_POI_PIN)
+            addStringProperty("color", color)
+            addStringProperty("haloColor", haloColor)
+            addStringProperty("strokeColor", strokeColor)
             addNumberProperty("haloRadius", haloRadius)
             addBooleanProperty("selected", place.id == focusedId)
         }
@@ -252,13 +287,13 @@ private fun addBubbleLayer(style: Style) {
     if (style.getSource(PLACES_SOURCE_ID) != null) return
     style.addSource(GeoJsonSource(PLACES_SOURCE_ID, FeatureCollection.fromFeatures(emptyList())))
 
-    // 1) Translucent blue halo sized by distance-to-user, same bubble feel as web.
+    // 1) Translucent weather-tinted halo sized by distance-to-user
     style.addLayer(
         CircleLayer(HALO_LAYER_ID, PLACES_SOURCE_ID).withProperties(
             PropertyFactory.circleRadius(Expression.get("haloRadius")),
-            PropertyFactory.circleColor(LIVE_POI_HALO),
+            PropertyFactory.circleColor(Expression.toColor(Expression.get("haloColor"))),
             PropertyFactory.circleOpacity(0.24f),
-            PropertyFactory.circleStrokeColor(LIVE_POI_HALO),
+            PropertyFactory.circleStrokeColor(Expression.toColor(Expression.get("strokeColor"))),
             PropertyFactory.circleStrokeWidth(
                 Expression.switchCase(
                     Expression.eq(Expression.get("selected"), Expression.literal(true)),
@@ -270,7 +305,7 @@ private fun addBubbleLayer(style: Style) {
         )
     )
 
-    // 2) Solid category-coloured pin dot (the marker itself).
+    // 2) Solid category-coloured pin dot (the marker itself)
     style.addLayer(
         CircleLayer(PIN_LAYER_ID, PLACES_SOURCE_ID).withProperties(
             PropertyFactory.circleRadius(
@@ -292,7 +327,7 @@ private fun addBubbleLayer(style: Style) {
         )
     )
 
-    // 3) Real POI name label under the pin.
+    // 3) Real POI name label under the pin
     style.addLayer(
         SymbolLayer(LABEL_LAYER_ID, PLACES_SOURCE_ID).withProperties(
             PropertyFactory.textField(Expression.get("name")),
@@ -306,6 +341,28 @@ private fun addBubbleLayer(style: Style) {
             PropertyFactory.textHaloWidth(1.4f)
         )
     )
+}
+
+// Enhance base POI labels from style layer (parity with web enhanceBasePoiLabels)
+private fun enhanceBasePoiLabels(style: Style) {
+    try {
+        for (layer in style.layers) {
+            val id = (layer.id ?: "").lowercase()
+            if (layer is SymbolLayer) {
+                val sourceLayer = (layer.sourceLayer ?: "").lowercase()
+                if (id.contains("poi") || sourceLayer.contains("poi")) {
+                    layer.setProperties(
+                        PropertyFactory.visibility(Property.VISIBLE),
+                        PropertyFactory.textColor("#ECE0C6"),
+                        PropertyFactory.textHaloColor("#15100A"),
+                        PropertyFactory.textHaloWidth(1.3f)
+                    )
+                }
+            }
+        }
+    } catch (e: Exception) {
+        // ignore
+    }
 }
 
 @Composable
@@ -424,12 +481,14 @@ private fun ExploreMapView(
         isStyleLoaded = false
         mapView.getMapAsync { map ->
             map.setStyle(Style.Builder().fromUri(styleUrl)) { style ->
+                enhanceBasePoiLabels(style)
                 addBubbleLayer(style)
                 (style.getSource(PLACES_SOURCE_ID) as? GeoJsonSource)?.setGeoJson(
                     nearbyFeatureCollection(
                         state.nearbyPlaces,
                         state.userLatitude,
                         state.userLongitude,
+                        state.areaWeather?.condition,
                         state.focusedPlaceId
                     )
                 )
@@ -450,6 +509,7 @@ private fun ExploreMapView(
                         state.nearbyPlaces,
                         state.userLatitude,
                         state.userLongitude,
+                        state.areaWeather?.condition,
                         state.focusedPlaceId
                     )
                 )
