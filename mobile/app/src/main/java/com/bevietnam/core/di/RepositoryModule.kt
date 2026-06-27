@@ -3,6 +3,7 @@ package com.bevietnam.core.di
 import com.bevietnam.core.data.repository.AuthRepository
 import com.bevietnam.core.data.repository.UserRepository
 import com.bevietnam.core.data.mock.MockPlaceRepository
+import com.bevietnam.core.data.repository.PlaceRepository
 import com.bevietnam.core.data.mock.MockFeedRepository
 import com.bevietnam.core.data.mock.MockTaskRepository
 import com.bevietnam.core.data.repository.FeedRepository
@@ -30,7 +31,7 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPlaceRepository(
-        placeRepository: MockPlaceRepository
+        placeRepository: PlaceRepository
     ): IPlaceRepository
 
     @Binds
