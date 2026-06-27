@@ -471,6 +471,15 @@ private fun ExploreMapView(
                     onPlaceFocused(placeId) // null when tapping empty space
                     true
                 }
+
+                // Query nearby POIs and weather dynamically when camera moves/zooms
+                map.addOnCameraIdleListener {
+                    val center = map.cameraPosition.target
+                    val zoom = map.cameraPosition.zoom
+                    if (zoom >= 13.0 && center != null) {
+                        onUserLocated(center.latitude, center.longitude)
+                    }
+                }
             }
         }
     }
