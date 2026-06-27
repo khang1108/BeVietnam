@@ -28,8 +28,8 @@ class GoongMapService:
 
     @property
     def _api_key(self) -> str:
-        # Prioritize server-side GOONG_API_KEY for all backend requests to avoid domain/referer restriction issues
-        return settings.GOONG_API_KEY or settings.GOONG_MAPTILES_KEY
+        # Prioritize server-side GOONG_MAPTILES_KEY for map/tile requests
+        return settings.GOONG_MAPTILES_KEY or settings.GOONG_API_KEY
 
     def backend_style_url(self) -> str:
         return f"{settings.PUBLIC_API_BASE_URL.rstrip('/')}/maps/style"

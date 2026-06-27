@@ -115,6 +115,7 @@ root_env = [
     ("FEED_IMAGE_PREFIX", get(values, "FEED_IMAGE_PREFIX", "feed-posts")),
     "",
     ("GOONG_API_KEY", get(values, "GOONG_API_KEY")),
+    ("GOONG_MAPTILES_KEY", get(values, "GOONG_MAPTILES_KEY")),
     ("GOONG_BASE_URL", get(values, "GOONG_BASE_URL", "https://rsapi.goong.io")),
     ("GOONG_TIMEOUT", get(values, "GOONG_TIMEOUT", "10")),
     ("OPENWEATHER_API_KEY", get(values, "OPENWEATHER_API_KEY")),

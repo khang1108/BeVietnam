@@ -55,6 +55,11 @@ async def proxy_map_asset(
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except (httpx.RequestError, httpx.HTTPStatusError) as exc:
-        logger.warning("Goong map proxy failed: %s", exc)
+    except httpx.HTTPStatusError as exc:
+        status_code = exc.response.status_code
+        if status_code != 404:
+            logger.warning("Goong map proxy upstream returned %d: %s", status_code, exc)
+        raise HTTPException(status_code=status_code, detail="Map asset is unavailable") from exc
+    except httpx.RequestError as exc:
+        logger.warning("Goong map proxy connection failed: %s", exc)
         raise HTTPException(status_code=502, detail="Map asset is unavailable") from exc
