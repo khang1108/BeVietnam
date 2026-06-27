@@ -322,8 +322,8 @@ def main() -> int:
     parser.add_argument("--dataset-id", default="", help="Collection slug (default: derived from --out)")
     parser.add_argument("--dataset-name", default="", help="Human collection name (default: derived)")
     parser.add_argument(
-        "--provider", choices=sorted(GATEWAYS), default="vllm",
-        help="LLM provider for extraction (default: vllm)",
+        "--provider", choices=sorted(GATEWAYS), default="gemini",
+        help="LLM provider for extraction (default: gemini)",
     )
     parser.add_argument("--limit", type=int, default=0, help="Cap chunks per book sent to LLM (0 = all)")
     parser.add_argument("--dry-run", action="store_true", help="Parse + chunk only; no LLM calls")

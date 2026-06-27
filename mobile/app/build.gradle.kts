@@ -1,6 +1,3 @@
-import java.util.Properties
-import java.io.FileInputStream
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -22,17 +19,6 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        // Load local.properties
-        val localProperties = Properties()
-        val localPropertiesFile = rootProject.file("local.properties")
-        if (localPropertiesFile.exists()) {
-            localProperties.load(FileInputStream(localPropertiesFile))
-        }
-        val goongKey = localProperties.getProperty("GOONG_MAPTILES_KEY") ?: ""
-
-        // BuildConfig field for Goong MapTiles Key
-        buildConfigField("String", "GOONG_MAPTILES_KEY", "\"$goongKey\"")
     }
 
     buildTypes {

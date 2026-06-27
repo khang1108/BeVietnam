@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     GOONG_BASE_URL: str = "https://rsapi.goong.io"
     GOONG_TIMEOUT: int = 10
 
+    # Goong MapTiles proxy. Android reads map config from backend, not local.properties.
+    GOONG_MAPTILES_KEY: str = ""
+    GOONG_MAP_STYLE_URL: str = "https://tiles.goong.io/assets/goong_map_dark.json"
+
     # OpenWeather context enrichment. Leave key empty for local fallback mode.
     OPENWEATHER_API_KEY: str = ""
     OPENWEATHER_BASE_URL: str = "https://api.openweathermap.org/data/2.5"

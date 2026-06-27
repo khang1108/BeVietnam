@@ -1,6 +1,7 @@
 package com.bevietnam.core.domain.repository
 
 import com.bevietnam.core.model.AreaWeather
+import com.bevietnam.core.model.MapConfig
 import com.bevietnam.core.model.NearbyPlace
 import com.bevietnam.core.model.Place
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +28,11 @@ interface IPlaceRepository {
      * @return Một [Flow] phát ra đối tượng địa danh [Place] nếu tìm thấy, hoặc `null` nếu không tồn tại.
      */
     fun getPlaceDetail(id: String): Flow<Place?>
+
+    /**
+     * Lấy cấu hình bản đồ backend-hosted cho MapLibre.
+     */
+    suspend fun getMapConfig(): MapConfig
 
     /**
      * Lấy danh sách POI thực tế (Foursquare) trong bán kính quanh một tọa độ.

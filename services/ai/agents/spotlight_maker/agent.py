@@ -3,8 +3,8 @@ Spotlight Maker — feed post generator.
 
 Composes an authored SpotlightPost for a place, grounded ONLY in cultural facts
 retrieved by Culture Scout, and assigns condition tags (weather/time/season)
-from the controlled vocab. The LLM (self-hosted vLLM) phrases the post; on any
-failure a source-backed fallback post is used so the feed never goes empty.
+from the controlled vocab. The LLM (Gemini) phrases the post; on any failure a source-backed fallback post
+is used so the feed never goes empty.
 
 The agent is stateless — facts and context come from the caller. A batch
 authoring script iterates POIs, validates each post (SpotlightPost schema +
@@ -22,7 +22,7 @@ from typing import Any
 
 from services.ai.agents.spotlight_maker.fallback import get_fallback_spotlight
 from services.ai.agents.spotlight_maker.prompts import SYSTEM_PROMPT, build_user_prompt
-from services.ai.common.llm import vllm_gateway
+from services.ai.common.llm import llm_gateway
 from services.ai.common.post_schema import SEASON_TAGS, TIME_TAGS, WEATHER_TAGS
 
 logger = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ class SpotlightMaker:
             logger.warning("SpotlightMaker: no grounded facts for '%s'", place_name)
             return {}
 
-        result = vllm_gateway.generate_json(
+        result = llm_gateway.generate_json(
             SYSTEM_PROMPT, build_user_prompt(place_name, facts, language)
         )
 

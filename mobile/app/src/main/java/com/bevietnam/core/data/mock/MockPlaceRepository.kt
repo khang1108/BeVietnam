@@ -2,9 +2,11 @@ package com.bevietnam.core.data.mock
 
 import com.bevietnam.core.data.remote.api.BeVietnamApi
 import com.bevietnam.core.data.remote.mapper.toAreaWeather
+import com.bevietnam.core.data.remote.mapper.toMapConfig
 import com.bevietnam.core.data.remote.mapper.toNearbyPlace
 import com.bevietnam.core.domain.repository.IPlaceRepository
 import com.bevietnam.core.model.AreaWeather
+import com.bevietnam.core.model.MapConfig
 import com.bevietnam.core.model.NearbyPlace
 import com.bevietnam.core.model.Place
 import kotlinx.coroutines.delay
@@ -52,6 +54,8 @@ class MockPlaceRepository @Inject constructor(
         val place = mockPlaces.find { it.id == id }
         emit(place)
     }
+
+    override suspend fun getMapConfig(): MapConfig = api.getMapConfig().toMapConfig()
 
     // Nearby POIs + weather are live (real backend) even though curated places are mocked.
     override suspend fun getNearby(lat: Double, lng: Double, radius: Int, limit: Int): List<NearbyPlace> =

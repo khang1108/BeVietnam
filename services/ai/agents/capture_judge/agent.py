@@ -21,7 +21,7 @@ import logging
 import httpx
 
 from services.ai.agents.capture_judge.reference import get_reference_image
-from services.ai.common.llm import vllm_gateway
+from services.ai.common.llm import llm_gateway
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +131,7 @@ class CaptureJudge:
             images.append(reference)
         images.append(user_image)
 
-        result = vllm_gateway.generate_json_multimodal(
+        result = llm_gateway.generate_json_multimodal(
             system_prompt=_RUBRIC_SYSTEM,
             user_prompt=_user_prompt(task, has_reference=reference is not None),
             images=images,

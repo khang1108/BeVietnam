@@ -4,6 +4,7 @@ import com.bevietnam.core.data.remote.api.dto.AuthResponseDto
 import com.bevietnam.core.data.remote.api.dto.FeedResponseDto
 import com.bevietnam.core.data.remote.api.dto.HealthResponseDto
 import com.bevietnam.core.data.remote.api.dto.LoginRequestDto
+import com.bevietnam.core.data.remote.api.dto.MapConfigDto
 import com.bevietnam.core.data.remote.api.dto.NearbyResponseDto
 import com.bevietnam.core.data.remote.api.dto.PlacesResponseDto
 import com.bevietnam.core.data.remote.api.dto.RegisterRequestDto
@@ -46,6 +47,12 @@ interface BeVietnamApi {
         @retrofit2.http.Query("limit") limit: Int = 10,
         @retrofit2.http.Query("offset") offset: Int = 0
     ): PlacesResponseDto
+
+    /**
+     * Cấu hình bản đồ do backend cung cấp (style URL, camera mặc định).
+     */
+    @GET("maps/config")
+    suspend fun getMapConfig(): MapConfigDto
 
     /**
      * Live POIs quanh vị trí người dùng (Foursquare proxy) cho bản đồ Khám phá.

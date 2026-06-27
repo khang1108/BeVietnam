@@ -15,6 +15,9 @@ scripts/vm_secrets.env
 scripts/vm_full_setup.local.sh
 scripts/setup.sh
 scripts/setup.sh.bak
+azure-backend.env
+azure-*-settings.json
+azure-credentials.json
 
 # ─── Python ────────────────────────────────────────────
 __pycache__/

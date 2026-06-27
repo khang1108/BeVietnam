@@ -49,7 +49,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.bevietnam.BuildConfig
 import com.bevietnam.R
 import com.bevietnam.core.model.AreaWeather
 import com.bevietnam.core.model.NearbyPlace
@@ -211,16 +210,9 @@ private const val HALO_LAYER_ID = "bv-places-halo"
 private const val PIN_LAYER_ID = "bv-places-pin"
 private const val LABEL_LAYER_ID = "bv-places-label"
 
-// Colour per coarse bucket returned by the backend. Default = gold.
-private fun bubbleColorFor(bucket: String): String = when (bucket) {
-    "history" -> "#B23A2E"   // lacquer red
-    "culture" -> "#C69A3F"   // imperial gold
-    "nature" -> "#3E7C5A"    // jade green
-    "lodging" -> "#3B6EA5"   // blue
-    "food" -> "#E07A3F"      // terracotta
-    "place" -> "#8A6D3B"     // bronze
-    else -> "#C69A3F"
-}
+// Match web map: every live POI is an orange pin with a soft blue bubble halo.
+private const val LIVE_POI_PIN = "#F97316"
+private const val LIVE_POI_HALO = "#60A5FA"
 
 private fun distanceMeters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
     val out = FloatArray(1)
@@ -248,7 +240,7 @@ private fun nearbyFeatureCollection(
         Feature.fromGeometry(Point.fromLngLat(place.longitude, place.latitude)).apply {
             addStringProperty("id", place.id)
             addStringProperty("name", place.name)
-            addStringProperty("color", bubbleColorFor(place.category))
+            addStringProperty("color", LIVE_POI_PIN)
             addNumberProperty("haloRadius", haloRadius)
             addBooleanProperty("selected", place.id == focusedId)
         }
@@ -260,13 +252,13 @@ private fun addBubbleLayer(style: Style) {
     if (style.getSource(PLACES_SOURCE_ID) != null) return
     style.addSource(GeoJsonSource(PLACES_SOURCE_ID, FeatureCollection.fromFeatures(emptyList())))
 
-    // 1) Translucent gold halo sized by distance-to-user.
+    // 1) Translucent blue halo sized by distance-to-user, same bubble feel as web.
     style.addLayer(
         CircleLayer(HALO_LAYER_ID, PLACES_SOURCE_ID).withProperties(
             PropertyFactory.circleRadius(Expression.get("haloRadius")),
-            PropertyFactory.circleColor("#C69A3F"),
-            PropertyFactory.circleOpacity(0.18f),
-            PropertyFactory.circleStrokeColor("#C69A3F"),
+            PropertyFactory.circleColor(LIVE_POI_HALO),
+            PropertyFactory.circleOpacity(0.24f),
+            PropertyFactory.circleStrokeColor(LIVE_POI_HALO),
             PropertyFactory.circleStrokeWidth(
                 Expression.switchCase(
                     Expression.eq(Expression.get("selected"), Expression.literal(true)),
@@ -284,8 +276,8 @@ private fun addBubbleLayer(style: Style) {
             PropertyFactory.circleRadius(
                 Expression.switchCase(
                     Expression.eq(Expression.get("selected"), Expression.literal(true)),
-                    Expression.literal(8f),
-                    Expression.literal(6f)
+                    Expression.literal(7f),
+                    Expression.literal(5.5f)
                 )
             ),
             PropertyFactory.circleColor(Expression.toColor(Expression.get("color"))),
@@ -330,6 +322,7 @@ private fun ExploreMapView(
     val lifecycleOwner = LocalLifecycleOwner.current
     val listState = rememberLazyListState()
     var mapState by remember { mutableStateOf<MapLibreMap?>(null) }
+    var isStyleLoaded by remember { mutableStateOf(false) }
 
     // Get the real user position, then pull live POIs + weather around it.
     val fusedClient = remember {
@@ -402,16 +395,10 @@ private fun ExploreMapView(
             onCreate(null)
             getMapAsync { map ->
                 mapState = map
-                map.setStyle(
-                    Style.Builder().fromUri("https://tiles.goong.io/assets/goong_map_web.json?api_key=${BuildConfig.GOONG_MAPTILES_KEY}")
-                ) { style ->
-                    addBubbleLayer(style)
-                }
-
-                val daNangLocation = LatLng(16.047079, 108.206230)
+                val initialLocation = LatLng(state.mapInitialLatitude, state.mapInitialLongitude)
                 map.cameraPosition = CameraPosition.Builder()
-                    .target(daNangLocation)
-                    .zoom(5.5)
+                    .target(initialLocation)
+                    .zoom(state.mapInitialZoom)
                     .build()
 
                 map.uiSettings.isCompassEnabled = false
@@ -432,9 +419,29 @@ private fun ExploreMapView(
     }
 
 
+    LaunchedEffect(state.mapStyleUrl) {
+        val styleUrl = state.mapStyleUrl ?: return@LaunchedEffect
+        isStyleLoaded = false
+        mapView.getMapAsync { map ->
+            map.setStyle(Style.Builder().fromUri(styleUrl)) { style ->
+                addBubbleLayer(style)
+                (style.getSource(PLACES_SOURCE_ID) as? GeoJsonSource)?.setGeoJson(
+                    nearbyFeatureCollection(
+                        state.nearbyPlaces,
+                        state.userLatitude,
+                        state.userLongitude,
+                        state.focusedPlaceId
+                    )
+                )
+                isStyleLoaded = true
+            }
+        }
+    }
+
     // Sync bubbles: rebuild the GeoJSON source from the live nearby POIs whenever
     // the data, the user position, or the selection changes.
-    LaunchedEffect(state.nearbyPlaces, state.userLatitude, state.userLongitude, state.focusedPlaceId) {
+    LaunchedEffect(state.nearbyPlaces, state.userLatitude, state.userLongitude, state.focusedPlaceId, isStyleLoaded) {
+        if (!isStyleLoaded) return@LaunchedEffect
         mapView.getMapAsync { map ->
             map.style?.let { style ->
                 addBubbleLayer(style) // no-op if already present
@@ -470,6 +477,23 @@ private fun ExploreMapView(
 
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(factory = { mapView }, modifier = Modifier.fillMaxSize())
+
+        if (!state.mapEnabled || state.mapStyleUrl == null) {
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(24.dp),
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                tonalElevation = 2.dp
+            ) {
+                Text(
+                    text = "Bản đồ chưa sẵn sàng. Kiểm tra cấu hình backend.",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                )
+            }
+        }
 
         // Live area weather (temp / UV / rain) around the user.
         state.areaWeather?.let { weather ->

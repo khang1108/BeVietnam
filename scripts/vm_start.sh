@@ -171,7 +171,7 @@ load_env() {
   export AI_CORE_BASE_URL="${AI_CORE_BASE_URL:-http://127.0.0.1:$AI_PORT}"
   export AI_CORE_USE_MOCK="${AI_CORE_USE_MOCK:-false}"
   export AI_CORE_TIMEOUT="${AI_CORE_TIMEOUT:-300}"
-  export LLM_PROVIDER="${LLM_PROVIDER:-vllm}"
+  export LLM_PROVIDER="${LLM_PROVIDER:-gemini}"
 }
 
 ensure_python_tooling() {

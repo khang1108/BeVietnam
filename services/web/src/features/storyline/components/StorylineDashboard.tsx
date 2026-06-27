@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styles from '../styles/storyline.module.css';
 import { storylineApi, type QuestTask, type StorylineTaskDetail } from '@/lib/api';
 import { useI18n } from '@/i18n';
+import { useAuth } from '@/hooks/useAuth';
 
 const QUEST_IMAGES = [
     '/images/hero-hue-citadel.png',
@@ -37,6 +38,7 @@ interface ActiveTaskState extends StorylineTaskDetail {
 
 export function StorylineDashboard() {
     const { t } = useI18n();
+    const { user } = useAuth();
     const [tasks, setTasks] = useState<QuestTask[]>(FALLBACK_TASKS);
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -47,22 +49,7 @@ export function StorylineDashboard() {
     const [selectedPlace, setSelectedPlace] = useState<{ task: QuestTask; index: number } | null>(null);
     const [cameraActive, setCameraActive] = useState(false);
     const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
-    const [savedMoments, setSavedMoments] = useState<CheckInMoment[]>(() => {
-        if (typeof window === 'undefined') {
-            return [];
-        }
-
-        const saved = localStorage.getItem('bevietnam-checkin-moments');
-        if (!saved) {
-            return [];
-        }
-
-        try {
-            return JSON.parse(saved);
-        } catch {
-            return [];
-        }
-    });
+    const [savedMoments, setSavedMoments] = useState<CheckInMoment[]>([]);
     const [showGallery, setShowGallery] = useState(false);
     const [savingMoment, setSavingMoment] = useState(false);
     const [cameraError, setCameraError] = useState<string | null>(null);
@@ -74,15 +61,57 @@ export function StorylineDashboard() {
     const completedCount = tasks.filter((_t, i) => _t.status === 'completed' || i < currentStep - 1).length;
     const progressPercent = Math.round((completedCount / tasks.length) * 100);
 
+    // Load saved moments dynamically based on user
+    useEffect(() => {
+        const userId = user?.id || 'guest';
+        const storageKey = `bevietnam-checkin-moments-${userId}`;
+        const saved = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null;
+        if (saved) {
+            try {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
+                setSavedMoments(JSON.parse(saved));
+            } catch {
+                setSavedMoments([]);
+            }
+        } else {
+            setSavedMoments([]);
+        }
+    }, [user]);
+
     const loadQuestChain = useCallback(async () => {
-        const res = await storylineApi.getQuestChain();
+        const userId = user?.id || 'demo-user';
+        const res = await storylineApi.getQuestChain(userId);
         if (res.data && res.data.tasks.length > 0) {
-            setTasks(res.data.tasks);
-            const activeIdx = res.data.tasks.findIndex((t) => t.status === 'active');
-            setCurrentStep(activeIdx >= 0 ? activeIdx + 1 : 1);
+            // Read saved moments to determine completed status
+            const storageKey = `bevietnam-checkin-moments-${user?.id || 'guest'}`;
+            const savedStr = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null;
+            const moments: CheckInMoment[] = savedStr ? JSON.parse(savedStr) : [];
+            const completedTaskIds = new Set(moments.map((m) => m.taskId));
+
+            const updatedTasks = res.data.tasks.map((task) => {
+                if (completedTaskIds.has(task.task_id)) {
+                    return { ...task, status: 'completed' as const };
+                }
+                return task;
+            });
+
+            // Find the first task that is not completed
+            const firstActiveIdx = updatedTasks.findIndex((t) => t.status !== 'completed');
+            const finalTasks = updatedTasks.map((task, i) => {
+                if (i === firstActiveIdx) {
+                    return { ...task, status: 'active' as const };
+                }
+                if (task.status !== 'completed') {
+                    return { ...task, status: 'locked' as const };
+                }
+                return task;
+            });
+
+            setTasks(finalTasks);
+            setCurrentStep(firstActiveIdx >= 0 ? firstActiveIdx + 1 : res.data.tasks.length + 1);
         }
         setLoading(false);
-    }, []);
+    }, [user]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -194,12 +223,14 @@ export function StorylineDashboard() {
             timestamp: new Date().toISOString(),
         };
 
+        const userId = user?.id || 'demo-user';
+        const storageKey = `bevietnam-checkin-moments-${user?.id || 'guest'}`;
         const updatedMoments = [...savedMoments, moment];
         setSavedMoments(updatedMoments);
 
         // Save to localStorage
         if (typeof window !== 'undefined') {
-            localStorage.setItem('bevietnam-checkin-moments', JSON.stringify(updatedMoments));
+            localStorage.setItem(storageKey, JSON.stringify(updatedMoments));
         }
 
         // Unlock next place
@@ -211,16 +242,16 @@ export function StorylineDashboard() {
         let res: Awaited<ReturnType<typeof storylineApi.getNextTask>>;
         try {
             if (!navigator.geolocation) {
-                res = await storylineApi.getNextTask();
+                res = await storylineApi.getNextTask({}, userId);
             } else {
                 const position = await getCurrentPosition();
                 res = await storylineApi.getNextTask({
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
-                });
+                }, userId);
             }
         } catch {
-            res = await storylineApi.getNextTask();
+            res = await storylineApi.getNextTask({}, userId);
         } finally {
             setGeneratingTask(false);
         }

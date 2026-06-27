@@ -5,19 +5,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@/i18n';
 import { questionPoolApi, storylineApi, type QuestionPoolItem, type VerifyCaptureResponse } from '@/lib/api';
 import styles from './path.module.css';
+import { useAuth } from '@/hooks/useAuth';
 
-const STORAGE_KEY = 'bevietnam-completed-questions';
 // Winding amplitude for the zig-zag trail (px).
 const SWING = 92;
-
-function loadCompleted(): string[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  } catch {
-    return [];
-  }
-}
 
 function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -30,6 +21,7 @@ function readFileAsDataUrl(file: File): Promise<string> {
 
 export default function StorylinePage() {
   const { t } = useI18n();
+  const { user } = useAuth();
   const [questions, setQuestions] = useState<QuestionPoolItem[]>([]);
   const [completedIds, setCompletedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +37,19 @@ export default function StorylinePage() {
 
   useEffect(() => {
     setIsClient(true);
-    setCompletedIds(loadCompleted());
+    const userId = user?.id || 'guest';
+    const storageKey = `bevietnam-completed-questions-${userId}`;
+    const saved = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null;
+    let completed: string[] = [];
+    if (saved) {
+      try {
+        completed = JSON.parse(saved);
+      } catch {
+        completed = [];
+      }
+    }
+    setCompletedIds(completed);
+
     (async () => {
       const res = await questionPoolApi.list();
       if (res.data && res.data.items.length > 0) {
@@ -55,7 +59,7 @@ export default function StorylinePage() {
       }
       setLoading(false);
     })();
-  }, []);
+  }, [user]);
 
   const activeIndex = questions.findIndex((q) => !completedIds.includes(q.question_id));
   const currentActive = activeIndex === -1 ? questions.length : activeIndex;
@@ -96,8 +100,11 @@ export default function StorylinePage() {
     setVerifying(true);
     setResult(null);
 
+    const userId = user?.id || 'demo-user';
+    const storageKey = `bevietnam-completed-questions-${user?.id || 'guest'}`;
+
     const res = await storylineApi.verifyCapture({
-      user_id: 'demo-user',
+      user_id: userId,
       task: {
         question_id: q.question_id,
         title: q.title,
@@ -125,7 +132,7 @@ export default function StorylinePage() {
     if (res.data.approved) {
       const next = [...completedIds, q.question_id];
       setCompletedIds(next);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      localStorage.setItem(storageKey, JSON.stringify(next));
     }
   }
 

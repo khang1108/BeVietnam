@@ -141,7 +141,8 @@ root_env = [
     ("MINIO_CONSOLE_PORT", get(values, "MINIO_CONSOLE_PORT", "9001")),
     "",
     ("GEMINI_API_KEY", get(values, "GEMINI_API_KEY")),
-    ("LLM_PROVIDER", get(values, "LLM_PROVIDER", "vllm")),
+    ("GEMINI_MODEL", get(values, "GEMINI_MODEL", "gemini-2.0-flash")),
+    ("LLM_PROVIDER", get(values, "LLM_PROVIDER", "gemini")),
     ("VLLM_BASE_URL", root_vllm_base_url),
     ("VLLM_MODEL", get(values, "ROOT_VLLM_MODEL", vllm_served_name)),
     ("VLLM_API_KEY", get(values, "VLLM_API_KEY")),
@@ -167,8 +168,8 @@ root_env = [
     ("RUN_MIGRATIONS", get(values, "RUN_MIGRATIONS", "1")),
     ("INSTALL_DEPS", get(values, "INSTALL_DEPS", "auto")),
     ("AUTO_APT_INSTALL", get(values, "AUTO_APT_INSTALL", "1")),
-    ("START_VLLM", get(values, "START_VLLM", "1")),
-    ("START_VLLM_TUNNEL", get(values, "START_VLLM_TUNNEL", "1")),
+    ("START_VLLM", get(values, "START_VLLM", "0")),
+    ("START_VLLM_TUNNEL", get(values, "START_VLLM_TUNNEL", "0")),
 ]
 
 vllm_env = [

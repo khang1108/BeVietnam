@@ -43,6 +43,11 @@ sealed class ExploreUiState {
         val searchQuery: String = "",
         val isMapView: Boolean = true,
         val focusedPlaceId: String? = null,
+        val mapEnabled: Boolean = false,
+        val mapStyleUrl: String? = null,
+        val mapInitialLatitude: Double = 16.047079,
+        val mapInitialLongitude: Double = 108.206230,
+        val mapInitialZoom: Double = 5.5,
         // Live data quanh vị trí người dùng (Foursquare + thời tiết) cho bubble động.
         val nearbyPlaces: List<NearbyPlace> = emptyList(),
         val areaWeather: AreaWeather? = null,
@@ -105,13 +110,32 @@ class ExploreViewModel @Inject constructor(
                     _uiState.value = if (places.isEmpty()) {
                         ExploreUiState.Empty
                     } else {
-                        ExploreUiState.Success(places = places, filteredPlaces = places)
+                        ExploreUiState.Success(places = places, filteredPlaces = places).also {
+                            loadMapConfig()
+                        }
                     }
                 }
             } catch (e: CancellationException) {
                 throw e // Không nuốt CancellationException — để coroutine hủy đúng cách
             } catch (e: Exception) {
                 _uiState.value = ExploreUiState.Error(e.message ?: "Đã xảy ra lỗi không xác định")
+            }
+        }
+    }
+
+    private fun loadMapConfig() {
+        viewModelScope.launch {
+            val mapConfig = runCatching { placeRepository.getMapConfig() }.getOrNull() ?: return@launch
+            _uiState.update { currentState ->
+                if (currentState is ExploreUiState.Success) {
+                    currentState.copy(
+                        mapEnabled = mapConfig.enabled,
+                        mapStyleUrl = mapConfig.styleUrl,
+                        mapInitialLatitude = mapConfig.initialLatitude,
+                        mapInitialLongitude = mapConfig.initialLongitude,
+                        mapInitialZoom = mapConfig.initialZoom
+                    )
+                } else currentState
             }
         }
     }

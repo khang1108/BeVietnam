@@ -57,7 +57,8 @@ Settings → Secrets and variables → Actions.
 | `ACR_NAME` | `bevietnamacr` |
 | `AZURE_RESOURCE_GROUP` | `bevietnam-rg` |
 | `AZURE_WEBAPP_NAME` | `bevietnam-web` |
-| `NEXT_PUBLIC_API_URL` | `https://api.iamphuckhang.dev/api/v1` |
+| `AZURE_BACKEND_WEBAPP_NAME` | `bevietnam-backend` |
+| `NEXT_PUBLIC_API_URL` | `https://bevietnam-backend.azurewebsites.net/api/v1` |
 
 **Secrets:**
 
@@ -66,11 +67,36 @@ Settings → Secrets and variables → Actions.
 | `AZURE_CREDENTIALS` | the `--sdk-auth` JSON from step 2 |
 | `NEXT_PUBLIC_GOONG_API_KEY` | your Goong **Maptiles** key |
 
-`NEXT_PUBLIC_API_URL` points at the backend once it is deployed (the AI service is
-separate, served at `api.iamphuckhang.dev` from the VM). Update the variable and
-re-run the workflow whenever the backend URL changes — it is baked into the image.
+`NEXT_PUBLIC_API_URL` points at the Azure backend once it is deployed. Update the
+variable and re-run the workflow whenever the backend URL changes — it is baked
+into the image.
 
-## 4. Deploy
+## 4. Backend App Service
+
+Create a separate backend Web App for Containers that listens on port 8000. The
+backend deploy workflow uses `AZURE_BACKEND_WEBAPP_NAME` and builds
+`services/backend/Dockerfile`.
+
+Required backend App Service settings:
+
+```bash
+az webapp config appsettings set -g "$RG" -n bevietnam-backend --settings \
+  WEBSITES_PORT=8000 \
+  DATABASE_URL='<postgresql+asyncpg://...>' \
+  SECRET_KEY='<production-secret>' \
+  PUBLIC_API_BASE_URL='https://bevietnam-backend.azurewebsites.net/api/v1' \
+  ALLOWED_ORIGINS='["https://bevietnam-web.azurewebsites.net"]' \
+  AI_CORE_BASE_URL='<ai-core-url>' \
+  AI_CORE_USE_MOCK=false \
+  GEMINI_API_KEY='<gemini-key>' \
+  LLM_PROVIDER=gemini
+```
+
+Also configure storage/provider keys used by enabled features: `MINIO_*`,
+`GOONG_API_KEY`, `GOONG_MAPTILES_KEY`, `OPENWEATHER_API_KEY`, and
+`FOURSQUARE_API_KEY`.
+
+## 5. Deploy
 
 Push to `main` touching `services/web/**`, or run the **Deploy web to Azure**
 workflow manually (`workflow_dispatch`). The workflow:
@@ -81,7 +107,7 @@ workflow manually (`workflow_dispatch`). The workflow:
 
 App URL: `https://<AZURE_WEBAPP_NAME>.azurewebsites.net`.
 
-## 5. Custom domain (optional)
+## 6. Custom domain (optional)
 
 ```bash
 az webapp config hostname add -g "$RG" --webapp-name "$APP" --hostname www.iamphuckhang.dev

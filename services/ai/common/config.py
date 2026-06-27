@@ -61,8 +61,8 @@ class Settings(BaseSettings):
     # Where downloaded reference images are cached (one per task, reused).
     reference_cache_dir: str = "data/reference_images"
 
-    # ── LLM (self-hosted vLLM — OpenAI-compatible, replaces quota-dead Gemini) ─
-    # Served by vllm_hosting/ on a Thundercompute L40, exposed via cloudflared.
+    # ── LLM (optional legacy self-hosted vLLM — OpenAI-compatible) ─────────────
+    # Disabled by default; Gemini is the primary runtime provider.
     vllm_base_url: str = "https://api.iamphuckhang.dev/v1"
     vllm_model: str = "qwen2.5-14b-instruct"  # the --served-model-name
     vllm_api_key: str = ""  # empty = open endpoint
