@@ -251,12 +251,6 @@ private fun nearbyFeatureCollection(
 
     val weather = normalizeWeather(weatherCondition)
     val haloColor = when (weather) {
-        "sunny" -> "rgba(251, 191, 36, 0.22)"
-        "cloudy" -> "rgba(96, 165, 250, 0.18)"
-        "rainy" -> "rgba(167, 139, 250, 0.18)"
-        else -> "rgba(198, 154, 63, 0.18)"
-    }
-    val strokeColor = when (weather) {
         "sunny" -> "#fbbf24"
         "cloudy" -> "#60a5fa"
         "rainy" -> "#a78bfa"
@@ -275,7 +269,7 @@ private fun nearbyFeatureCollection(
             addStringProperty("name", place.name)
             addStringProperty("color", color)
             addStringProperty("haloColor", haloColor)
-            addStringProperty("strokeColor", strokeColor)
+            addStringProperty("weather", weather)
             addNumberProperty("haloRadius", haloRadius)
             addBooleanProperty("selected", place.id == focusedId)
         }
@@ -292,8 +286,14 @@ private fun addBubbleLayer(style: Style) {
         CircleLayer(HALO_LAYER_ID, PLACES_SOURCE_ID).withProperties(
             PropertyFactory.circleRadius(Expression.get("haloRadius")),
             PropertyFactory.circleColor(Expression.toColor(Expression.get("haloColor"))),
-            PropertyFactory.circleOpacity(0.24f),
-            PropertyFactory.circleStrokeColor(Expression.toColor(Expression.get("strokeColor"))),
+            PropertyFactory.circleOpacity(
+                Expression.switchCase(
+                    Expression.eq(Expression.get("weather"), Expression.literal("sunny")),
+                    Expression.literal(0.22f),
+                    Expression.literal(0.18f)
+                )
+            ),
+            PropertyFactory.circleStrokeColor(Expression.toColor(Expression.get("haloColor"))),
             PropertyFactory.circleStrokeWidth(
                 Expression.switchCase(
                     Expression.eq(Expression.get("selected"), Expression.literal(true)),
