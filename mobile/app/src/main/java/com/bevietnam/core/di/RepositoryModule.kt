@@ -5,6 +5,7 @@ import com.bevietnam.core.data.repository.UserRepository
 import com.bevietnam.core.data.mock.MockPlaceRepository
 import com.bevietnam.core.data.mock.MockFeedRepository
 import com.bevietnam.core.data.mock.MockTaskRepository
+import com.bevietnam.core.data.repository.FeedRepository
 import com.bevietnam.core.data.mock.MockCaptureRepository
 import com.bevietnam.core.data.repository.HealthRepository
 import com.bevietnam.core.domain.repository.IAuthRepository
@@ -52,7 +53,7 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindFeedRepository(
-        feedRepository: MockFeedRepository
+        feedRepository: FeedRepository
     ): IFeedRepository
 
     @Binds
