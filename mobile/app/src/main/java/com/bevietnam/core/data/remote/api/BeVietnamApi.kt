@@ -10,6 +10,10 @@ import com.bevietnam.core.data.remote.api.dto.PlacesResponseDto
 import com.bevietnam.core.data.remote.api.dto.RegisterRequestDto
 import com.bevietnam.core.data.remote.api.dto.UserDto
 import com.bevietnam.core.data.remote.api.dto.WeatherResponseDto
+import com.bevietnam.core.data.remote.api.dto.QuestChainResponseDto
+import com.bevietnam.core.data.remote.api.dto.StorylineNextTaskResponseDto
+import com.bevietnam.core.data.remote.api.dto.VerifyTaskCaptureBodyDto
+import com.bevietnam.core.data.remote.api.dto.VerifyTaskCaptureResponseDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -79,4 +83,26 @@ interface BeVietnamApi {
      */
     @GET("feed")
     suspend fun getFeed(): FeedResponseDto
+
+    @GET("storyline/quest")
+    suspend fun getQuestChain(
+        @Query("user_id") userId: String,
+        @Query("quest_id") questId: String = "quest-hue-imperial"
+    ): QuestChainResponseDto
+
+    @GET("storyline/next-task")
+    suspend fun getNextTask(
+        @Query("user_id") userId: String,
+        @Query("latitude") latitude: Double? = null,
+        @Query("longitude") longitude: Double? = null,
+        @Query("weather") weather: String? = null,
+        @Query("time_of_day") timeOfDay: String? = null,
+        @Query("interests") interests: List<String>? = null,
+        @Query("completed_question_ids") completedQuestionIds: List<String>? = null
+    ): StorylineNextTaskResponseDto
+
+    @POST("storyline/verify-capture")
+    suspend fun verifyCapture(
+        @Body body: VerifyTaskCaptureBodyDto
+    ): VerifyTaskCaptureResponseDto
 }
