@@ -4,13 +4,14 @@ Capture Judge — verifies that a user's photo actually matches the task.
 Pipeline:
   1. Decode the uploaded image (base64 data URL or hosted URL).
   2. Fetch a reference photo of the task's subject (SerpAPI → cached on disk).
-  3. Ask Gemini vision to score the upload against the reference + task text on a
-     deterministic rubric, returning a confidence in [0, 1].
+  3. Ask the self-hosted vLLM vision model (qwen2.5-vl) to score the upload
+     against the reference + task text on a deterministic rubric, returning a
+     confidence in [0, 1].
   4. Map the score to approved / needs_review / rejected.
 
 If no reference image is available (no SerpAPI key) it still judges the upload
-against the task description alone. If vision is unavailable (no Gemini key /
-call fails) it returns needs_review rather than blindly approving.
+against the task description alone. If vision is unavailable (vLLM down / call
+fails) it returns needs_review rather than blindly approving.
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ import logging
 import httpx
 
 from services.ai.agents.capture_judge.reference import get_reference_image
-from services.ai.common.llm import llm_gateway
+from services.ai.common.llm import vllm_gateway
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +132,7 @@ class CaptureJudge:
             images.append(reference)
         images.append(user_image)
 
-        result = llm_gateway.generate_json_multimodal(
+        result = vllm_gateway.generate_json_multimodal(
             system_prompt=_RUBRIC_SYSTEM,
             user_prompt=_user_prompt(task, has_reference=reference is not None),
             images=images,
